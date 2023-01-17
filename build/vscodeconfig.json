@@ -1,0 +1,401 @@
+[
+  {
+    "name": "linuxathena",
+    "architecture": "arm-v7",
+    "operatingSystem": "linux",
+    "flavor": "default",
+    "buildType": "debug",
+    "cppPath": "C:\\Users\\Public\\wpilib\\2023\\roborio\\bin\\arm-frc2023-linux-gnueabi-g++.exe",
+    "cPath": "C:\\Users\\Public\\wpilib\\2023\\roborio\\bin\\arm-frc2023-linux-gnueabi-gcc.exe",
+    "msvc": false,
+    "gcc": true,
+    "systemCppMacros": [],
+    "systemCppArgs": [],
+    "systemCMacros": [],
+    "systemCArgs": [],
+    "allLibFiles": [
+      "C:\\Users\\Oscar\\.gradle\\caches\\transforms-3\\15e8da222faf78d91ba91e98828d7442\\transformed\\wpilibNewCommands-cpp-2023.1.1-headers\\",
+      "C:\\Users\\Oscar\\.gradle\\caches\\transforms-3\\dce223fa984c82063e0bb9df41171b16\\transformed\\wpilibc-cpp-2023.1.1-headers\\",
+      "C:\\Users\\Oscar\\.gradle\\caches\\transforms-3\\214b8752c4c09675d18e415f63a256e4\\transformed\\ntcore-cpp-2023.1.1-headers\\",
+      "C:\\Users\\Oscar\\.gradle\\caches\\transforms-3\\360a603a165585da8dd969e454b2b8f5\\transformed\\hal-cpp-2023.1.1-headers\\",
+      "C:\\Users\\Oscar\\.gradle\\caches\\transforms-3\\12ed0b1551d5867598b9351625f052d3\\transformed\\wpimath-cpp-2023.1.1-headers\\",
+      "C:\\Users\\Oscar\\.gradle\\caches\\transforms-3\\20156f0a8f23d96fbc966a7259384ba4\\transformed\\wpinet-cpp-2023.1.1-headers\\",
+      "C:\\Users\\Oscar\\.gradle\\caches\\transforms-3\\30ff12426ca5dbc27dcdb8d34f5ca2d2\\transformed\\wpiutil-cpp-2023.1.1-headers\\",
+      "C:\\Users\\Oscar\\.gradle\\caches\\transforms-3\\f0cde09cc5a0844311328c3670c7875f\\transformed\\netcomm-2023.3.0-headers\\",
+      "C:\\Users\\Oscar\\.gradle\\caches\\transforms-3\\0e52dc9417cfe1cc95bd3735fdb5241b\\transformed\\chipobject-2023.3.0-headers\\",
+      "C:\\Users\\Oscar\\.gradle\\caches\\transforms-3\\631ea71821ee8460d0baba8543a482bc\\transformed\\visa-2023.3.0-headers\\",
+      "C:\\Users\\Oscar\\.gradle\\caches\\transforms-3\\02d20b9ccbfff079a8ed22fa02367f2c\\transformed\\cameraserver-cpp-2023.1.1-headers\\",
+      "C:\\Users\\Oscar\\.gradle\\caches\\transforms-3\\cb382a8c5374b586bcfcd5928db8092c\\transformed\\cscore-cpp-2023.1.1-headers\\",
+      "C:\\Users\\Oscar\\.gradle\\caches\\transforms-3\\6af02709045476b20a907b94c716519e\\transformed\\apriltag-cpp-2023.1.1-headers\\",
+      "C:\\Users\\Oscar\\.gradle\\caches\\transforms-3\\942e54c2eacf2d899f16791245c3073c\\transformed\\opencv-cpp-4.6.0-4-headers\\",
+      "C:\\Users\\Oscar\\Robotics\\Source\\FRC2023-Homunculus-Imported\\src\\main\\include\\",
+      "C:\\Users\\Oscar\\.gradle\\caches\\transforms-3\\58e7fb4dd30c23f85f40d3cea9aa9f32\\transformed\\wpilibNewCommands-cpp-2023.1.1-sources\\",
+      "C:\\Users\\Oscar\\.gradle\\caches\\transforms-3\\bd573e092b799b46c82440c781ddb06a\\transformed\\wpilibc-cpp-2023.1.1-sources\\",
+      "C:\\Users\\Oscar\\.gradle\\caches\\transforms-3\\d6716308020458a93c50cdbd74fc74b7\\transformed\\ntcore-cpp-2023.1.1-sources\\",
+      "C:\\Users\\Oscar\\.gradle\\caches\\transforms-3\\bc17d47a9442b926a1f2866258a933d9\\transformed\\hal-cpp-2023.1.1-sources\\",
+      "C:\\Users\\Oscar\\.gradle\\caches\\transforms-3\\6d208439f9db2ffe9981581cc9fa13b9\\transformed\\wpimath-cpp-2023.1.1-sources\\",
+      "C:\\Users\\Oscar\\.gradle\\caches\\transforms-3\\7acf057eb0f1c8db2a51a7d7f4520e4d\\transformed\\wpinet-cpp-2023.1.1-sources\\",
+      "C:\\Users\\Oscar\\.gradle\\caches\\transforms-3\\5fdc1901af1e1a7fe1c176e29a5545af\\transformed\\wpiutil-cpp-2023.1.1-sources\\",
+      "C:\\Users\\Oscar\\.gradle\\caches\\transforms-3\\e4d9268066c1651bcab5a8807229d77b\\transformed\\cameraserver-cpp-2023.1.1-sources\\",
+      "C:\\Users\\Oscar\\.gradle\\caches\\transforms-3\\89e38f3a57fb9f31b4658412230f1b2e\\transformed\\cscore-cpp-2023.1.1-sources\\",
+      "C:\\Users\\Oscar\\.gradle\\caches\\transforms-3\\c1c12722c5f264c89e5b6b70d2ff9564\\transformed\\apriltag-cpp-2023.1.1-sources\\",
+      "C:\\Users\\Oscar\\.gradle\\caches\\transforms-3\\6c659e4983da2bac7f3ce4150e3300d2\\transformed\\opencv-cpp-4.6.0-4-sources\\"
+    ],
+    "allLibSources": [
+      "C:\\Users\\Oscar\\.gradle\\caches\\transforms-3\\58e7fb4dd30c23f85f40d3cea9aa9f32\\transformed\\wpilibNewCommands-cpp-2023.1.1-sources\\",
+      "C:\\Users\\Oscar\\.gradle\\caches\\transforms-3\\bd573e092b799b46c82440c781ddb06a\\transformed\\wpilibc-cpp-2023.1.1-sources\\",
+      "C:\\Users\\Oscar\\.gradle\\caches\\transforms-3\\d6716308020458a93c50cdbd74fc74b7\\transformed\\ntcore-cpp-2023.1.1-sources\\",
+      "C:\\Users\\Oscar\\.gradle\\caches\\transforms-3\\bc17d47a9442b926a1f2866258a933d9\\transformed\\hal-cpp-2023.1.1-sources\\",
+      "C:\\Users\\Oscar\\.gradle\\caches\\transforms-3\\6d208439f9db2ffe9981581cc9fa13b9\\transformed\\wpimath-cpp-2023.1.1-sources\\",
+      "C:\\Users\\Oscar\\.gradle\\caches\\transforms-3\\7acf057eb0f1c8db2a51a7d7f4520e4d\\transformed\\wpinet-cpp-2023.1.1-sources\\",
+      "C:\\Users\\Oscar\\.gradle\\caches\\transforms-3\\5fdc1901af1e1a7fe1c176e29a5545af\\transformed\\wpiutil-cpp-2023.1.1-sources\\",
+      "C:\\Users\\Oscar\\.gradle\\caches\\transforms-3\\e4d9268066c1651bcab5a8807229d77b\\transformed\\cameraserver-cpp-2023.1.1-sources\\",
+      "C:\\Users\\Oscar\\.gradle\\caches\\transforms-3\\89e38f3a57fb9f31b4658412230f1b2e\\transformed\\cscore-cpp-2023.1.1-sources\\",
+      "C:\\Users\\Oscar\\.gradle\\caches\\transforms-3\\c1c12722c5f264c89e5b6b70d2ff9564\\transformed\\apriltag-cpp-2023.1.1-sources\\",
+      "C:\\Users\\Oscar\\.gradle\\caches\\transforms-3\\6c659e4983da2bac7f3ce4150e3300d2\\transformed\\opencv-cpp-4.6.0-4-sources\\"
+    ],
+    "allLibHeaders": [
+      "C:\\Users\\Oscar\\.gradle\\caches\\transforms-3\\15e8da222faf78d91ba91e98828d7442\\transformed\\wpilibNewCommands-cpp-2023.1.1-headers\\",
+      "C:\\Users\\Oscar\\.gradle\\caches\\transforms-3\\dce223fa984c82063e0bb9df41171b16\\transformed\\wpilibc-cpp-2023.1.1-headers\\",
+      "C:\\Users\\Oscar\\.gradle\\caches\\transforms-3\\214b8752c4c09675d18e415f63a256e4\\transformed\\ntcore-cpp-2023.1.1-headers\\",
+      "C:\\Users\\Oscar\\.gradle\\caches\\transforms-3\\360a603a165585da8dd969e454b2b8f5\\transformed\\hal-cpp-2023.1.1-headers\\",
+      "C:\\Users\\Oscar\\.gradle\\caches\\transforms-3\\12ed0b1551d5867598b9351625f052d3\\transformed\\wpimath-cpp-2023.1.1-headers\\",
+      "C:\\Users\\Oscar\\.gradle\\caches\\transforms-3\\20156f0a8f23d96fbc966a7259384ba4\\transformed\\wpinet-cpp-2023.1.1-headers\\",
+      "C:\\Users\\Oscar\\.gradle\\caches\\transforms-3\\30ff12426ca5dbc27dcdb8d34f5ca2d2\\transformed\\wpiutil-cpp-2023.1.1-headers\\",
+      "C:\\Users\\Oscar\\.gradle\\caches\\transforms-3\\f0cde09cc5a0844311328c3670c7875f\\transformed\\netcomm-2023.3.0-headers\\",
+      "C:\\Users\\Oscar\\.gradle\\caches\\transforms-3\\0e52dc9417cfe1cc95bd3735fdb5241b\\transformed\\chipobject-2023.3.0-headers\\",
+      "C:\\Users\\Oscar\\.gradle\\caches\\transforms-3\\631ea71821ee8460d0baba8543a482bc\\transformed\\visa-2023.3.0-headers\\",
+      "C:\\Users\\Oscar\\.gradle\\caches\\transforms-3\\02d20b9ccbfff079a8ed22fa02367f2c\\transformed\\cameraserver-cpp-2023.1.1-headers\\",
+      "C:\\Users\\Oscar\\.gradle\\caches\\transforms-3\\cb382a8c5374b586bcfcd5928db8092c\\transformed\\cscore-cpp-2023.1.1-headers\\",
+      "C:\\Users\\Oscar\\.gradle\\caches\\transforms-3\\6af02709045476b20a907b94c716519e\\transformed\\apriltag-cpp-2023.1.1-headers\\",
+      "C:\\Users\\Oscar\\.gradle\\caches\\transforms-3\\942e54c2eacf2d899f16791245c3073c\\transformed\\opencv-cpp-4.6.0-4-headers\\",
+      "C:\\Users\\Oscar\\Robotics\\Source\\FRC2023-Homunculus-Imported\\src\\main\\include\\"
+    ],
+    "binaries": [
+      {
+        "componentName": "frcUserProgram",
+        "sourceSets": [
+          {
+            "source": {
+              "srcDirs": [
+                "C:\\Users\\Oscar\\Robotics\\Source\\FRC2023-Homunculus-Imported\\src\\main\\cpp\\"
+              ],
+              "includes": [
+                "**/*.cpp",
+                "**/*.cc"
+              ],
+              "excludes": []
+            },
+            "exportedHeaders": {
+              "srcDirs": [
+                "C:\\Users\\Oscar\\Robotics\\Source\\FRC2023-Homunculus-Imported\\src\\main\\include\\"
+              ],
+              "includes": [],
+              "excludes": []
+            },
+            "cpp": true,
+            "args": [
+              "-Wall",
+              "-Wextra",
+              "-std=c++20",
+              "-Wformat=2",
+              "-pedantic",
+              "-Wno-psabi",
+              "-Wno-unused-parameter",
+              "-Wno-error=deprecated-declarations",
+              "-fPIC",
+              "-pthread",
+              "-Wno-error=deprecated-enum-enum-conversion",
+              "-Og",
+              "-g"
+            ],
+            "macros": []
+          }
+        ],
+        "libHeaders": [
+          "C:\\Users\\Oscar\\.gradle\\caches\\transforms-3\\15e8da222faf78d91ba91e98828d7442\\transformed\\wpilibNewCommands-cpp-2023.1.1-headers\\",
+          "C:\\Users\\Oscar\\.gradle\\caches\\transforms-3\\dce223fa984c82063e0bb9df41171b16\\transformed\\wpilibc-cpp-2023.1.1-headers\\",
+          "C:\\Users\\Oscar\\.gradle\\caches\\transforms-3\\214b8752c4c09675d18e415f63a256e4\\transformed\\ntcore-cpp-2023.1.1-headers\\",
+          "C:\\Users\\Oscar\\.gradle\\caches\\transforms-3\\360a603a165585da8dd969e454b2b8f5\\transformed\\hal-cpp-2023.1.1-headers\\",
+          "C:\\Users\\Oscar\\.gradle\\caches\\transforms-3\\12ed0b1551d5867598b9351625f052d3\\transformed\\wpimath-cpp-2023.1.1-headers\\",
+          "C:\\Users\\Oscar\\.gradle\\caches\\transforms-3\\20156f0a8f23d96fbc966a7259384ba4\\transformed\\wpinet-cpp-2023.1.1-headers\\",
+          "C:\\Users\\Oscar\\.gradle\\caches\\transforms-3\\30ff12426ca5dbc27dcdb8d34f5ca2d2\\transformed\\wpiutil-cpp-2023.1.1-headers\\",
+          "C:\\Users\\Oscar\\.gradle\\caches\\transforms-3\\f0cde09cc5a0844311328c3670c7875f\\transformed\\netcomm-2023.3.0-headers\\",
+          "C:\\Users\\Oscar\\.gradle\\caches\\transforms-3\\0e52dc9417cfe1cc95bd3735fdb5241b\\transformed\\chipobject-2023.3.0-headers\\",
+          "C:\\Users\\Oscar\\.gradle\\caches\\transforms-3\\631ea71821ee8460d0baba8543a482bc\\transformed\\visa-2023.3.0-headers\\",
+          "C:\\Users\\Oscar\\.gradle\\caches\\transforms-3\\02d20b9ccbfff079a8ed22fa02367f2c\\transformed\\cameraserver-cpp-2023.1.1-headers\\",
+          "C:\\Users\\Oscar\\.gradle\\caches\\transforms-3\\cb382a8c5374b586bcfcd5928db8092c\\transformed\\cscore-cpp-2023.1.1-headers\\",
+          "C:\\Users\\Oscar\\.gradle\\caches\\transforms-3\\6af02709045476b20a907b94c716519e\\transformed\\apriltag-cpp-2023.1.1-headers\\",
+          "C:\\Users\\Oscar\\.gradle\\caches\\transforms-3\\942e54c2eacf2d899f16791245c3073c\\transformed\\opencv-cpp-4.6.0-4-headers\\",
+          "C:\\Users\\Oscar\\Robotics\\Source\\FRC2023-Homunculus-Imported\\src\\main\\include\\"
+        ],
+        "sharedLibrary": false,
+        "executable": true
+      }
+    ],
+    "sourceBinaries": [
+      {
+        "source": {
+          "srcDirs": [
+            "C:\\Users\\Oscar\\Robotics\\Source\\FRC2023-Homunculus-Imported\\src\\main\\cpp\\"
+          ],
+          "includes": [
+            "**/*.cpp",
+            "**/*.cc"
+          ],
+          "excludes": []
+        },
+        "componentName": "frcUserProgram",
+        "cpp": true,
+        "args": [
+          "-Wall",
+          "-Wextra",
+          "-std=c++20",
+          "-Wformat=2",
+          "-pedantic",
+          "-Wno-psabi",
+          "-Wno-unused-parameter",
+          "-Wno-error=deprecated-declarations",
+          "-fPIC",
+          "-pthread",
+          "-Wno-error=deprecated-enum-enum-conversion",
+          "-Og",
+          "-g"
+        ],
+        "macros": [],
+        "sharedLibrary": false,
+        "executable": true
+      },
+      {
+        "source": {
+          "srcDirs": [
+            "C:\\Users\\Oscar\\Robotics\\Source\\FRC2023-Homunculus-Imported\\src\\main\\include\\"
+          ],
+          "includes": [],
+          "excludes": []
+        },
+        "componentName": "frcUserProgram",
+        "cpp": true,
+        "args": [
+          "-Wall",
+          "-Wextra",
+          "-std=c++20",
+          "-Wformat=2",
+          "-pedantic",
+          "-Wno-psabi",
+          "-Wno-unused-parameter",
+          "-Wno-error=deprecated-declarations",
+          "-fPIC",
+          "-pthread",
+          "-Wno-error=deprecated-enum-enum-conversion",
+          "-Og",
+          "-g"
+        ],
+        "macros": [],
+        "sharedLibrary": false,
+        "executable": true
+      }
+    ],
+    "nameBinaryMap": {
+      "frcUserProgram": 0
+    }
+  },
+  {
+    "name": "linuxathena",
+    "architecture": "arm-v7",
+    "operatingSystem": "linux",
+    "flavor": "default",
+    "buildType": "release",
+    "cppPath": "C:\\Users\\Public\\wpilib\\2023\\roborio\\bin\\arm-frc2023-linux-gnueabi-g++.exe",
+    "cPath": "C:\\Users\\Public\\wpilib\\2023\\roborio\\bin\\arm-frc2023-linux-gnueabi-gcc.exe",
+    "msvc": false,
+    "gcc": true,
+    "systemCppMacros": [],
+    "systemCppArgs": [],
+    "systemCMacros": [],
+    "systemCArgs": [],
+    "allLibFiles": [
+      "C:\\Users\\Oscar\\.gradle\\caches\\transforms-3\\15e8da222faf78d91ba91e98828d7442\\transformed\\wpilibNewCommands-cpp-2023.1.1-headers\\",
+      "C:\\Users\\Oscar\\.gradle\\caches\\transforms-3\\dce223fa984c82063e0bb9df41171b16\\transformed\\wpilibc-cpp-2023.1.1-headers\\",
+      "C:\\Users\\Oscar\\.gradle\\caches\\transforms-3\\214b8752c4c09675d18e415f63a256e4\\transformed\\ntcore-cpp-2023.1.1-headers\\",
+      "C:\\Users\\Oscar\\.gradle\\caches\\transforms-3\\360a603a165585da8dd969e454b2b8f5\\transformed\\hal-cpp-2023.1.1-headers\\",
+      "C:\\Users\\Oscar\\.gradle\\caches\\transforms-3\\12ed0b1551d5867598b9351625f052d3\\transformed\\wpimath-cpp-2023.1.1-headers\\",
+      "C:\\Users\\Oscar\\.gradle\\caches\\transforms-3\\20156f0a8f23d96fbc966a7259384ba4\\transformed\\wpinet-cpp-2023.1.1-headers\\",
+      "C:\\Users\\Oscar\\.gradle\\caches\\transforms-3\\30ff12426ca5dbc27dcdb8d34f5ca2d2\\transformed\\wpiutil-cpp-2023.1.1-headers\\",
+      "C:\\Users\\Oscar\\.gradle\\caches\\transforms-3\\f0cde09cc5a0844311328c3670c7875f\\transformed\\netcomm-2023.3.0-headers\\",
+      "C:\\Users\\Oscar\\.gradle\\caches\\transforms-3\\0e52dc9417cfe1cc95bd3735fdb5241b\\transformed\\chipobject-2023.3.0-headers\\",
+      "C:\\Users\\Oscar\\.gradle\\caches\\transforms-3\\631ea71821ee8460d0baba8543a482bc\\transformed\\visa-2023.3.0-headers\\",
+      "C:\\Users\\Oscar\\.gradle\\caches\\transforms-3\\02d20b9ccbfff079a8ed22fa02367f2c\\transformed\\cameraserver-cpp-2023.1.1-headers\\",
+      "C:\\Users\\Oscar\\.gradle\\caches\\transforms-3\\cb382a8c5374b586bcfcd5928db8092c\\transformed\\cscore-cpp-2023.1.1-headers\\",
+      "C:\\Users\\Oscar\\.gradle\\caches\\transforms-3\\6af02709045476b20a907b94c716519e\\transformed\\apriltag-cpp-2023.1.1-headers\\",
+      "C:\\Users\\Oscar\\.gradle\\caches\\transforms-3\\942e54c2eacf2d899f16791245c3073c\\transformed\\opencv-cpp-4.6.0-4-headers\\",
+      "C:\\Users\\Oscar\\Robotics\\Source\\FRC2023-Homunculus-Imported\\src\\main\\include\\",
+      "C:\\Users\\Oscar\\.gradle\\caches\\transforms-3\\58e7fb4dd30c23f85f40d3cea9aa9f32\\transformed\\wpilibNewCommands-cpp-2023.1.1-sources\\",
+      "C:\\Users\\Oscar\\.gradle\\caches\\transforms-3\\bd573e092b799b46c82440c781ddb06a\\transformed\\wpilibc-cpp-2023.1.1-sources\\",
+      "C:\\Users\\Oscar\\.gradle\\caches\\transforms-3\\d6716308020458a93c50cdbd74fc74b7\\transformed\\ntcore-cpp-2023.1.1-sources\\",
+      "C:\\Users\\Oscar\\.gradle\\caches\\transforms-3\\bc17d47a9442b926a1f2866258a933d9\\transformed\\hal-cpp-2023.1.1-sources\\",
+      "C:\\Users\\Oscar\\.gradle\\caches\\transforms-3\\6d208439f9db2ffe9981581cc9fa13b9\\transformed\\wpimath-cpp-2023.1.1-sources\\",
+      "C:\\Users\\Oscar\\.gradle\\caches\\transforms-3\\7acf057eb0f1c8db2a51a7d7f4520e4d\\transformed\\wpinet-cpp-2023.1.1-sources\\",
+      "C:\\Users\\Oscar\\.gradle\\caches\\transforms-3\\5fdc1901af1e1a7fe1c176e29a5545af\\transformed\\wpiutil-cpp-2023.1.1-sources\\",
+      "C:\\Users\\Oscar\\.gradle\\caches\\transforms-3\\e4d9268066c1651bcab5a8807229d77b\\transformed\\cameraserver-cpp-2023.1.1-sources\\",
+      "C:\\Users\\Oscar\\.gradle\\caches\\transforms-3\\89e38f3a57fb9f31b4658412230f1b2e\\transformed\\cscore-cpp-2023.1.1-sources\\",
+      "C:\\Users\\Oscar\\.gradle\\caches\\transforms-3\\c1c12722c5f264c89e5b6b70d2ff9564\\transformed\\apriltag-cpp-2023.1.1-sources\\",
+      "C:\\Users\\Oscar\\.gradle\\caches\\transforms-3\\6c659e4983da2bac7f3ce4150e3300d2\\transformed\\opencv-cpp-4.6.0-4-sources\\"
+    ],
+    "allLibSources": [
+      "C:\\Users\\Oscar\\.gradle\\caches\\transforms-3\\58e7fb4dd30c23f85f40d3cea9aa9f32\\transformed\\wpilibNewCommands-cpp-2023.1.1-sources\\",
+      "C:\\Users\\Oscar\\.gradle\\caches\\transforms-3\\bd573e092b799b46c82440c781ddb06a\\transformed\\wpilibc-cpp-2023.1.1-sources\\",
+      "C:\\Users\\Oscar\\.gradle\\caches\\transforms-3\\d6716308020458a93c50cdbd74fc74b7\\transformed\\ntcore-cpp-2023.1.1-sources\\",
+      "C:\\Users\\Oscar\\.gradle\\caches\\transforms-3\\bc17d47a9442b926a1f2866258a933d9\\transformed\\hal-cpp-2023.1.1-sources\\",
+      "C:\\Users\\Oscar\\.gradle\\caches\\transforms-3\\6d208439f9db2ffe9981581cc9fa13b9\\transformed\\wpimath-cpp-2023.1.1-sources\\",
+      "C:\\Users\\Oscar\\.gradle\\caches\\transforms-3\\7acf057eb0f1c8db2a51a7d7f4520e4d\\transformed\\wpinet-cpp-2023.1.1-sources\\",
+      "C:\\Users\\Oscar\\.gradle\\caches\\transforms-3\\5fdc1901af1e1a7fe1c176e29a5545af\\transformed\\wpiutil-cpp-2023.1.1-sources\\",
+      "C:\\Users\\Oscar\\.gradle\\caches\\transforms-3\\e4d9268066c1651bcab5a8807229d77b\\transformed\\cameraserver-cpp-2023.1.1-sources\\",
+      "C:\\Users\\Oscar\\.gradle\\caches\\transforms-3\\89e38f3a57fb9f31b4658412230f1b2e\\transformed\\cscore-cpp-2023.1.1-sources\\",
+      "C:\\Users\\Oscar\\.gradle\\caches\\transforms-3\\c1c12722c5f264c89e5b6b70d2ff9564\\transformed\\apriltag-cpp-2023.1.1-sources\\",
+      "C:\\Users\\Oscar\\.gradle\\caches\\transforms-3\\6c659e4983da2bac7f3ce4150e3300d2\\transformed\\opencv-cpp-4.6.0-4-sources\\"
+    ],
+    "allLibHeaders": [
+      "C:\\Users\\Oscar\\.gradle\\caches\\transforms-3\\15e8da222faf78d91ba91e98828d7442\\transformed\\wpilibNewCommands-cpp-2023.1.1-headers\\",
+      "C:\\Users\\Oscar\\.gradle\\caches\\transforms-3\\dce223fa984c82063e0bb9df41171b16\\transformed\\wpilibc-cpp-2023.1.1-headers\\",
+      "C:\\Users\\Oscar\\.gradle\\caches\\transforms-3\\214b8752c4c09675d18e415f63a256e4\\transformed\\ntcore-cpp-2023.1.1-headers\\",
+      "C:\\Users\\Oscar\\.gradle\\caches\\transforms-3\\360a603a165585da8dd969e454b2b8f5\\transformed\\hal-cpp-2023.1.1-headers\\",
+      "C:\\Users\\Oscar\\.gradle\\caches\\transforms-3\\12ed0b1551d5867598b9351625f052d3\\transformed\\wpimath-cpp-2023.1.1-headers\\",
+      "C:\\Users\\Oscar\\.gradle\\caches\\transforms-3\\20156f0a8f23d96fbc966a7259384ba4\\transformed\\wpinet-cpp-2023.1.1-headers\\",
+      "C:\\Users\\Oscar\\.gradle\\caches\\transforms-3\\30ff12426ca5dbc27dcdb8d34f5ca2d2\\transformed\\wpiutil-cpp-2023.1.1-headers\\",
+      "C:\\Users\\Oscar\\.gradle\\caches\\transforms-3\\f0cde09cc5a0844311328c3670c7875f\\transformed\\netcomm-2023.3.0-headers\\",
+      "C:\\Users\\Oscar\\.gradle\\caches\\transforms-3\\0e52dc9417cfe1cc95bd3735fdb5241b\\transformed\\chipobject-2023.3.0-headers\\",
+      "C:\\Users\\Oscar\\.gradle\\caches\\transforms-3\\631ea71821ee8460d0baba8543a482bc\\transformed\\visa-2023.3.0-headers\\",
+      "C:\\Users\\Oscar\\.gradle\\caches\\transforms-3\\02d20b9ccbfff079a8ed22fa02367f2c\\transformed\\cameraserver-cpp-2023.1.1-headers\\",
+      "C:\\Users\\Oscar\\.gradle\\caches\\transforms-3\\cb382a8c5374b586bcfcd5928db8092c\\transformed\\cscore-cpp-2023.1.1-headers\\",
+      "C:\\Users\\Oscar\\.gradle\\caches\\transforms-3\\6af02709045476b20a907b94c716519e\\transformed\\apriltag-cpp-2023.1.1-headers\\",
+      "C:\\Users\\Oscar\\.gradle\\caches\\transforms-3\\942e54c2eacf2d899f16791245c3073c\\transformed\\opencv-cpp-4.6.0-4-headers\\",
+      "C:\\Users\\Oscar\\Robotics\\Source\\FRC2023-Homunculus-Imported\\src\\main\\include\\"
+    ],
+    "binaries": [
+      {
+        "componentName": "frcUserProgram",
+        "sourceSets": [
+          {
+            "source": {
+              "srcDirs": [
+                "C:\\Users\\Oscar\\Robotics\\Source\\FRC2023-Homunculus-Imported\\src\\main\\cpp\\"
+              ],
+              "includes": [
+                "**/*.cpp",
+                "**/*.cc"
+              ],
+              "excludes": []
+            },
+            "exportedHeaders": {
+              "srcDirs": [
+                "C:\\Users\\Oscar\\Robotics\\Source\\FRC2023-Homunculus-Imported\\src\\main\\include\\"
+              ],
+              "includes": [],
+              "excludes": []
+            },
+            "cpp": true,
+            "args": [
+              "-Wall",
+              "-Wextra",
+              "-std=c++20",
+              "-Wformat=2",
+              "-pedantic",
+              "-Wno-psabi",
+              "-Wno-unused-parameter",
+              "-Wno-error=deprecated-declarations",
+              "-fPIC",
+              "-pthread",
+              "-Wno-error=deprecated-enum-enum-conversion",
+              "-O2"
+            ],
+            "macros": []
+          }
+        ],
+        "libHeaders": [
+          "C:\\Users\\Oscar\\.gradle\\caches\\transforms-3\\15e8da222faf78d91ba91e98828d7442\\transformed\\wpilibNewCommands-cpp-2023.1.1-headers\\",
+          "C:\\Users\\Oscar\\.gradle\\caches\\transforms-3\\dce223fa984c82063e0bb9df41171b16\\transformed\\wpilibc-cpp-2023.1.1-headers\\",
+          "C:\\Users\\Oscar\\.gradle\\caches\\transforms-3\\214b8752c4c09675d18e415f63a256e4\\transformed\\ntcore-cpp-2023.1.1-headers\\",
+          "C:\\Users\\Oscar\\.gradle\\caches\\transforms-3\\360a603a165585da8dd969e454b2b8f5\\transformed\\hal-cpp-2023.1.1-headers\\",
+          "C:\\Users\\Oscar\\.gradle\\caches\\transforms-3\\12ed0b1551d5867598b9351625f052d3\\transformed\\wpimath-cpp-2023.1.1-headers\\",
+          "C:\\Users\\Oscar\\.gradle\\caches\\transforms-3\\20156f0a8f23d96fbc966a7259384ba4\\transformed\\wpinet-cpp-2023.1.1-headers\\",
+          "C:\\Users\\Oscar\\.gradle\\caches\\transforms-3\\30ff12426ca5dbc27dcdb8d34f5ca2d2\\transformed\\wpiutil-cpp-2023.1.1-headers\\",
+          "C:\\Users\\Oscar\\.gradle\\caches\\transforms-3\\f0cde09cc5a0844311328c3670c7875f\\transformed\\netcomm-2023.3.0-headers\\",
+          "C:\\Users\\Oscar\\.gradle\\caches\\transforms-3\\0e52dc9417cfe1cc95bd3735fdb5241b\\transformed\\chipobject-2023.3.0-headers\\",
+          "C:\\Users\\Oscar\\.gradle\\caches\\transforms-3\\631ea71821ee8460d0baba8543a482bc\\transformed\\visa-2023.3.0-headers\\",
+          "C:\\Users\\Oscar\\.gradle\\caches\\transforms-3\\02d20b9ccbfff079a8ed22fa02367f2c\\transformed\\cameraserver-cpp-2023.1.1-headers\\",
+          "C:\\Users\\Oscar\\.gradle\\caches\\transforms-3\\cb382a8c5374b586bcfcd5928db8092c\\transformed\\cscore-cpp-2023.1.1-headers\\",
+          "C:\\Users\\Oscar\\.gradle\\caches\\transforms-3\\6af02709045476b20a907b94c716519e\\transformed\\apriltag-cpp-2023.1.1-headers\\",
+          "C:\\Users\\Oscar\\.gradle\\caches\\transforms-3\\942e54c2eacf2d899f16791245c3073c\\transformed\\opencv-cpp-4.6.0-4-headers\\",
+          "C:\\Users\\Oscar\\Robotics\\Source\\FRC2023-Homunculus-Imported\\src\\main\\include\\"
+        ],
+        "sharedLibrary": false,
+        "executable": true
+      }
+    ],
+    "sourceBinaries": [
+      {
+        "source": {
+          "srcDirs": [
+            "C:\\Users\\Oscar\\Robotics\\Source\\FRC2023-Homunculus-Imported\\src\\main\\cpp\\"
+          ],
+          "includes": [
+            "**/*.cpp",
+            "**/*.cc"
+          ],
+          "excludes": []
+        },
+        "componentName": "frcUserProgram",
+        "cpp": true,
+        "args": [
+          "-Wall",
+          "-Wextra",
+          "-std=c++20",
+          "-Wformat=2",
+          "-pedantic",
+          "-Wno-psabi",
+          "-Wno-unused-parameter",
+          "-Wno-error=deprecated-declarations",
+          "-fPIC",
+          "-pthread",
+          "-Wno-error=deprecated-enum-enum-conversion",
+          "-O2"
+        ],
+        "macros": [],
+        "sharedLibrary": false,
+        "executable": true
+      },
+      {
+        "source": {
+          "srcDirs": [
+            "C:\\Users\\Oscar\\Robotics\\Source\\FRC2023-Homunculus-Imported\\src\\main\\include\\"
+          ],
+          "includes": [],
+          "excludes": []
+        },
+        "componentName": "frcUserProgram",
+        "cpp": true,
+        "args": [
+          "-Wall",
+          "-Wextra",
+          "-std=c++20",
+          "-Wformat=2",
+          "-pedantic",
+          "-Wno-psabi",
+          "-Wno-unused-parameter",
+          "-Wno-error=deprecated-declarations",
+          "-fPIC",
+          "-pthread",
+          "-Wno-error=deprecated-enum-enum-conversion",
+          "-O2"
+        ],
+        "macros": [],
+        "sharedLibrary": false,
+        "executable": true
+      }
+    ],
+    "nameBinaryMap": {
+      "frcUserProgram": 0
+    }
+  }
+]
