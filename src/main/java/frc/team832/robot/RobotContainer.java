@@ -3,11 +3,14 @@ package frc.team832.robot;
 import org.photonvision.PhotonCamera;
 
 import edu.wpi.first.math.filter.SlewRateLimiter;
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.Compressor;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import frc.team832.robot.subsystems.DrivetrainSubsystem;
 import frc.team832.robot.subsystems.VisionSubsystem;
+import lombok.Getter;
+import lombok.Setter;
 
 
 
@@ -20,10 +23,9 @@ import frc.team832.robot.subsystems.VisionSubsystem;
 
 public class RobotContainer {
   /** Control system objects **/
-  public static final Compressor compressor =
-      new Compressor(Constants.RPH_CAN_ID, PneumaticsModuleType.REVPH);
-
-  public void setAutoPose() {}
+  @Setter
+  @Getter
+  private Pose2d autoPose;
 
   /** Subsystems **/
   public final DrivetrainSubsystem drivetrain = new DrivetrainSubsystem();
