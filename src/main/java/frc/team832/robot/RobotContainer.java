@@ -13,7 +13,6 @@ import frc.team832.robot.subsystems.DrivetrainSubsystem;
 
 
 
-
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
  * "declarative" paradigm, very little robot logic should actually be handled in the {@link Robot}
@@ -21,20 +20,20 @@ import frc.team832.robot.subsystems.DrivetrainSubsystem;
  * subsystems, commands, and button mappings) should be declared here.
  */
 
- public class RobotContainer {
-    /** Control system objects **/
-    public static final Compressor compressor = new Compressor(Constants.RPH_CAN_ID, PneumaticsModuleType.REVPH);
-    /** Vision Camera**/
+public class RobotContainer {
+  /** Control system objects **/
+  public static final Compressor compressor =
+      new Compressor(Constants.RPH_CAN_ID, PneumaticsModuleType.REVPH);
+  /** Vision Camera **/
   public static final PhotonCamera gloworm = new PhotonCamera("gloworm");
 
-    public void setAutoPose() {
-    }
+  public void setAutoPose() {}
 
-    /** Subsystems **/
-    public final DrivetrainSubsystem drivetrain = new DrivetrainSubsystem(gloworm);
-    /** HID Controllers **/
+  /** Subsystems **/
+  public final DrivetrainSubsystem drivetrain = new DrivetrainSubsystem(gloworm);
+  /** HID Controllers **/
 
-    /** Autonomous Selector **/
+  /** Autonomous Selector **/
   public final AutonomousSelector autoSelector = new AutonomousSelector();
   private final SlewRateLimiter driveLimiter = new SlewRateLimiter(6);
   private final SlewRateLimiter turnLimiter = new SlewRateLimiter(3);
@@ -45,7 +44,7 @@ import frc.team832.robot.subsystems.DrivetrainSubsystem;
     LiveWindow.disableAllTelemetry();
 
 
-    /* Arcade Drive Commands*/
+    /* Arcade Drive Commands */
 
   }
 }
