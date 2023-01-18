@@ -3,13 +3,14 @@ package frc.team832.robot;
 import org.photonvision.PhotonCamera;
 
 import edu.wpi.first.math.filter.SlewRateLimiter;
-import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.Compressor;
-import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
-import frc.team832.AutonomousSelector;
 import frc.team832.robot.subsystems.DrivetrainSubsystem;
+import frc.team832.robot.subsystems.VisionSubsystem;
+import lombok.Getter;
+import lombok.Setter;
 
 
 
@@ -22,21 +23,20 @@ import frc.team832.robot.subsystems.DrivetrainSubsystem;
 
 public class RobotContainer {
   /** Control system objects **/
-  public static final Compressor compressor =
-      new Compressor(Constants.RPH_CAN_ID, PneumaticsModuleType.REVPH);
-  /** Vision Camera **/
-  public static final PhotonCamera gloworm = new PhotonCamera("gloworm");
-
-  public void setAutoPose() {}
+  @Setter
+  @Getter
+  private Pose2d autoPose;
 
   /** Subsystems **/
-  public final DrivetrainSubsystem drivetrain = new DrivetrainSubsystem(gloworm);
+  public final DrivetrainSubsystem drivetrain = new DrivetrainSubsystem();
+
+  public final VisionSubsystem visionSubsystem = new VisionSubsystem();
   /** HID Controllers **/
 
   /** Autonomous Selector **/
   public final AutonomousSelector autoSelector = new AutonomousSelector();
-  private final SlewRateLimiter driveLimiter = new SlewRateLimiter(6);
-  private final SlewRateLimiter turnLimiter = new SlewRateLimiter(3);
+  private final SlewRateLimiter driveRateLimiter = new SlewRateLimiter(6);
+  private final SlewRateLimiter turnRateLimiter = new SlewRateLimiter(3);
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {

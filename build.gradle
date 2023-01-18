@@ -2,6 +2,7 @@ import edu.wpi.first.gradlerio.deploy.roborio.RoboRIO
 plugins {
     id "java"
     id "edu.wpi.first.GradleRIO" version "2023.1.1"
+    id "io.freefair.lombok" version "6.6.1"
 }
 
 sourceCompatibility = JavaVersion.VERSION_11
@@ -43,7 +44,6 @@ def deployArtifact = deploy.targets.roborio.artifacts.frcJava
 def includeDesktopSupport = true
 
 dependencies {
-
     // //Import Grouchlib (likely will be scrapped)
     // implementation project (':GrouchLib')
 

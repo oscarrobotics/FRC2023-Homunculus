@@ -1,5 +1,13 @@
 package frc.team832.robot.subsystems;
 
+import org.photonvision.PhotonCamera;
+
 public class VisionSubsystem {
-    // implement AprilTag vision system somehow
+  protected final String robotCameraName = "robotCamera";
+  protected final PhotonCamera robotPhotonCamera = new PhotonCamera(robotCameraName);
+
+  // TODO: Vision
+  public VisionSubsystem() {
+
+  }
 }

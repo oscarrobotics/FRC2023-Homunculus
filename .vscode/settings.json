@@ -7,8 +7,9 @@
   "[java]": {
     "editor.formatOnSave": true
   },
-  "editor.tabSize": 4,
+  "editor.tabSize": 2,
   "editor.insertSpaces": true,
+  "editor.detectIndentation": false,
   "files.exclude": {
     "**/.git": true,
     "**/.svn": true,
