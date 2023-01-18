@@ -19,9 +19,9 @@ public class Robot extends TimedRobot {
    * class or the package after creating this project, you must also update the build.gradle file in
    * the project.
    */
-  private Command m_autonomousCommand;
+  private Command autonomousCommand;
 
-  private RobotContainer m_robotContainer = new RobotContainer();
+  private RobotContainer robotContainer = new RobotContainer();
 
   /**
    * This function is run when the robot is first started up and should be used for any
@@ -34,7 +34,6 @@ public class Robot extends TimedRobot {
     }
 
     CameraServer.startAutomaticCapture();
-
   }
 
   /**
@@ -55,10 +54,6 @@ public class Robot extends TimedRobot {
 
     double prox = NetworkTableInstance.getDefault().getEntry("proximity1").getDouble(-1);
     System.out.printf("Proximity: %.2f\n", prox);
-
-    if (m_robotContainer.userButton.get()) {
-      m_robotContainer.setAutoPose();
-    }
   }
 
   /** This function is called once each time the robot enters Disabled mode. */
@@ -71,14 +66,14 @@ public class Robot extends TimedRobot {
   /** This autonomous runs the autonomous command selected by your {@link RobotContainer} class. */
   @Override
   public void autonomousInit() {
-    m_autonomousCommand = m_robotContainer.getAutonomousCommand();
+    autonomousCommand = robotContainer.getAutonomousCommand();
     CommandScheduler.getInstance().cancelAll();
 
-    m_robotContainer.setAutoPose();
+    robotContainer.setAutoPose();
 
     // schedule the autonomous command (example)
-    if (m_autonomousCommand != null) {
-      m_autonomousCommand.schedule();
+    if (autonomousCommand != null) {
+      autonomousCommand.schedule();
     }
 
   /** This function is called periodically during autonomous. */
@@ -93,8 +88,8 @@ public class Robot extends TimedRobot {
     // this line or comment it out.
     CommandScheduler.getInstance().cancelAll();
 
-    if (m_autonomousCommand != null) {
-      m_autonomousCommand.cancel();
+    if (autonomousCommand != null) {
+      autonomousCommand.cancel();
     }
 
   /** This function is called periodically during operator control. */
