@@ -5,7 +5,7 @@
   "java.format.settings.url": "https://raw.githubusercontent.com/google/styleguide/gh-pages/eclipse-java-google-style.xml",
   "java.format.settings.profile": "GoogleStyle",
   "[java]": {
-    "editor.formatOnSave": true
+    "editor.formatOnSave": false
   },
   "editor.tabSize": 2,
   "editor.insertSpaces": true,
