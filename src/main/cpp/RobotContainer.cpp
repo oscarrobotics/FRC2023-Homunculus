@@ -7,8 +7,8 @@
 #include <frc/shuffleboard/Shuffleboard.h>
 #include <frc2/command/button/JoystickButton.h>
 
-#include "commands/DefaultDriveCommand.h"
-#include "commands/HalveDriveSpeedCommand.h"
+#include "commands/DefaultArcadeDriveCommand.h"
+#include "commands/UncapDriveSpeedCommand.h"
 
 RobotContainer::RobotContainer()
 {
@@ -19,14 +19,14 @@ RobotContainer::RobotContainer()
 
   ConfigureBindings();
 
-  m_drivetrain.SetDefaultCommand(DefaultDriveCommand(
+  m_drivetrain.SetDefaultCommand(DefaultArcadeDriveCommand(
       &m_drivetrain, [this] { return -m_driverController.GetLeftY(); }, [this] { return -m_driverController.GetRightX(); }));
 }
 
 void RobotContainer::ConfigureBindings()
 {
   frc2::JoystickButton(&m_driverController, frc::XboxController::Button::kRightBumper)
-      .WhileTrue(HalveDriveSpeedCommand(&m_drivetrain).ToPtr());
+      .WhileTrue(UncapDriveSpeedCommand(&m_drivetrain).ToPtr());
 }
 
 frc2::Command *RobotContainer::GetAutonomousCommand()

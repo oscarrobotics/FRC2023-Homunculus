@@ -5,10 +5,10 @@
 
 #include "subsystems/Drivetrain.h"
 
-class DefaultDriveCommand : public frc2::CommandHelper<frc2::CommandBase, DefaultDriveCommand>
+class DefaultArcadeDriveCommand : public frc2::CommandHelper<frc2::CommandBase, DefaultArcadeDriveCommand>
 {
   public:
-  DefaultDriveCommand(Drivetrain *subsystem, std::function<double()> forward, std::function<double()> rotation);
+  DefaultArcadeDriveCommand(Drivetrain *subsystem, std::function<double()> m_forward, std::function<double()> m_rotation);
 
   void Execute() override;
 

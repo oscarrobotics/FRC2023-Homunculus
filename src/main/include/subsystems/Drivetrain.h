@@ -3,7 +3,7 @@
 #include <frc/Encoder.h>
 #include <frc/drive/DifferentialDrive.h>
 #include <frc/motorcontrol/MotorControllerGroup.h>
-#include <frc/motorcontrol/PWMTalonFX.h>
+#include <ctre/phoenix/motorcontrol/can/WPI_TalonFX.h>
 #include <frc2/command/CommandPtr.h>
 #include <frc2/command/SubsystemBase.h>
 
@@ -28,10 +28,10 @@ class Drivetrain : public frc2::SubsystemBase
 
   frc::DifferentialDrive m_diffDrive{m_leftMotors, m_rightMotors};
 
-  frc::PWMTalonFX m_leftMaster{kLeftMasterCANID};
-  frc::PWMTalonFX m_leftDrone{kLeftDroneCANID};
-  frc::PWMTalonFX m_rightMaster{kRightMasterCANID};
-  frc::PWMTalonFX m_rightDrone{kRightDroneCANID};
+  ctre::phoenix::motorcontrol::can::WPI_TalonFX m_leftMaster{kLeftMasterCANID};
+  ctre::phoenix::motorcontrol::can::WPI_TalonFX m_leftDrone{kLeftDroneCANID};
+  ctre::phoenix::motorcontrol::can::WPI_TalonFX m_rightMaster{kRightMasterCANID};
+  ctre::phoenix::motorcontrol::can::WPI_TalonFX m_rightDrone{kRightDroneCANID};
 
   frc::MotorControllerGroup m_leftMotors{m_leftMaster, m_leftDrone};
   frc::MotorControllerGroup m_rightMotors{m_rightMaster, m_rightDrone};

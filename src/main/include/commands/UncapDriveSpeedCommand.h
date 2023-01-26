@@ -5,10 +5,10 @@
 
 #include "subsystems/Drivetrain.h"
 
-class HalveDriveSpeedCommand : public frc2::CommandHelper<frc2::CommandBase, HalveDriveSpeedCommand>
+class UncapDriveSpeedCommand : public frc2::CommandHelper<frc2::CommandBase, UncapDriveSpeedCommand>
 {
   public:
-  explicit HalveDriveSpeedCommand(Drivetrain *subsystem);
+  explicit UncapDriveSpeedCommand(Drivetrain *subsystem);
 
   void Initialize() override;
 
