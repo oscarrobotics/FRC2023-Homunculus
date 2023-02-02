@@ -4,9 +4,11 @@
 
 package frc.robot;
 
+import edu.wpi.first.wpilibj.shuffleboard.EventImportance;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.subsystems.drivetrain.Drivetrain;
@@ -24,7 +26,9 @@ public class RobotContainer {
     configureBindings();
 
     m_drivetrain.setDefaultCommand(Commands.run(() -> {
-      m_drivetrain.arcadeDrive(m_driverController.getLeftY(), m_driverController.getRightX());
+      double modifier = m_driverController.getRightTriggerAxis() * 0.5 + 0.5;
+      m_drivetrain.arcadeDrive(m_driverController.getLeftY() * modifier,
+          m_driverController.getRightX() * modifier);
     }, m_drivetrain));
   }
 

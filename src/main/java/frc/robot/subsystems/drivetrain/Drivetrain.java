@@ -5,6 +5,8 @@ import edu.wpi.first.wpilibj.motorcontrol.MotorControllerGroup;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
+import com.ctre.phoenix.sensors.Pigeon2;
+import com.ctre.phoenix.sensors.WPI_Pigeon2;
 
 public class Drivetrain extends SubsystemBase {
 
@@ -30,9 +32,13 @@ public class Drivetrain extends SubsystemBase {
   public final DifferentialDrive m_differentialDrive =
       new DifferentialDrive(m_leftMotors, m_rightMotors);
 
+  private final WPI_Pigeon2 m_gyro = new WPI_Pigeon2(0);
+
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
+
+    System.out.println(String.format("Roll: %f, Pitch: %f, Yaw: %f", m_gyro.getRoll(), m_gyro.getPitch(), m_gyro.getYaw()));
   }
 
   @Override
