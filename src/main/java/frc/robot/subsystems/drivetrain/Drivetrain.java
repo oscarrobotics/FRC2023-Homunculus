@@ -10,7 +10,10 @@ import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
+import edu.wpi.first.math.kinematics.DifferentialDriveKinematics;
 import edu.wpi.first.math.kinematics.DifferentialDriveOdometry;
+import edu.wpi.first.math.kinematics.DifferentialDriveWheelSpeeds;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.motorcontrol.MotorControllerGroup;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -23,9 +26,13 @@ import org.photonvision.PhotonPoseEstimator.PoseStrategy;
 import org.photonvision.targeting.PhotonTrackedTarget;
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
+import com.ctre.phoenix.motorcontrol.TalonFXFeedbackDevice;
+import com.ctre.phoenix.motorcontrol.can.TalonFXConfiguration;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
+import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.sensors.Pigeon2;
 import com.ctre.phoenix.sensors.WPI_Pigeon2;
+import frc.robot.Constants;
 
 public class Drivetrain extends SubsystemBase {
   
@@ -44,19 +51,60 @@ public class Drivetrain extends SubsystemBase {
       new MotorControllerGroup(m_rightMaster, m_rightDrone);
 
 
-  public final DifferentialDrive m_differentialDrive =
-      new DifferentialDrive(m_leftMotors, m_rightMotors);
+  // public final DifferentialDrive m_differentialDrive =
+  //     new DifferentialDrive(m_leftMotors, m_rightMotors);
+
+  public final DifferentialDriveKinematics m_kinematics =
+      new DifferentialDriveKinematics(Constants.wheelbwidth);
 
   public Drivetrain() {
     m_rightMotors.setInverted(true);
+    m_rightMaster.setInverted(true);
+    m_rightDrone.setInverted(true);
 
     m_leftMaster.setNeutralMode(NeutralMode.Brake);
     m_leftDrone.setNeutralMode(NeutralMode.Brake);
     m_rightMaster.setNeutralMode(NeutralMode.Brake);
     m_rightDrone.setNeutralMode(NeutralMode.Brake);
+    // m_leftMaster.setNeutralMode(NeutralMode.Coast);
+    // m_leftDrone.setNeutralMode(NeutralMode.Coast);
+    // m_rightMaster.setNeutralMode(NeutralMode.Coast);
+    // m_rightDrone.setNeutralMode(NeutralMode.Coast);
+
+      
+    m_leftMaster.configSelectedFeedbackSensor(TalonFXFeedbackDevice.IntegratedSensor, Constants.dkloop, Constants.kTimoutms);
+    m_leftMaster.configNominalOutputForward(0);
+    m_leftMaster.configNominalOutputReverse(0);
+    m_leftMaster.configPeakOutputForward(1);
+    m_leftMaster.configPeakOutputReverse(-1);
+    m_leftMaster.configClosedloopRamp(.5);
+    
+    m_leftMaster.config_kF(Constants.dkslot, Constants.dKf);
+    m_leftMaster.config_kP(Constants.dkslot, Constants.dKp);
+    m_leftMaster.config_kI(Constants.dkslot, Constants.dKi);
+    m_leftMaster.config_kD(Constants.dkslot, Constants.dKd);
+    m_leftMaster.config_IntegralZone(Constants.dkslot, Constants.dIz);
+    
+
+
+    m_rightMaster.configSelectedFeedbackSensor(TalonFXFeedbackDevice.IntegratedSensor, Constants.dkloop, Constants.kTimoutms);
+    m_rightMaster.configNominalOutputForward(0);
+    m_rightMaster.configNominalOutputReverse(0);
+    m_rightMaster.configPeakOutputForward(1);
+    m_rightMaster.configPeakOutputReverse(-1);
+    m_rightMaster.configClosedloopRamp(.5);
+
+    m_rightMaster.config_kF(Constants.dkslot, Constants.dKf);
+    m_rightMaster.config_kP(Constants.dkslot, Constants.dKp);
+    m_rightMaster.config_kI(Constants.dkslot, Constants.dKi);
+    m_rightMaster.config_kD(Constants.dkslot, Constants.dKd);
+    m_rightMaster.config_IntegralZone(Constants.dkslot, Constants.dIz);
+
+
+
 
     //Odometry
-    m_rightMotors.setInverted(true);
+    
     
     m_leftMaster.configSelectedFeedbackSensor(FeedbackDevice.IntegratedSensor, 0, 0);
     m_rightMaster.configSelectedFeedbackSensor(FeedbackDevice.IntegratedSensor, 0, 0);
@@ -106,7 +154,7 @@ public class Drivetrain extends SubsystemBase {
   public void periodic() {
     // This method will be called once per scheduler run
 
-    System.out.println(String.format("Roll: %f, Pitch: %f, Yaw: %f", m_gyro.getRoll(), m_gyro.getPitch(), m_gyro.getYaw()));
+    // System.out.println(String.format("Roll: %f, Pitch: %f, Yaw: %f", m_gyro.getRoll(), m_gyro.getPitch(), m_gyro.getYaw()));
   }
 
   @Override
@@ -114,19 +162,55 @@ public class Drivetrain extends SubsystemBase {
     // This method will be called once per scheduler run during simulation
   }
 
-  public void arcadeDrive(double speed, double rotation) {
-    m_differentialDrive.arcadeDrive(speed, rotation);
-  }
+  // public void arcadeDrive(double speed, double rotation) {
+  //   m_differentialDrive.arcadeDrive(speed, rotation);
+  // }
 
-  public void tankDrive(double leftSpeed, double rightSpeed) {
-    m_differentialDrive.tankDrive(leftSpeed, rightSpeed);
-  }
+  public void arcadeDriveV(double speed, double rotation){
+    //use the differntial drive invers kinematics class to set the motor controllers directly in velocity control mode
+    
+    DifferentialDriveWheelSpeeds wheelSpeeds = m_kinematics.toWheelSpeeds(new ChassisSpeeds(speed, 0, rotation));
+
+
+    // 2048 units per rev
+    // 600 : 100ms per min
+
+    double metertorpm = Constants.wheelrad*2*Math.PI ; //convertion from meters per second to rev per second
+    double rpmtounit = 2048/10; //convertion from rpm to units per 100ms
+
+    double leftspeedtalon = wheelSpeeds.leftMetersPerSecond / metertorpm * rpmtounit; //unit/100ms
+    double rightspeedtalon = wheelSpeeds.rightMetersPerSecond / metertorpm * rpmtounit; //unit/100ms
+    System.out.print(leftspeedtalon);
+    System.out.print("  ");
+    System.out.println(rightspeedtalon);
+
+    m_leftMaster.set(ControlMode.Velocity, leftspeedtalon);
+    m_rightMaster.set(ControlMode.Velocity, rightspeedtalon);
+    m_leftDrone.set(ControlMode.Follower, 1);
+    m_rightDrone.set(ControlMode.Follower, 3);
+    
+
+
+   }
+
+  // public void curvatureDrive(double speed, double rotation, boolean isQuickTurn) {
+  //   m_differentialDrive.curvatureDrive(speed, rotation, isQuickTurn);
+  // }
+
+  // public void tankDrive(double leftSpeed, double rightSpeed) {
+  //   m_differentialDrive.tankDrive(leftSpeed, rightSpeed);
+  // }
+
+
 
   public void stop() {
-    m_differentialDrive.stopMotor();
+    // m_differentialDrive.stopMotor();
+    m_leftMotors.stopMotor();
+    m_rightMotors.stopMotor();
   }
 
   public void setMaxOutput(double maxOutput) {
-    m_differentialDrive.setMaxOutput(maxOutput);
+    // m_differentialDrive.setMaxOutput(maxOutput);
+  
   }
 }

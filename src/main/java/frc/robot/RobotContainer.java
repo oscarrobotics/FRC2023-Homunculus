@@ -25,11 +25,37 @@ public class RobotContainer {
 
     configureBindings();
 
+    // m_drivetrain.setDefaultCommand(Commands.run(() -> {
+    //   double Smodifier = m_driverController.getRightTriggerAxis() * 0.5 + 0.5-m_driverController.getLeftTriggerAxis()*0.5;
+    //   double Tmodifer =1-(( m_driverController.leftBumper().getAsBoolean()?0:1 )* (m_driverController.getRightTriggerAxis()>0.5?1:0)*0.4);
+      
+
+    //   m_drivetrain.arcadeDrive(m_driverController.getLeftY() * Smodifier,
+    //       m_driverController.getRightX() * Smodifier * Tmodifer);
+    // }, m_drivetrain));
+
+
+    // m_drivetrain.setDefaultCommand(Commands.run(() -> {
+    //   double Smodifier = m_driverController.getRightTriggerAxis() * 0.5 + 0.5-m_driverController.getLeftTriggerAxis()*0.5;
+    //   // double Tmodifer =1-(( m_driverController.leftBumper().getAsBoolean()?0:1 )* (m_driverController.getRightTriggerAxis()>0.5?1:0)*0.4);
+    //   if (m_driverController.getLeftTriggerAxis()>0.5){
+    //     m_drivetrain.curvatureDrive(m_driverController.getLeftY() * Smodifier, m_driverController.getRightX()*Smodifier, m_driverController.leftBumper().getAsBoolean());
+    //   }else{
+    //   m_drivetrain.arcadeDrive(m_driverController.getLeftY() * Smodifier,
+    //       m_driverController.getRightX() * Smodifier);
+    //   }
+    // }, m_drivetrain));
     m_drivetrain.setDefaultCommand(Commands.run(() -> {
-      double modifier = m_driverController.getRightTriggerAxis() * 0.5 + 0.5;
-      m_drivetrain.arcadeDrive(m_driverController.getLeftY() * modifier,
-          m_driverController.getRightX() * modifier);
+      double Smodifier = m_driverController.getRightTriggerAxis() * 0.5 + 0.5-m_driverController.getLeftTriggerAxis()*0.5;
+      double Tmodifer =1-(( m_driverController.leftBumper().getAsBoolean()?0:1 )* (m_driverController.getRightTriggerAxis()>0.5?1:0)*0.4);
+      
+
+      m_drivetrain.arcadeDriveV(m_driverController.getLeftY() * Math.abs(m_driverController.getLeftY())* Smodifier * Constants.maxSpeed,
+          m_driverController.getRightX() * Math.abs(m_driverController.getRightX())* Smodifier * Tmodifer*Math.PI*6);
     }, m_drivetrain));
+   
+
+
   }
 
   private void configureBindings() {}
