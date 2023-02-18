@@ -4,14 +4,36 @@
 
 package frc.robot;
 
+import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import frc.robot.subsystems.drivetrain.Drivetrain;
+import org.photonvision.PhotonCamera;
+import org.photonvision.PhotonUtils;
 
 public class Robot extends TimedRobot {
   private Command m_autonomousCommand;
 
   private RobotContainer m_robotContainer;
+
+  private Drivetrain m_Drivetrain;
+
+  final double CAMERA_HEIGHT_METERS = Units.inchesToMeters(24);
+  final double CAMERA_ANGLE_RADIANS = Units.degreesToRadians(0);
+  
+  //Tune PID const via sysID
+  final double LINEAR_P = 0.1;
+  final double LINEAR_D = 0.0;
+  PIDController forwardController = new PIDController(LINEAR_P, 0, LINEAR_D);
+
+  final double ANGULAR_P = 0.1;
+  final double ANGULAR_D = 0.0;
+  PIDController turnController = new PIDController(ANGULAR_P, 0, ANGULAR_D);
+
+  XboxController xboxController;
 
   @Override
   public void robotInit() {
@@ -55,7 +77,27 @@ public class Robot extends TimedRobot {
   }
 
   @Override
-  public void teleopPeriodic() {}
+  public void teleopPeriodic() {
+    // double forwardSpeed;
+    // double rotationSpeed;
+
+    // forwardSpeed = -xboxController.getRightY();
+
+    // if(xboxController.getAButton()){
+    //   var result = camera.getLatestResult();
+      
+    //   if(result.hasTargets()){
+    //     rotationSpeed = -turnController.calculate(result.getBestTarget().getYaw(), 0);
+    //     // double range = PhotonUtils.calculateDistanceToTargetMeters(rotationSpeed, rotationSpeed, forwardSpeed, rotationSpeed);
+    //   } else { 
+    //     rotationSpeed = 0; 
+    //   }
+    // } else {
+    //   rotationSpeed = xboxController.getLeftX();
+    // }
+
+    // m_Drivetrain.arcadeDrive(forwardSpeed, rotationSpeed);
+  }
 
   @Override
   public void teleopExit() {}
