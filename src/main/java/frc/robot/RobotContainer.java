@@ -51,7 +51,7 @@ public class RobotContainer {
       
 
       m_drivetrain.arcadeDriveV(m_driverController.getLeftY() * Math.abs(m_driverController.getLeftY())* Smodifier * Constants.maxSpeed,
-          m_driverController.getRightX() * Math.abs(m_driverController.getRightX())* Smodifier * Tmodifer*Math.PI*6);
+          m_driverController.getRightX() * Math.abs(m_driverController.getRightX())* Smodifier * Tmodifer*Constants.maxTurn);
     }, m_drivetrain));
    
 

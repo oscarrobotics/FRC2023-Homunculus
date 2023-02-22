@@ -70,7 +70,7 @@ public class Drivetrain extends SubsystemBase {
   
   //kinematics
   public final DifferentialDriveKinematics m_kinematics =
-      new DifferentialDriveKinematics(Constants.wheelbwidth);
+      new DifferentialDriveKinematics(Constants.wheelBaseWidth);
 
   // a varible used to keep track of the current commanded speed from the joystick
   // used in smooth drive as part of a low pass filter
@@ -92,9 +92,9 @@ public class Drivetrain extends SubsystemBase {
  private final TalonFXSimCollection m_rightDriveSim = m_rightMaster.getSimCollection();
 
  final int kCountsPerRev = Constants.encodercounts;  //Encoder counts per revolution of the motor shaft.
- final double kSensorGearRatio = Constants.gearratio; //Gear ratio is the ratio between the *encoder* and the wheels.  
- final double kGearRatio = Constants.gearratio; //Switch kSensorGearRatio to this gear ratio if encoder is on the motor instead of on the gearbox.
- final double kWheelRadiusInches = Constants.wheelrad; //Wheel radius in inches
+ final double kSensorGearRatio = Constants.gearRatio; //Gear ratio is the ratio between the *encoder* and the wheels.  
+ final double kGearRatio = Constants.gearRatio; //Switch kSensorGearRatio to this gear ratio if encoder is on the motor instead of on the gearbox.
+ final double kWheelRadiusInches = Constants.wheelRad; //Wheel radius in inches
  final int k100msPerSecond = 10;
 
 
@@ -106,8 +106,8 @@ public class Drivetrain extends SubsystemBase {
                  m_drivetrainSystem,
                  DCMotor.getFalcon500(2),
                  8,
-                 Constants.wheelbwidth,
-                 Constants.wheelrad,
+                 Constants.wheelBaseWidth,
+                 Constants.wheelRad,
                  null);
 
 

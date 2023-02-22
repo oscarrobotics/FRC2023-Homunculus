@@ -9,13 +9,14 @@ public final  class Constants {
 
   public static final int kTimoutms = 30;
 
-  public static final double wheelrad = Units.inchesToMeters(3);
-  public static final double wheelbwidth = Units.inchesToMeters(28); // test robot
+  public static final double wheelRad = Units.inchesToMeters(3);
+  public static final double wheelBaseWidth = Units.inchesToMeters(28); // test robot
   // public final double wheelbwidth = Units.inchesToMeters(26); // new robot
-  public static final double wheelblength =30;
-  public static final double gearratio = 10; // test robot
+  public static final double wheelBaseLength =30;
+  public static final double gearRatio = 10; // test robot
   // public final double gearratio = 9.8; // new robot
   public static final double maxSpeed = 4.0; //m/s
+  public static final double maxTurn = 2.0; //rad/s
 
   public static final double dKf = 1023.0 / 2066.0;
   public static final double dKp = 0.1;
