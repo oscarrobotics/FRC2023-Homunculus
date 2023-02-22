@@ -72,6 +72,11 @@ public class Drivetrain extends SubsystemBase {
   public final DifferentialDriveKinematics m_kinematics =
       new DifferentialDriveKinematics(Constants.wheelbwidth);
 
+  // a varible used to keep track of the current commanded speed from the joystick
+  // used in smooth drive as part of a low pass filter
+  static double filtspeed =0;
+ 
+ 
   //odometry
   private final DifferentialDrivePoseEstimator m_poseEstimator =
       new DifferentialDrivePoseEstimator(
@@ -109,8 +114,7 @@ public class Drivetrain extends SubsystemBase {
   public Drivetrain() {
 
 
-    
-
+  
     m_rightMotors.setInverted(true);
     m_rightMaster.setInverted(true);
     m_rightDrone.setInverted(true);
@@ -281,7 +285,34 @@ public class Drivetrain extends SubsystemBase {
 
    }
 
+   public void smoothDrive(double speed, double rotation){
+    
+    final double kFiltercoeff = 0.9;//filter coefficient for the low pass filter high value means more smoothing
+     
+    //apply a low pass filter to the speed input
+    //takes a percentage of the new speed and the oposite percentage of the old speed and adds them together
+    speed = speed * (1-kFiltercoeff) + filtspeed * kFiltercoeff ;
+    
+    //use the differntial drive invers kinematics class to set the motor controllers directly in velocity control mode
+    DifferentialDriveWheelSpeeds wheelSpeeds = m_kinematics.toWheelSpeeds(new ChassisSpeeds(speed, 0, rotation));
+    
+    
+   
+    
+    double leftspeedtalon = velocityToNativeUnits( wheelSpeeds.leftMetersPerSecond );
+    double rightspeedtalon = velocityToNativeUnits( wheelSpeeds.rightMetersPerSecond );
+    System.out.print(leftspeedtalon);
+    System.out.print("  ");
+    System.out.println(rightspeedtalon);
 
+    m_leftMaster.set(ControlMode.Velocity, leftspeedtalon);
+    m_rightMaster.set(ControlMode.Velocity, rightspeedtalon);
+    m_leftDrone.set(ControlMode.Follower, 1);
+    m_rightDrone.set(ControlMode.Follower, 3);
+    
+
+
+   }
   // public void arcadeDrive(double speed, double rotation) {
   //   m_differentialDrive.arcadeDrive(speed, rotation);
   // }
