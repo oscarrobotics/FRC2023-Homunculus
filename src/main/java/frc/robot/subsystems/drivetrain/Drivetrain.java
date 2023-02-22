@@ -1,23 +1,18 @@
 package frc.robot.subsystems.drivetrain;
 
-import edu.wpi.first.apriltag.AprilTag;
-import edu.wpi.first.apriltag.AprilTagFieldLayout;
-import edu.wpi.first.apriltag.AprilTagFields;
+
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.math.numbers.N2;
 import edu.wpi.first.math.system.LinearSystem;
 import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Pose3d;
+
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Rotation3d;
-import edu.wpi.first.math.geometry.Transform3d;
-import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.geometry.Translation3d;
+
 import edu.wpi.first.math.kinematics.DifferentialDriveKinematics;
 import edu.wpi.first.math.estimator.DifferentialDrivePoseEstimator;
-import edu.wpi.first.math.kinematics.DifferentialDriveOdometry;
+
 import edu.wpi.first.math.kinematics.DifferentialDriveWheelSpeeds;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
@@ -26,21 +21,19 @@ import edu.wpi.first.wpilibj.RobotController;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-import edu.wpi.first.wpilibj.simulation.AnalogGyroSim;
+
 import edu.wpi.first.wpilibj.simulation.DifferentialDrivetrainSim;
-import edu.wpi.first.wpilibj.simulation.EncoderSim;
+
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
+
 import java.util.Optional;
 
 
 import org.photonvision.EstimatedRobotPose;
 
-import com.ctre.phoenix.motorcontrol.FeedbackDevice;
+
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.TalonFXFeedbackDevice;
 import com.ctre.phoenix.motorcontrol.can.TalonFXConfiguration;
@@ -93,10 +86,10 @@ public class Drivetrain extends SubsystemBase {
  private final TalonFXSimCollection m_leftDriveSim = m_leftMaster.getSimCollection();
  private final TalonFXSimCollection m_rightDriveSim = m_rightMaster.getSimCollection();
 
- final int kCountsPerRev = 4096;  //Encoder counts per revolution of the motor shaft.
- final double kSensorGearRatio = 10.71; //Gear ratio is the ratio between the *encoder* and the wheels.  On the AndyMark drivetrain, encoders mount 1:1 with the gearbox shaft.
- final double kGearRatio = 10.71; //Switch kSensorGearRatio to this gear ratio if encoder is on the motor instead of on the gearbox.
- final double kWheelRadiusInches = 3;
+ final int kCountsPerRev = Constants.encodercounts;  //Encoder counts per revolution of the motor shaft.
+ final double kSensorGearRatio = Constants.gearratio; //Gear ratio is the ratio between the *encoder* and the wheels.  
+ final double kGearRatio = Constants.gearratio; //Switch kSensorGearRatio to this gear ratio if encoder is on the motor instead of on the gearbox.
+ final double kWheelRadiusInches = Constants.wheelrad; //Wheel radius in inches
  final int k100msPerSecond = 10;
 
 
@@ -137,7 +130,7 @@ public class Drivetrain extends SubsystemBase {
     m_leftMaster.configNominalOutputReverse(0);
     m_leftMaster.configPeakOutputForward(1);
     m_leftMaster.configPeakOutputReverse(-1);
-    m_leftMaster.configClosedloopRamp(.5);
+    m_leftMaster.configClosedloopRamp(.2);
     
     m_leftMaster.config_kF(Constants.dkslot, Constants.dKf);
     m_leftMaster.config_kP(Constants.dkslot, Constants.dKp);
@@ -152,7 +145,7 @@ public class Drivetrain extends SubsystemBase {
     m_rightMaster.configNominalOutputReverse(0);
     m_rightMaster.configPeakOutputForward(1);
     m_rightMaster.configPeakOutputReverse(-1);
-    m_rightMaster.configClosedloopRamp(.5);
+    m_rightMaster.configClosedloopRamp(.2);
 
     m_rightMaster.config_kF(Constants.dkslot, Constants.dKf);
     m_rightMaster.config_kP(Constants.dkslot, Constants.dKp);
@@ -267,11 +260,14 @@ public class Drivetrain extends SubsystemBase {
     // 2048 units per rev
     // 600 : 100ms per min
 
-    double metertorpm = Constants.wheelrad*2*Math.PI ; //convertion from meters per second to rev per second
-    double rpmtounit = 2048/10; //convertion from rpm to units per 100ms
+    // double metertorpm = Constants.wheelrad*2*Math.PI ; //convertion from meters per second to rev per second
+    // double rpmtounit = 2048/10; //convertion from rpm to units per 100ms
 
-    double leftspeedtalon = wheelSpeeds.leftMetersPerSecond / metertorpm * rpmtounit; //unit/100ms
-    double rightspeedtalon = wheelSpeeds.rightMetersPerSecond / metertorpm * rpmtounit; //unit/100ms
+    // double leftspeedtalon = wheelSpeeds.leftMetersPerSecond / metertorpm * rpmtounit; //unit/100ms
+    // double rightspeedtalon = wheelSpeeds.rightMetersPerSecond / metertorpm * rpmtounit; //unit/100ms
+   
+    double leftspeedtalon = velocityToNativeUnits( wheelSpeeds.leftMetersPerSecond );
+    double rightspeedtalon = velocityToNativeUnits( wheelSpeeds.rightMetersPerSecond );
     System.out.print(leftspeedtalon);
     System.out.print("  ");
     System.out.println(rightspeedtalon);
