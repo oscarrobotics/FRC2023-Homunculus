@@ -18,7 +18,7 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.motorcontrol.MotorControllerGroup;
 import edu.wpi.first.wpilibj.RobotController;
-
+import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 
@@ -32,13 +32,14 @@ import java.util.Optional;
 
 
 import org.photonvision.EstimatedRobotPose;
-
-
+import org.photonvision.PhotonPoseEstimator;
+import org.photonvision.PhotonPoseEstimator.PoseStrategy;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.TalonFXFeedbackDevice;
 import com.ctre.phoenix.motorcontrol.can.TalonFXConfiguration;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 import com.ctre.phoenix.motorcontrol.ControlMode;
+import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.sensors.WPI_Pigeon2;
 import com.ctre.phoenix.motorcontrol.TalonFXSimCollection;
 import com.ctre.phoenix.sensors.BasePigeonSimCollection;
@@ -91,7 +92,7 @@ public class Drivetrain extends SubsystemBase {
  private final TalonFXSimCollection m_leftDriveSim = m_leftMaster.getSimCollection();
  private final TalonFXSimCollection m_rightDriveSim = m_rightMaster.getSimCollection();
 
- final int kCountsPerRev = Constants.encodercounts;  //Encoder counts per revolution of the motor shaft.
+ final int kCountsPerRev = Constants.encoderCounts;  //Encoder counts per revolution of the motor shaft.
  final double kSensorGearRatio = Constants.gearRatio; //Gear ratio is the ratio between the *encoder* and the wheels.  
  final double kGearRatio = Constants.gearRatio; //Switch kSensorGearRatio to this gear ratio if encoder is on the motor instead of on the gearbox.
  final double kWheelRadiusInches = Constants.wheelRad; //Wheel radius in inches
@@ -113,7 +114,7 @@ public class Drivetrain extends SubsystemBase {
 
   public Drivetrain() {
 
-
+    m_gyro.reset(); 
   
     m_rightMotors.setInverted(true);
     m_rightMaster.setInverted(true);
@@ -159,11 +160,15 @@ public class Drivetrain extends SubsystemBase {
 
 
     //Odometry
+    m_rightMotors.setInverted(true);
+    
+    m_leftMaster.configSelectedFeedbackSensor(FeedbackDevice.IntegratedSensor, 0, 0);
+    m_rightMaster.configSelectedFeedbackSensor(FeedbackDevice.IntegratedSensor, 0, 0);
     
     m_leftMaster.setSelectedSensorPosition(0);
     m_rightMaster.setSelectedSensorPosition(0);
     m_gyro.setYaw(0);
-    
+
 
   
 
@@ -173,12 +178,25 @@ public class Drivetrain extends SubsystemBase {
     pcw = new PhotonCameraWrapper();
 
 
-
+        
   }
 
+      // PhotonPoseEstimator photonPoseEstimator = new PhotonPoseEstimator(layout, PoseStrategy.CLOSEST_TO_REFERENCE_POSE, camera, robotToCam);
+    
+    //TODO: get targets, get results, get data from targets, etc. (all null so it will not run in current state)
+      // var result = camera.getLatestResult();
+      // boolean hasTargets = result.hasTargets(); 
 
+      // PhotonTrackedTarget target = result.getBestTarget();
+      // List<PhotonTrackedTarget> targets = result.getTargets();
+      // // double poseAmbiguity = target.getPoseAmbiguity();
+      // Transform3d bestCameraToTarget = target.getBestCameraToTarget();
+      // Transform3d alternateCameraToTarget = target.getAlternateCameraToTarget();
+  
 
+  // private final WPI_Pigeon2 m_gyro = new WPI_Pigeon2(0); //fix canID
 
+  private void printf(String string) {}
 
   @Override
   public void periodic() {
@@ -283,7 +301,7 @@ public class Drivetrain extends SubsystemBase {
     
 
 
-   }
+  }
 
    public void smoothDrive(double speed, double rotation){
     
@@ -312,7 +330,7 @@ public class Drivetrain extends SubsystemBase {
     
 
 
-   }
+  }
   // public void arcadeDrive(double speed, double rotation) {
   //   m_differentialDrive.arcadeDrive(speed, rotation);
   // }
@@ -385,5 +403,30 @@ private double nativeUnitsToDistanceMeters(double sensorCounts){
   double wheelRotations = motorRotations / kSensorGearRatio;
   double positionMeters = wheelRotations * (2 * Math.PI * Units.inchesToMeters(kWheelRadiusInches));
   return positionMeters;
+  }
 }
+
+private int moveTenFeet(){  //move 10 feet in native units
+  double tenFeet = Units.feetToMeters(10);
+  int tenFeetNativeUnits = distanceToNativeUnits(tenFeet);
+  return tenFeetNativeUnits;
+}                                
+
+public CommandBase movingCommand(){
+  
+  return new CommandBase() {
+    @Override
+    public void initialize() {}
+
+    @Override
+    public void execute() {
+      m_leftMaster.set(ControlMode.Position, moveTenFeet());
+      m_rightMaster.set(ControlMode.Position, moveTenFeet());
+    }
+
+    @Override
+    public boolean isFinished() {
+      return false;
+    }
+  };
 }

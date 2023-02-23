@@ -23,7 +23,7 @@ public final  class Constants {
   public static final double dKi = 0.001;
   public static final double dKd = 5;
   public static final double dIz= 300;
-  public static final int encodercounts = 2048;
+  public static final int encoderCounts = 2048;
 
   
   public static final int dkslot = 0;
