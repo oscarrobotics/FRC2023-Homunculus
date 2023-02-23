@@ -7,6 +7,7 @@ package frc.robot;
 import edu.wpi.first.wpilibj.shuffleboard.EventImportance;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -45,16 +46,29 @@ public class RobotContainer {
     //       m_driverController.getRightX() * Smodifier);
     //   }
     // }, m_drivetrain));
-    m_drivetrain.setDefaultCommand(Commands.run(() -> {
-      double Smodifier = m_driverController.getRightTriggerAxis() * 0.5 + 0.5-m_driverController.getLeftTriggerAxis()*0.5;
-      double Tmodifer =1-(( m_driverController.leftBumper().getAsBoolean()?0:1 )* (m_driverController.getRightTriggerAxis()>0.5?1:0)*0.4);
+    // m_drivetrain.setDefaultCommand(Commands.run(() -> {
+    //   double Smodifier = m_driverController.getRightTriggerAxis() * 0.5 + 0.5-m_driverController.getLeftTriggerAxis()*0.5;
+    //   double Tmodifer =1-(( m_driverController.leftBumper().getAsBoolean()?0:1 )* (m_driverController.getRightTriggerAxis()>0.5?1:0)*0.4);
       
 
-      m_drivetrain.arcadeDriveV(m_driverController.getLeftY() * Math.abs(m_driverController.getLeftY())* Smodifier * Constants.maxSpeed,
-          m_driverController.getRightX() * Math.abs(m_driverController.getRightX())* Smodifier * Tmodifer*Constants.maxTurn);
-    }, m_drivetrain));
-   
-
+    //   m_drivetrain.arcadeDriveV(m_driverController.getLeftY() * Math.abs(m_driverController.getLeftY())* Smodifier * Constants.maxSpeed,
+    //       m_driverController.getRightX() * Math.abs(m_driverController.getRightX())* Smodifier * Tmodifer*Constants.maxTurn);
+    // }, m_drivetrain));
+  //  
+    // m_drivetrain.setDefaultCommand(Commands.run(() -> {
+    //   m_drivetrain.arcadeDriveV(m_driverController.getLeftY(), m_driverController.getRightX());
+    //   double modifier = m_driverController.getRightTriggerAxis() * 0.5 + 0.5;
+    //   m_drivetrain.arcadeDriveV(m_driverController.getLeftY() * modifier,
+    //       m_driverController.getRightX() * modifier);
+    // }, m_drivetrain));
+    m_drivetrain.setDefaultCommand(Commands.run(() -> {
+        double Smodifier = m_driverController.getRightTriggerAxis() * 0.5 + 0.5-m_driverController.getLeftTriggerAxis()*0.5;
+        double Tmodifer =1-(( m_driverController.leftBumper().getAsBoolean()?0:1 )* (m_driverController.getRightTriggerAxis()>0.5 && m_driverController.getLeftTriggerAxis()<0.5?1:0)*0.4);
+        
+  
+        m_drivetrain.smoothDrive(m_driverController.getLeftY() * Math.abs(m_driverController.getLeftY())* Smodifier * Constants.maxSpeed,
+            m_driverController.getRightX() * Math.abs(m_driverController.getRightX())* Smodifier * Tmodifer*Constants.maxTurn);
+      }, m_drivetrain));
 
   }
 

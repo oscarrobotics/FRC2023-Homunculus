@@ -20,8 +20,7 @@ import edu.wpi.first.wpilibj.motorcontrol.MotorControllerGroup;
 import edu.wpi.first.wpilibj.RobotController;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-
-
+import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj.simulation.DifferentialDrivetrainSim;
 
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
@@ -49,6 +48,9 @@ import frc.robot.PhotonCameraWrapper;
 
 
 public class Drivetrain extends SubsystemBase {
+
+  private final CommandXboxController m_driverController = new CommandXboxController(0);
+  
   //motors
   private final WPI_TalonFX m_leftMaster = new WPI_TalonFX(1);
   private final WPI_TalonFX m_leftDrone = new WPI_TalonFX(2);
@@ -94,7 +96,7 @@ public class Drivetrain extends SubsystemBase {
  final int kCountsPerRev = Constants.encodercounts;  //Encoder counts per revolution of the motor shaft.
  final double kSensorGearRatio = Constants.gearRatio; //Gear ratio is the ratio between the *encoder* and the wheels.  
  final double kGearRatio = Constants.gearRatio; //Switch kSensorGearRatio to this gear ratio if encoder is on the motor instead of on the gearbox.
- final double kWheelRadiusInches = Constants.wheelRad; //Wheel radius in inches
+ final double kWheelRadiusInches = 3; //Wheel radius in inches
  final int k100msPerSecond = 10;
 
 
@@ -256,7 +258,7 @@ public class Drivetrain extends SubsystemBase {
 
 
   public void arcadeDriveV(double speed, double rotation){
-    //use the differntial drive invers kinematics class to set the motor controllers directly in velocity control mode
+    //use the differential drive inverse kinematics class to set the motor controllers directly in velocity control mode
     
     DifferentialDriveWheelSpeeds wheelSpeeds = m_kinematics.toWheelSpeeds(new ChassisSpeeds(speed, 0, rotation));
 
@@ -292,7 +294,7 @@ public class Drivetrain extends SubsystemBase {
     //apply a low pass filter to the speed input
     //takes a percentage of the new speed and the oposite percentage of the old speed and adds them together
     speed = speed * (1-kFiltercoeff) + filtspeed * kFiltercoeff ;
-    
+    filtspeed = speed;
     //use the differntial drive invers kinematics class to set the motor controllers directly in velocity control mode
     DifferentialDriveWheelSpeeds wheelSpeeds = m_kinematics.toWheelSpeeds(new ChassisSpeeds(speed, 0, rotation));
     
@@ -304,6 +306,8 @@ public class Drivetrain extends SubsystemBase {
     System.out.print(leftspeedtalon);
     System.out.print("  ");
     System.out.println(rightspeedtalon);
+
+    System.out.println(String.format("Right trigger: %f", m_driverController.getRightTriggerAxis()));
 
     m_leftMaster.set(ControlMode.Velocity, leftspeedtalon);
     m_rightMaster.set(ControlMode.Velocity, rightspeedtalon);
