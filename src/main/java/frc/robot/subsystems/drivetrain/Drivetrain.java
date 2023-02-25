@@ -95,7 +95,7 @@ public class Drivetrain extends SubsystemBase {
  final int kCountsPerRev = Constants.encoderCounts;  //Encoder counts per revolution of the motor shaft.
  final double kSensorGearRatio = Constants.gearRatio; //Gear ratio is the ratio between the *encoder* and the wheels.  
  final double kGearRatio = Constants.gearRatio; //Switch kSensorGearRatio to this gear ratio if encoder is on the motor instead of on the gearbox.
- final double kWheelRadiusInches = Constants.wheelRad; //Wheel radius in inches
+ final double kWheelRadiusInches = 3; //Wheel radius in inches
  final int k100msPerSecond = 10;
 
 
@@ -135,7 +135,7 @@ public class Drivetrain extends SubsystemBase {
     m_leftMaster.configNominalOutputReverse(0);
     m_leftMaster.configPeakOutputForward(1);
     m_leftMaster.configPeakOutputReverse(-1);
-    m_leftMaster.configClosedloopRamp(.2);
+    m_leftMaster.configClosedloopRamp(0);
     
     m_leftMaster.config_kF(Constants.dkslot, Constants.dKf);
     m_leftMaster.config_kP(Constants.dkslot, Constants.dKp);
@@ -150,7 +150,7 @@ public class Drivetrain extends SubsystemBase {
     m_rightMaster.configNominalOutputReverse(0);
     m_rightMaster.configPeakOutputForward(1);
     m_rightMaster.configPeakOutputReverse(-1);
-    m_rightMaster.configClosedloopRamp(.2);
+    m_rightMaster.configClosedloopRamp(0);
 
     m_rightMaster.config_kF(Constants.dkslot, Constants.dKf);
     m_rightMaster.config_kP(Constants.dkslot, Constants.dKp);
@@ -201,16 +201,17 @@ public class Drivetrain extends SubsystemBase {
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
+    updateOdometry();
 
     // System.out.println(String.format("Roll: %f, Pitch: %f, Yaw: %f", m_gyro.getRoll(), m_gyro.getPitch(), m_gyro.getYaw()));
   }
-
+ 
   @Override
   public void simulationPeriodic() {
       /* Pass the robot battery voltage to the simulated Talon SRXs */
       m_leftDriveSim.setBusVoltage(RobotController.getBatteryVoltage());
       m_rightDriveSim.setBusVoltage(RobotController.getBatteryVoltage());
-  
+      updateOdometry();
       /*
        * CTRE simulation is low-level, so SimCollection inputs
        * and outputs are not affected by SetInverted(). Only
@@ -287,12 +288,16 @@ public class Drivetrain extends SubsystemBase {
 
     // double leftspeedtalon = wheelSpeeds.leftMetersPerSecond / metertorpm * rpmtounit; //unit/100ms
     // double rightspeedtalon = wheelSpeeds.rightMetersPerSecond / metertorpm * rpmtounit; //unit/100ms
+    // System.out.print(wheelSpeeds.leftMetersPerSecond);
+    // System.out.print("*");
+    // System.out.println(wheelSpeeds.rightMetersPerSecond);
    
+
     double leftspeedtalon = velocityToNativeUnits( wheelSpeeds.leftMetersPerSecond );
     double rightspeedtalon = velocityToNativeUnits( wheelSpeeds.rightMetersPerSecond );
-    System.out.print(leftspeedtalon);
-    System.out.print("  ");
-    System.out.println(rightspeedtalon);
+    // System.out.print(leftspeedtalon);
+    // System.out.print("  ");
+    // System.out.println(rightspeedtalon);
 
     m_leftMaster.set(ControlMode.Velocity, leftspeedtalon);
     m_rightMaster.set(ControlMode.Velocity, rightspeedtalon);
@@ -305,7 +310,7 @@ public class Drivetrain extends SubsystemBase {
 
    public void smoothDrive(double speed, double rotation){
     
-    final double kFiltercoeff = 0.9;//filter coefficient for the low pass filter high value means more smoothing
+    final double kFiltercoeff = 0;//filter coefficient for the low pass filter high value means more smoothing
      
     //apply a low pass filter to the speed input
     //takes a percentage of the new speed and the oposite percentage of the old speed and adds them together
@@ -314,7 +319,9 @@ public class Drivetrain extends SubsystemBase {
     //use the differntial drive invers kinematics class to set the motor controllers directly in velocity control mode
     DifferentialDriveWheelSpeeds wheelSpeeds = m_kinematics.toWheelSpeeds(new ChassisSpeeds(speed, 0, rotation));
     
-    
+    System.out.print(wheelSpeeds.leftMetersPerSecond);
+    System.out.print("*");
+    System.out.println(wheelSpeeds.rightMetersPerSecond);
    
     
     double leftspeedtalon = velocityToNativeUnits( wheelSpeeds.leftMetersPerSecond );
@@ -360,7 +367,7 @@ public class Drivetrain extends SubsystemBase {
 
   public void updateOdometry() {
     m_poseEstimator.update(
-      m_gyro.getRotation2d(), m_leftMaster.getSelectedSensorPosition(), m_rightMaster.getSelectedSensorPosition());
+      m_gyro.getRotation2d(),nativeUnitsToDistanceMeters( m_leftMaster.getSelectedSensorPosition()),  nativeUnitsToDistanceMeters( m_rightMaster.getSelectedSensorPosition()));
 
     Optional<EstimatedRobotPose> result =
             pcw.getEstimatedGlobalPose(m_poseEstimator.getEstimatedPosition());
@@ -404,7 +411,7 @@ private double nativeUnitsToDistanceMeters(double sensorCounts){
   double positionMeters = wheelRotations * (2 * Math.PI * Units.inchesToMeters(kWheelRadiusInches));
   return positionMeters;
   }
-}
+
 
 private int moveTenFeet(){  //move 10 feet in native units
   double tenFeet = Units.feetToMeters(10);
@@ -412,21 +419,22 @@ private int moveTenFeet(){  //move 10 feet in native units
   return tenFeetNativeUnits;
 }                                
 
-public CommandBase movingCommand(){
+// public CommandBase movingCommand(){
   
-  return new CommandBase() {
-    @Override
-    public void initialize() {}
+//   return new CommandBase() {
+//     @Override
+//     public void initialize() {}
 
-    @Override
-    public void execute() {
-      m_leftMaster.set(ControlMode.Position, moveTenFeet());
-      m_rightMaster.set(ControlMode.Position, moveTenFeet());
-    }
+//     @Override
+//     public void execute() {
+//       m_leftMaster.set(ControlMode.Position, moveTenFeet());
+//       m_rightMaster.set(ControlMode.Position, moveTenFeet());
+//     }
 
-    @Override
-    public boolean isFinished() {
-      return false;
-    }
-  };
+//     @Override
+//     public boolean isFinished() {
+//       return false;
+//     }
+//   };
+// }
 }

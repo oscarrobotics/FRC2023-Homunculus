@@ -4,11 +4,12 @@
 
 package frc.robot;
 
-import edu.wpi.first.wpilibj.shuffleboard.EventImportance;
+import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.subsystems.drivetrain.Drivetrain;
@@ -19,12 +20,15 @@ public class RobotContainer {
   private final Drivetrain m_drivetrain = new Drivetrain();
 
   private final SendableChooser<Command> m_chooser = new SendableChooser<>();
+  
+  private final NetworkTableInstance ntinst = NetworkTableInstance.getDefault();
 
   public RobotContainer() {
     Shuffleboard.getTab("Autonomous").add(m_chooser);
 
     configureBindings();
-
+    ntinst.startServer();
+    
     // m_drivetrain.setDefaultCommand(Commands.run(() -> {
     //   double Smodifier = m_driverController.getRightTriggerAxis() * 0.5 + 0.5-m_driverController.getLeftTriggerAxis()*0.5;
     //   double Tmodifer =1-(( m_driverController.leftBumper().getAsBoolean()?0:1 )* (m_driverController.getRightTriggerAxis()>0.5?1:0)*0.4);
@@ -46,12 +50,12 @@ public class RobotContainer {
     //   }
     // }, m_drivetrain));
     m_drivetrain.setDefaultCommand(Commands.run(() -> {
-      double Smodifier = m_driverController.getRightTriggerAxis() * 0.5 + 0.5-m_driverController.getLeftTriggerAxis()*0.5;
+      double Smodifier = m_driverController.getRightTriggerAxis() * 0.5 + 0.5-m_driverController.getLeftTriggerAxis()*0.42;
       double Tmodifer =1-(( m_driverController.leftBumper().getAsBoolean()?0:1 )* (m_driverController.getRightTriggerAxis()>0.5 && m_driverController.getLeftTriggerAxis()<0.5?1:0)*0.4); //
       
 
       m_drivetrain.arcadeDriveV(m_driverController.getLeftY() * Math.abs(m_driverController.getLeftY())* Smodifier * Constants.maxSpeed,
-          m_driverController.getRightX() * Math.abs(m_driverController.getRightX())* Smodifier * Tmodifer*Constants.maxTurn);
+          m_driverController.getRightX() * Math.abs(m_driverController.getRightX())* Smodifier * Constants.maxTurn);
     }, m_drivetrain));
    
 
