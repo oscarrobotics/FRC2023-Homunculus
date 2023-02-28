@@ -9,7 +9,7 @@ import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.geometry.Pose2d;
 
 import edu.wpi.first.math.geometry.Rotation2d;
-
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.DifferentialDriveKinematics;
 import edu.wpi.first.math.estimator.DifferentialDrivePoseEstimator;
 
@@ -46,10 +46,13 @@ import com.ctre.phoenix.sensors.BasePigeonSimCollection;
 
 import frc.robot.Constants;
 import frc.robot.PhotonCameraWrapper;
+import io.github.oblarg.oblog.Loggable;
+import io.github.oblarg.oblog.annotations.Config;
+import io.github.oblarg.oblog.annotations.Log;
 
 
 
-public class Drivetrain extends SubsystemBase {
+public class Drivetrain extends SubsystemBase implements Loggable {
   //motors
   private final WPI_TalonFX m_leftMaster = new WPI_TalonFX(1);
   private final WPI_TalonFX m_leftDrone = new WPI_TalonFX(2);
@@ -60,8 +63,10 @@ public class Drivetrain extends SubsystemBase {
   private final WPI_Pigeon2 m_gyro = new WPI_Pigeon2(0);
 
   //motor groups
+  @Log.MotorController(name = "Left Motors", tabName = "Drivetrain")
   private final MotorControllerGroup m_leftMotors =
       new MotorControllerGroup(m_leftMaster, m_leftDrone);
+  @Log.MotorController(name = "Right Motors", tabName = "Drivetrain")
   private final MotorControllerGroup m_rightMotors =
       new MotorControllerGroup(m_rightMaster, m_rightDrone);
 
@@ -83,8 +88,8 @@ public class Drivetrain extends SubsystemBase {
       new DifferentialDrivePoseEstimator(
               m_kinematics, new Rotation2d(0), 0.0, 0.0, new Pose2d());
 
-  // public final DifferentialDrive m_differentialDrive =
-  //     new DifferentialDrive(m_leftMotors, m_rightMotors);
+  public final DifferentialDrive m_differentialDrive =
+      new DifferentialDrive(m_leftMotors, m_rightMotors);
 
 
  // Simulation classes help us simulate our robot
@@ -323,7 +328,6 @@ public class Drivetrain extends SubsystemBase {
     System.out.print("*");
     System.out.println(wheelSpeeds.rightMetersPerSecond);
    
-    
     double leftspeedtalon = velocityToNativeUnits( wheelSpeeds.leftMetersPerSecond );
     double rightspeedtalon = velocityToNativeUnits( wheelSpeeds.rightMetersPerSecond );
     System.out.print(leftspeedtalon);
@@ -358,17 +362,14 @@ public class Drivetrain extends SubsystemBase {
     m_rightMotors.stopMotor();
   }
 
+  @Config(name = "Max Output", defaultValueNumeric = 1)
+
   public void setMaxOutput(double maxOutput) {
-    // m_differentialDrive.setMaxOutput(maxOutput);
-  
-  }
-
-
-
+    m_differentialDrive.setMaxOutput(maxOutput);
+  } 
   public void updateOdometry() {
     m_poseEstimator.update(
       m_gyro.getRotation2d(),nativeUnitsToDistanceMeters( m_leftMaster.getSelectedSensorPosition()),  nativeUnitsToDistanceMeters( m_rightMaster.getSelectedSensorPosition()));
-
     Optional<EstimatedRobotPose> result =
             pcw.getEstimatedGlobalPose(m_poseEstimator.getEstimatedPosition());
 
@@ -385,9 +386,22 @@ public class Drivetrain extends SubsystemBase {
     m_fieldSim.getObject("Actual Pos").setPose(m_driveSim.getPose());
     m_fieldSim.setRobotPose(m_poseEstimator.getEstimatedPosition());
 }
-
+// @Log.ToString(name = "Pose")
 public Pose2d getPose() {
     return m_poseEstimator.getEstimatedPosition();
+}
+@Log.ToString(name = "Translation")
+public Translation2d getTranslation() {
+    return m_poseEstimator.getEstimatedPosition().getTranslation();
+}
+@Log.ToString(name = "Rotation")
+public Rotation2d getRot() {
+    return m_poseEstimator.getEstimatedPosition().getRotation();
+}
+
+@Log(name = "Gyro Yaw")
+private double getGyroPos(){
+  return m_gyro.getYaw();
 }
 
 private int distanceToNativeUnits(double positionMeters){
@@ -419,22 +433,22 @@ private int moveTenFeet(){  //move 10 feet in native units
   return tenFeetNativeUnits;
 }                                
 
-// public CommandBase movingCommand(){
+public CommandBase movingCommand(){
   
-//   return new CommandBase() {
-//     @Override
-//     public void initialize() {}
+  return new CommandBase() {
+    @Override
+    public void initialize() {}
 
-//     @Override
-//     public void execute() {
-//       m_leftMaster.set(ControlMode.Position, moveTenFeet());
-//       m_rightMaster.set(ControlMode.Position, moveTenFeet());
-//     }
+    @Override
+    public void execute() {
+      m_leftMaster.set(ControlMode.Position, moveTenFeet());
+      m_rightMaster.set(ControlMode.Position, moveTenFeet());
+    }
 
-//     @Override
-//     public boolean isFinished() {
-//       return false;
-//     }
-//   };
-// }
+    @Override
+    public boolean isFinished() {
+      return false;
+    }
+  };
+}
 }

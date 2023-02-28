@@ -13,6 +13,8 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.subsystems.drivetrain.Drivetrain;
+import io.github.oblarg.oblog.Logger;
+import io.github.oblarg.oblog.annotations.Log;
 
 public class RobotContainer {
   private final CommandXboxController m_driverController = new CommandXboxController(0);
@@ -24,10 +26,11 @@ public class RobotContainer {
   private final NetworkTableInstance ntinst = NetworkTableInstance.getDefault();
 
   public RobotContainer() {
-    Shuffleboard.getTab("Autonomous").add(m_chooser);
+    
 
     configureBindings();
     ntinst.startServer();
+
     
     // m_drivetrain.setDefaultCommand(Commands.run(() -> {
     //   double Smodifier = m_driverController.getRightTriggerAxis() * 0.5 + 0.5-m_driverController.getLeftTriggerAxis()*0.5;
