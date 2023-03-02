@@ -88,10 +88,6 @@ public class Drivetrain extends SubsystemBase implements Loggable {
       new DifferentialDrivePoseEstimator(
               m_kinematics, new Rotation2d(0), 0.0, 0.0, new Pose2d());
 
-  public final DifferentialDrive m_differentialDrive =
-      new DifferentialDrive(m_leftMotors, m_rightMotors);
-
-
  // Simulation classes help us simulate our robot
  private final BasePigeonSimCollection m_gyroSim = m_gyro.getSimCollection();
  private final TalonFXSimCollection m_leftDriveSim = m_leftMaster.getSimCollection();
@@ -354,19 +350,12 @@ public class Drivetrain extends SubsystemBase implements Loggable {
   //   m_differentialDrive.tankDrive(leftSpeed, rightSpeed);
   // }
 
-
-
   public void stop() {
     // m_differentialDrive.stopMotor();
     m_leftMotors.stopMotor();
     m_rightMotors.stopMotor();
   }
 
-  @Config(name = "Max Output", defaultValueNumeric = 1)
-
-  public void setMaxOutput(double maxOutput) {
-    m_differentialDrive.setMaxOutput(maxOutput);
-  } 
   public void updateOdometry() {
     m_poseEstimator.update(
       m_gyro.getRotation2d(),nativeUnitsToDistanceMeters( m_leftMaster.getSelectedSensorPosition()),  nativeUnitsToDistanceMeters( m_rightMaster.getSelectedSensorPosition()));
