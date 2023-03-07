@@ -54,11 +54,11 @@ public class RobotContainer {
     // }, m_drivetrain));
     m_drivetrain.setDefaultCommand(Commands.run(() -> {
       double Smodifier = m_driverController.getRightTriggerAxis() * 0.5 + 0.5-m_driverController.getLeftTriggerAxis()*0.42;
-      double Tmodifer =1-(( m_driverController.leftBumper().getAsBoolean()?0:1 )* (m_driverController.getRightTriggerAxis()>0.5 && m_driverController.getLeftTriggerAxis()<0.5?1:0)*0.4); //
-      
+      // double Tmodifer =1-(( m_driverController.leftBumper().getAsBoolean()?0:1 )* (m_driverController.getRightTriggerAxis()>0.5 && m_driverController.getLeftTriggerAxis()<0.5?1:0)*0.4); //
+      double Tmodifier = (Math.abs( m_driverController.getLeftY())<0.25?Smodifier:0.5);
 
-      m_drivetrain.arcadeDriveV(m_driverController.getLeftY() * Math.abs(m_driverController.getLeftY())* Smodifier * Constants.maxSpeed,
-          m_driverController.getRightX() * Math.abs(m_driverController.getRightX())* Smodifier * Constants.maxTurn);
+      m_drivetrain.smoothDrive(m_driverController.getLeftY() * Math.abs(m_driverController.getLeftY())* Smodifier * Constants.maxSpeed,
+          m_driverController.getRightX() * Math.abs(m_driverController.getRightX())* Tmodifier * Constants.maxTurn);
     }, m_drivetrain));
    
 

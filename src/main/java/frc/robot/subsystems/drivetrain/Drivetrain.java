@@ -88,8 +88,8 @@ public class Drivetrain extends SubsystemBase implements Loggable {
       new DifferentialDrivePoseEstimator(
               m_kinematics, new Rotation2d(0), 0.0, 0.0, new Pose2d());
 
-  public final DifferentialDrive m_differentialDrive =
-      new DifferentialDrive(m_leftMotors, m_rightMotors);
+  // public final DifferentialDrive m_differentialDrive =
+  //     new DifferentialDrive(m_leftMotors, m_rightMotors);
 
 
  // Simulation classes help us simulate our robot
@@ -201,13 +201,12 @@ public class Drivetrain extends SubsystemBase implements Loggable {
 
   // private final WPI_Pigeon2 m_gyro = new WPI_Pigeon2(0); //fix canID
 
-  private void printf(String string) {}
+ 
 
   @Override
   public void periodic() {
-    // This method will be called once per scheduler run
+    // This method will be called once per scheduler runs
     updateOdometry();
-
     // System.out.println(String.format("Roll: %f, Pitch: %f, Yaw: %f", m_gyro.getRoll(), m_gyro.getPitch(), m_gyro.getYaw()));
   }
  
@@ -324,15 +323,15 @@ public class Drivetrain extends SubsystemBase implements Loggable {
     //use the differntial drive invers kinematics class to set the motor controllers directly in velocity control mode
     DifferentialDriveWheelSpeeds wheelSpeeds = m_kinematics.toWheelSpeeds(new ChassisSpeeds(speed, 0, rotation));
     
-    System.out.print(wheelSpeeds.leftMetersPerSecond);
-    System.out.print("*");
-    System.out.println(wheelSpeeds.rightMetersPerSecond);
+    // System.out.print(wheelSpeeds.leftMetersPerSecond);
+    // System.out.print("*");
+    // System.out.println(wheelSpeeds.rightMetersPerSecond);
    
     double leftspeedtalon = velocityToNativeUnits( wheelSpeeds.leftMetersPerSecond );
     double rightspeedtalon = velocityToNativeUnits( wheelSpeeds.rightMetersPerSecond );
-    System.out.print(leftspeedtalon);
-    System.out.print("  ");
-    System.out.println(rightspeedtalon);
+    // System.out.print(leftspeedtalon);
+    // System.out.print("  ");
+    // System.out.println(rightspeedtalon);
 
     m_leftMaster.set(ControlMode.Velocity, leftspeedtalon);
     m_rightMaster.set(ControlMode.Velocity, rightspeedtalon);
@@ -364,12 +363,12 @@ public class Drivetrain extends SubsystemBase implements Loggable {
 
   @Config(name = "Max Output", defaultValueNumeric = 1)
 
-  public void setMaxOutput(double maxOutput) {
-    m_differentialDrive.setMaxOutput(maxOutput);
-  } 
+  // public void setMaxOutput(double maxOutput) {
+  //   m_differentialDrive.setMaxOutput(maxOutput);
+  // } 
   public void updateOdometry() {
     m_poseEstimator.update(
-      m_gyro.getRotation2d(),nativeUnitsToDistanceMeters( m_leftMaster.getSelectedSensorPosition()),  nativeUnitsToDistanceMeters( m_rightMaster.getSelectedSensorPosition()));
+      m_gyro.getRotation2d(), nativeUnitsToDistanceMeters( m_leftMaster.getSelectedSensorPosition()),nativeUnitsToDistanceMeters( m_rightMaster.getSelectedSensorPosition()));
     Optional<EstimatedRobotPose> result =
             pcw.getEstimatedGlobalPose(m_poseEstimator.getEstimatedPosition());
 
@@ -403,6 +402,15 @@ public Rotation2d getRot() {
 private double getGyroPos(){
   return m_gyro.getYaw();
 }
+@Log.Graph(name = "lefterror")
+public double lerror(){
+  return m_leftMaster.getClosedLoopError();
+}
+@Log.Graph(name = "righterror")
+public double rerror(){
+  return m_rightMaster.getClosedLoopError();
+}
+
 
 private int distanceToNativeUnits(double positionMeters){
   double wheelRotations = positionMeters/(2 * Math.PI * Units.inchesToMeters(kWheelRadiusInches));
