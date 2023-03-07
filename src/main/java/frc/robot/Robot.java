@@ -4,23 +4,37 @@
 
 package frc.robot;
 
+import com.pathplanner.lib.server.PathPlannerServer;
+import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import frc.robot.subsystems.drivetrain.Drivetrain;
+import io.github.oblarg.oblog.Logger;
+
 
 public class Robot extends TimedRobot {
   private Command m_autonomousCommand;
 
   private RobotContainer m_robotContainer;
 
+  private Drivetrain m_drivetrain;
+
+  XboxController xboxController;
+
   @Override
   public void robotInit() {
     m_robotContainer = new RobotContainer();
+    PathPlannerServer.startServer(5811);
+    Logger.configureLoggingAndConfig(m_robotContainer, false); // true for verbose logging
   }
 
   @Override
   public void robotPeriodic() {
     CommandScheduler.getInstance().run();
+    Logger.updateEntries();
   }
 
   @Override
@@ -55,7 +69,27 @@ public class Robot extends TimedRobot {
   }
 
   @Override
-  public void teleopPeriodic() {}
+  public void teleopPeriodic() {
+    // double forwardSpeed;
+    // double rotationSpeed;
+
+    // forwardSpeed = -xboxController.getRightY();
+
+    // if(xboxController.getAButton()){
+    //   var result = camera.getLatestResult();
+      
+    //   if(result.hasTargets()){
+    //     rotationSpeed = -turnController.calculate(result.getBestTarget().getYaw(), 0);
+    //     // double range = PhotonUtils.calculateDistanceToTargetMeters(rotationSpeed, rotationSpeed, forwardSpeed, rotationSpeed);
+    //   } else { 
+    //     rotationSpeed = 0; 
+    //   }
+    // } else {
+    //   rotationSpeed = xboxController.getLeftX();
+    // }
+
+    // m_Drivetrain.arcadeDrive(forwardSpeed, rotationSpeed);
+  }
 
   @Override
   public void teleopExit() {}
