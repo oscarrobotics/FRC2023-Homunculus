@@ -7,7 +7,7 @@ import frc.robot.RobotContainer;
 
 
 
-public final  class Constants {
+public final class Constants {
 
   public static final int kTimoutms = 30;
 
@@ -21,12 +21,12 @@ public final  class Constants {
   public static final double maxTurn = 2.0; //rad/s
 
   public static final double dKf = 1023.0 / 18252;
-  public static final double dKp = 0.0;
+  public static final double dKp = 0.05;
   public static final double dKi = 0.000;
   public static final double dKd = 0;
   public static final double dIz= 300;
   public static final int encoderCounts = 2048;
-
+  public static final int voltageDropThreshold = 3;
   
   public static final int dkslot = 0;
   public static final int dkloop = 0;
