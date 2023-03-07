@@ -10,6 +10,8 @@ import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import frc.robot.subsystems.drivetrain.Drivetrain;
+import io.github.oblarg.oblog.Logger;
 
 
 public class Robot extends TimedRobot {
@@ -17,35 +19,20 @@ public class Robot extends TimedRobot {
 
   private RobotContainer m_robotContainer;
 
-  
-  
-  
-
-
-
-
-  final double CAMERA_HEIGHT_METERS = Units.inchesToMeters(24);
-  final double CAMERA_ANGLE_RADIANS = Units.degreesToRadians(0);
-  
-  //Tune PID const via sysID
-  final double LINEAR_P = 0.1;
-  final double LINEAR_D = 0.0;
-  PIDController forwardController = new PIDController(LINEAR_P, 0, LINEAR_D);
-
-  final double ANGULAR_P = 0.1;
-  final double ANGULAR_D = 0.0;
-  PIDController turnController = new PIDController(ANGULAR_P, 0, ANGULAR_D);
+  private Drivetrain m_drivetrain;
 
   XboxController xboxController;
 
   @Override
   public void robotInit() {
     m_robotContainer = new RobotContainer();
+    Logger.configureLoggingAndConfig(m_robotContainer, false); // true for verbose logging
   }
 
   @Override
   public void robotPeriodic() {
     CommandScheduler.getInstance().run();
+    Logger.updateEntries();
   }
 
   @Override

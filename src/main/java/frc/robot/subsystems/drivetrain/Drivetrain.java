@@ -9,7 +9,7 @@ import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.geometry.Pose2d;
 
 import edu.wpi.first.math.geometry.Rotation2d;
-
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.DifferentialDriveKinematics;
 import edu.wpi.first.math.estimator.DifferentialDrivePoseEstimator;
 
@@ -18,9 +18,10 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.motorcontrol.MotorControllerGroup;
 import edu.wpi.first.wpilibj.RobotController;
-
+import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+
+
 import edu.wpi.first.wpilibj.simulation.DifferentialDrivetrainSim;
 
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
@@ -31,26 +32,27 @@ import java.util.Optional;
 
 
 import org.photonvision.EstimatedRobotPose;
-
-
+import org.photonvision.PhotonPoseEstimator;
+import org.photonvision.PhotonPoseEstimator.PoseStrategy;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.TalonFXFeedbackDevice;
 import com.ctre.phoenix.motorcontrol.can.TalonFXConfiguration;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 import com.ctre.phoenix.motorcontrol.ControlMode;
+import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.sensors.WPI_Pigeon2;
 import com.ctre.phoenix.motorcontrol.TalonFXSimCollection;
 import com.ctre.phoenix.sensors.BasePigeonSimCollection;
 
 import frc.robot.Constants;
 import frc.robot.PhotonCameraWrapper;
+import io.github.oblarg.oblog.Loggable;
+import io.github.oblarg.oblog.annotations.Config;
+import io.github.oblarg.oblog.annotations.Log;
 
 
 
-public class Drivetrain extends SubsystemBase {
-
-  private final CommandXboxController m_driverController = new CommandXboxController(0);
-  
+public class Drivetrain extends SubsystemBase implements Loggable {
   //motors
   private final WPI_TalonFX m_leftMaster = new WPI_TalonFX(1);
   private final WPI_TalonFX m_leftDrone = new WPI_TalonFX(2);
@@ -61,8 +63,10 @@ public class Drivetrain extends SubsystemBase {
   private final WPI_Pigeon2 m_gyro = new WPI_Pigeon2(0);
 
   //motor groups
+  @Log.MotorController(name = "Left Motors", tabName = "Drivetrain")
   private final MotorControllerGroup m_leftMotors =
       new MotorControllerGroup(m_leftMaster, m_leftDrone);
+  @Log.MotorController(name = "Right Motors", tabName = "Drivetrain")
   private final MotorControllerGroup m_rightMotors =
       new MotorControllerGroup(m_rightMaster, m_rightDrone);
 
@@ -93,7 +97,7 @@ public class Drivetrain extends SubsystemBase {
  private final TalonFXSimCollection m_leftDriveSim = m_leftMaster.getSimCollection();
  private final TalonFXSimCollection m_rightDriveSim = m_rightMaster.getSimCollection();
 
- final int kCountsPerRev = Constants.encodercounts;  //Encoder counts per revolution of the motor shaft.
+ final int kCountsPerRev = Constants.encoderCounts;  //Encoder counts per revolution of the motor shaft.
  final double kSensorGearRatio = Constants.gearRatio; //Gear ratio is the ratio between the *encoder* and the wheels.  
  final double kGearRatio = Constants.gearRatio; //Switch kSensorGearRatio to this gear ratio if encoder is on the motor instead of on the gearbox.
  final double kWheelRadiusInches = 3; //Wheel radius in inches
@@ -115,7 +119,7 @@ public class Drivetrain extends SubsystemBase {
 
   public Drivetrain() {
 
-
+    m_gyro.reset(); 
   
     m_rightMotors.setInverted(true);
     m_rightMaster.setInverted(true);
@@ -136,7 +140,7 @@ public class Drivetrain extends SubsystemBase {
     m_leftMaster.configNominalOutputReverse(0);
     m_leftMaster.configPeakOutputForward(1);
     m_leftMaster.configPeakOutputReverse(-1);
-    m_leftMaster.configClosedloopRamp(.2);
+    m_leftMaster.configClosedloopRamp(0);
     
     m_leftMaster.config_kF(Constants.dkslot, Constants.dKf);
     m_leftMaster.config_kP(Constants.dkslot, Constants.dKp);
@@ -151,7 +155,7 @@ public class Drivetrain extends SubsystemBase {
     m_rightMaster.configNominalOutputReverse(0);
     m_rightMaster.configPeakOutputForward(1);
     m_rightMaster.configPeakOutputReverse(-1);
-    m_rightMaster.configClosedloopRamp(.2);
+    m_rightMaster.configClosedloopRamp(0);
 
     m_rightMaster.config_kF(Constants.dkslot, Constants.dKf);
     m_rightMaster.config_kP(Constants.dkslot, Constants.dKp);
@@ -161,11 +165,15 @@ public class Drivetrain extends SubsystemBase {
 
 
     //Odometry
+    m_rightMotors.setInverted(true);
+    
+    m_leftMaster.configSelectedFeedbackSensor(FeedbackDevice.IntegratedSensor, 0, 0);
+    m_rightMaster.configSelectedFeedbackSensor(FeedbackDevice.IntegratedSensor, 0, 0);
     
     m_leftMaster.setSelectedSensorPosition(0);
     m_rightMaster.setSelectedSensorPosition(0);
     m_gyro.setYaw(0);
-    
+
 
   
 
@@ -175,26 +183,39 @@ public class Drivetrain extends SubsystemBase {
     pcw = new PhotonCameraWrapper();
 
 
-
+        
   }
 
+      // PhotonPoseEstimator photonPoseEstimator = new PhotonPoseEstimator(layout, PoseStrategy.CLOSEST_TO_REFERENCE_POSE, camera, robotToCam);
+    
+    //TODO: get targets, get results, get data from targets, etc. (all null so it will not run in current state)
+      // var result = camera.getLatestResult();
+      // boolean hasTargets = result.hasTargets(); 
 
+      // PhotonTrackedTarget target = result.getBestTarget();
+      // List<PhotonTrackedTarget> targets = result.getTargets();
+      // // double poseAmbiguity = target.getPoseAmbiguity();
+      // Transform3d bestCameraToTarget = target.getBestCameraToTarget();
+      // Transform3d alternateCameraToTarget = target.getAlternateCameraToTarget();
+  
 
+  // private final WPI_Pigeon2 m_gyro = new WPI_Pigeon2(0); //fix canID
 
+ 
 
   @Override
   public void periodic() {
-    // This method will be called once per scheduler run
-
+    // This method will be called once per scheduler runs
+    updateOdometry();
     // System.out.println(String.format("Roll: %f, Pitch: %f, Yaw: %f", m_gyro.getRoll(), m_gyro.getPitch(), m_gyro.getYaw()));
   }
-
+ 
   @Override
   public void simulationPeriodic() {
       /* Pass the robot battery voltage to the simulated Talon SRXs */
       m_leftDriveSim.setBusVoltage(RobotController.getBatteryVoltage());
       m_rightDriveSim.setBusVoltage(RobotController.getBatteryVoltage());
-  
+      updateOdometry();
       /*
        * CTRE simulation is low-level, so SimCollection inputs
        * and outputs are not affected by SetInverted(). Only
@@ -258,7 +279,7 @@ public class Drivetrain extends SubsystemBase {
 
 
   public void arcadeDriveV(double speed, double rotation){
-    //use the differential drive inverse kinematics class to set the motor controllers directly in velocity control mode
+    //use the differntial drive invers kinematics class to set the motor controllers directly in velocity control mode
     
     DifferentialDriveWheelSpeeds wheelSpeeds = m_kinematics.toWheelSpeeds(new ChassisSpeeds(speed, 0, rotation));
 
@@ -271,12 +292,16 @@ public class Drivetrain extends SubsystemBase {
 
     // double leftspeedtalon = wheelSpeeds.leftMetersPerSecond / metertorpm * rpmtounit; //unit/100ms
     // double rightspeedtalon = wheelSpeeds.rightMetersPerSecond / metertorpm * rpmtounit; //unit/100ms
+    // System.out.print(wheelSpeeds.leftMetersPerSecond);
+    // System.out.print("*");
+    // System.out.println(wheelSpeeds.rightMetersPerSecond);
    
+
     double leftspeedtalon = velocityToNativeUnits( wheelSpeeds.leftMetersPerSecond );
     double rightspeedtalon = velocityToNativeUnits( wheelSpeeds.rightMetersPerSecond );
-    System.out.print(leftspeedtalon);
-    System.out.print("  ");
-    System.out.println(rightspeedtalon);
+    // System.out.print(leftspeedtalon);
+    // System.out.print("  ");
+    // System.out.println(rightspeedtalon);
 
     m_leftMaster.set(ControlMode.Velocity, leftspeedtalon);
     m_rightMaster.set(ControlMode.Velocity, rightspeedtalon);
@@ -285,29 +310,28 @@ public class Drivetrain extends SubsystemBase {
     
 
 
-   }
+  }
 
    public void smoothDrive(double speed, double rotation){
     
-    final double kFiltercoeff = 0.9;//filter coefficient for the low pass filter high value means more smoothing
+    final double kFiltercoeff = 0;//filter coefficient for the low pass filter high value means more smoothing
      
     //apply a low pass filter to the speed input
     //takes a percentage of the new speed and the oposite percentage of the old speed and adds them together
     speed = speed * (1-kFiltercoeff) + filtspeed * kFiltercoeff ;
-    filtspeed = speed;
+    
     //use the differntial drive invers kinematics class to set the motor controllers directly in velocity control mode
     DifferentialDriveWheelSpeeds wheelSpeeds = m_kinematics.toWheelSpeeds(new ChassisSpeeds(speed, 0, rotation));
     
-    
+    // System.out.print(wheelSpeeds.leftMetersPerSecond);
+    // System.out.print("*");
+    // System.out.println(wheelSpeeds.rightMetersPerSecond);
    
-    
     double leftspeedtalon = velocityToNativeUnits( wheelSpeeds.leftMetersPerSecond );
     double rightspeedtalon = velocityToNativeUnits( wheelSpeeds.rightMetersPerSecond );
-    System.out.print(leftspeedtalon);
-    System.out.print("  ");
-    System.out.println(rightspeedtalon);
-
-    System.out.println(String.format("Right trigger: %f", m_driverController.getRightTriggerAxis()));
+    // System.out.print(leftspeedtalon);
+    // System.out.print("  ");
+    // System.out.println(rightspeedtalon);
 
     m_leftMaster.set(ControlMode.Velocity, leftspeedtalon);
     m_rightMaster.set(ControlMode.Velocity, rightspeedtalon);
@@ -316,7 +340,7 @@ public class Drivetrain extends SubsystemBase {
     
 
 
-   }
+  }
   // public void arcadeDrive(double speed, double rotation) {
   //   m_differentialDrive.arcadeDrive(speed, rotation);
   // }
@@ -337,17 +361,14 @@ public class Drivetrain extends SubsystemBase {
     m_rightMotors.stopMotor();
   }
 
-  public void setMaxOutput(double maxOutput) {
-    // m_differentialDrive.setMaxOutput(maxOutput);
-  
-  }
+  @Config(name = "Max Output", defaultValueNumeric = 1)
 
-
-
+  // public void setMaxOutput(double maxOutput) {
+  //   m_differentialDrive.setMaxOutput(maxOutput);
+  // } 
   public void updateOdometry() {
     m_poseEstimator.update(
-      m_gyro.getRotation2d(), m_leftMaster.getSelectedSensorPosition(), m_rightMaster.getSelectedSensorPosition());
-
+      m_gyro.getRotation2d(), nativeUnitsToDistanceMeters( m_leftMaster.getSelectedSensorPosition()),nativeUnitsToDistanceMeters( m_rightMaster.getSelectedSensorPosition()));
     Optional<EstimatedRobotPose> result =
             pcw.getEstimatedGlobalPose(m_poseEstimator.getEstimatedPosition());
 
@@ -364,10 +385,32 @@ public class Drivetrain extends SubsystemBase {
     m_fieldSim.getObject("Actual Pos").setPose(m_driveSim.getPose());
     m_fieldSim.setRobotPose(m_poseEstimator.getEstimatedPosition());
 }
-
+// @Log.ToString(name = "Pose")
 public Pose2d getPose() {
     return m_poseEstimator.getEstimatedPosition();
 }
+@Log.ToString(name = "Translation")
+public Translation2d getTranslation() {
+    return m_poseEstimator.getEstimatedPosition().getTranslation();
+}
+@Log.ToString(name = "Rotation")
+public Rotation2d getRot() {
+    return m_poseEstimator.getEstimatedPosition().getRotation();
+}
+
+@Log(name = "Gyro Yaw")
+private double getGyroPos(){
+  return m_gyro.getYaw();
+}
+@Log.Graph(name = "lefterror")
+public double lerror(){
+  return m_leftMaster.getClosedLoopError();
+}
+@Log.Graph(name = "righterror")
+public double rerror(){
+  return m_rightMaster.getClosedLoopError();
+}
+
 
 private int distanceToNativeUnits(double positionMeters){
   double wheelRotations = positionMeters/(2 * Math.PI * Units.inchesToMeters(kWheelRadiusInches));
@@ -389,5 +432,31 @@ private double nativeUnitsToDistanceMeters(double sensorCounts){
   double wheelRotations = motorRotations / kSensorGearRatio;
   double positionMeters = wheelRotations * (2 * Math.PI * Units.inchesToMeters(kWheelRadiusInches));
   return positionMeters;
+  }
+
+
+private int moveTenFeet(){  //move 10 feet in native units
+  double tenFeet = Units.feetToMeters(10);
+  int tenFeetNativeUnits = distanceToNativeUnits(tenFeet);
+  return tenFeetNativeUnits;
+}                                
+
+public CommandBase movingCommand(){
+  
+  return new CommandBase() {
+    @Override
+    public void initialize() {}
+
+    @Override
+    public void execute() {
+      m_leftMaster.set(ControlMode.Position, moveTenFeet());
+      m_rightMaster.set(ControlMode.Position, moveTenFeet());
+    }
+
+    @Override
+    public boolean isFinished() {
+      return false;
+    }
+  };
 }
 }
