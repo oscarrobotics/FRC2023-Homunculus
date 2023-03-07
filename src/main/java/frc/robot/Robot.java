@@ -4,6 +4,7 @@
 
 package frc.robot;
 
+import com.pathplanner.lib.server.PathPlannerServer;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.TimedRobot;
@@ -26,6 +27,7 @@ public class Robot extends TimedRobot {
   @Override
   public void robotInit() {
     m_robotContainer = new RobotContainer();
+    PathPlannerServer.startServer(5811);
     Logger.configureLoggingAndConfig(m_robotContainer, false); // true for verbose logging
   }
 

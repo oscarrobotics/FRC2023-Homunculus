@@ -1,12 +1,5 @@
 package frc.robot.subsystems.drivetrain;
 
-<<<<<<< Updated upstream
-import edu.wpi.first.wpilibj.drive.DifferentialDrive;
-import edu.wpi.first.wpilibj.motorcontrol.MotorControllerGroup;
-import edu.wpi.first.wpilibj.RobotController;
-import edu.wpi.first.wpilibj2.command.CommandBase;
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
-=======
 
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.math.numbers.N2;
@@ -44,13 +37,10 @@ import java.util.function.BiConsumer;
 import org.photonvision.EstimatedRobotPose;
 import org.photonvision.PhotonPoseEstimator;
 import org.photonvision.PhotonPoseEstimator.PoseStrategy;
->>>>>>> Stashed changes
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.TalonFXFeedbackDevice;
 import com.ctre.phoenix.motorcontrol.can.TalonFXConfiguration;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
-<<<<<<< Updated upstream
-=======
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.sensors.WPI_Pigeon2;
@@ -127,7 +117,6 @@ public class Drivetrain extends SubsystemBase implements Loggable {
                  Constants.wheelBaseWidth,
                  Constants.wheelRad,
                  null);
->>>>>>> Stashed changes
 
 import frc.robot.Constants;
 import frc.robot.PhotonCameraWrapper;
@@ -140,8 +129,6 @@ import io.github.oblarg.oblog.annotations.Log;
     m_leftDrone.setNeutralMode(NeutralMode.Brake);
     m_rightMaster.setNeutralMode(NeutralMode.Brake);
     m_rightDrone.setNeutralMode(NeutralMode.Brake);
-<<<<<<< Updated upstream
-=======
     // m_leftMaster.setNeutralMode(NeutralMode.Coast);
     // m_leftDrone.setNeutralMode(NeutralMode.Coast);
     // m_rightMaster.setNeutralMode(NeutralMode.Coast);
@@ -195,7 +182,6 @@ import io.github.oblarg.oblog.annotations.Log;
     //Vision
     pcw = new PhotonCameraWrapper();
 
->>>>>>> Stashed changes
   }
 // Assuming this method is part of a drivetrain subsystem that provides the necessary methods
 public Command followTrajectoryCommand(PathPlannerTrajectory traj, boolean isFirstPath) {
@@ -240,12 +226,7 @@ public class Drivetrain extends SubsystemBase implements Loggable {
   private final MotorControllerGroup m_rightMotors =
       new MotorControllerGroup(m_rightMaster, m_rightDrone);
 
-<<<<<<< Updated upstream
-  public final DifferentialDrive m_differentialDrive =
-      new DifferentialDrive(m_leftMotors, m_rightMotors);
-=======
   // private final WPI_Pigeon2 m_gyro = new WPI_Pigeon2(0); //fix canID
->>>>>>> Stashed changes
 
   @Override
   public void periodic() {
@@ -462,8 +443,6 @@ private double nativeUnitsToDistanceMeters(double sensorCounts){
   double positionMeters = wheelRotations * (2 * Math.PI * Units.inchesToMeters(kWheelRadiusInches));
   return positionMeters;
   }
-<<<<<<< Updated upstream
-=======
 
   // BiConsumer<Double, Double> setSpeeds = (left, right) -> {
   //   m_leftMaster.set(ControlMode.Velocity, left);
@@ -500,5 +479,4 @@ public CommandBase movingCommand(){
       return false;
     }
   };
->>>>>>> Stashed changes
 }
