@@ -4,9 +4,9 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.RobotContainer;
 import io.github.oblarg.oblog.Loggable;
 
-public class ExtendArm extends CommandBase implements Loggable {
-
-  public ExtendArm() {
+public class SetArmPosition extends CommandBase implements Loggable {
+  
+  public SetArmPosition() {
     // Use addRequirements() here to declare subsystem dependencies.
     addRequirements(RobotContainer.m_arm);
   }
