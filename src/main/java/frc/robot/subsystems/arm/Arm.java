@@ -25,8 +25,8 @@ private final double k_maxLengthPos = 0;//postion at the max length we mesures i
 private final double k_maxLeanglePos = 0 ; //max length of the angle control in units
 private final double k_maxClaw = 0;
 
-private final double k_maxHieght = 6.25 ;// hieght in feet that the robot is alowed to be
-private final double k_pivotHieght = 22; // hieght in inches that the pivot point oi the arm is of the floor
+private final double k_maxHeight = 6.25 ;// hieght in feet that the robot is alowed to be
+private final double k_pivotHeight = 22; // hieght in inches that the pivot point oi the arm is of the floor
 
 private final double k_defaultLength = 0; // the length we want the ar m to be most of the time 
 private final double k_defaultLeanglle= 0;//the lenght of the angle  motor we want most of the time 
@@ -62,11 +62,11 @@ private final double k_minLeangle= 0;//used for kinematics
 private final double k_maxLeangle=0;//used for kinematic
 private final double k_minLength=0;
 private final double k_maxLengh=0;
-private final double k_columtToFrame = 0; //distance of the colloum from the front of the robot
+private final double k_columtToFront = 0; //distance of the colloum from the front of the robot
 
-private final double k_ticksPerInchExtend=0;
-private final double k_ticksPerInchRaise=0;
-private final double k_ticksPerInchGrip= 0;
+private final double k_ticksPerInchExtend=1;
+private final double k_ticksPerInchRaise=1;
+private final double k_ticksPerInchGrip= 1;
 
 // private final AbsoluteEncoder m_Encoder;
 
@@ -119,14 +119,15 @@ private final double k_ticksPerInchGrip= 0;
     return m_extendMotor.getOutputCurrent();
   }
 
-public Translation2d getArmPosition(){
+@Log.String(name = "Arm Pose")
+public Translation2d getArmPose(){
 
 double armangle = getArmAngle();
 
 double armlength = k_minLength + m_extendEncoder.getPosition();
 
 double clawhieght = k_pivotHieght+ Math.sin(armangle)*armlength; 
-double clawlength =Math.cos(armangle)*armlength-k_columtToFrame;
+double clawlength =Math.cos(armangle)*armlength-k_columtToFront;
 
 
 
@@ -152,6 +153,56 @@ public double getArmAngle(){
 
   return angle;
 }
+public double angleToLeangle(double angle){
+  //angle is the angle of the arm above or below horizontal
+ //use law of cosines because we have 2 sides and an included angle
+  //c^2 = a^2+b^2-2ab*cos(C)
+  // solve for c 
+  //C =  the  moving angle of the arm
+  C = angle + 90;
+  double a = k_pivotLenght;
+  double b = k_pivotOffset;
+  double c = Math.sqrt(Math.pow(a, 2)+Math.pow(b, 2)-2*a*b*Math.cos(C));
+  return c;
 
+
+}
+
+public Translation2d radialToLengths(double angle, double length){
+ //calculate the lengths of the arm and angle motor to get to the desired position
+ //angle is the angle of the arm above or below horizontal
+ //length is the distance from the front of the robot to the desired position
+
+ double leangle = angleToLeangle(angle);
+ double length = length/Math.cos(angle) - k_columtToFront;
+
+ 
+
+  return new Translation2d(leangle,lenght);
+}
+
+public Translation2d cartToLengths(double lenght, double height){
+  //calculate the lengths of the arm and angle motor to get to the desired position
+  //height is the hieght of the desired position
+  //length is the distance from the front of the robot to the desired position
+  height = height - k_pivotHeight;
+  lenght = lenght + k_columtToFront;
+  double angle = Math.atan(height/lenght);
+  double leangle = angleToLeangle(angle);
+  double length = length/Math.cos(angle);
+ 
+  
+ 
+   return new Translation2d(leangle,lenght);
+ }
+
+@Log.graph(name = "Extent Position")
+m_extendEncoder.getPosition();
+
+@Log.graph(name = "Raise Position")
+m_raiseEncoder.getPosition();
+
+@Log.graph(name = "Grip Position")
+m_gripEncoder.getPosition();
 
 }
