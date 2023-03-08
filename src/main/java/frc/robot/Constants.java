@@ -7,7 +7,7 @@ import frc.robot.RobotContainer;
 
 
 
-public final  class Constants {
+public final class Constants {
 
   public static final int kTimoutms = 30;
 
@@ -26,7 +26,7 @@ public final  class Constants {
   public static final double dKd = 0;
   public static final double dIz= 300;
   public static final int encoderCounts = 2048;
-
+  public static final int voltageDropThreshold = 3;
   
   public static final int dkslot = 0;
   public static final int dkloop = 0;
@@ -36,15 +36,23 @@ public final  class Constants {
     static final double width = Units.feetToMeters(27);
 }
 
-  static class VisionConstants {
-    static final Transform3d robotToCam =
+  public static class VisionConstants {
+    public static final Transform3d robotToCam =
             new Transform3d(
                     new Translation3d(0.5, 0.0, 0.5),
                     new Rotation3d(
                             0, 0,
                             0)); // Cam mounted facing forward, half a meter forward of center, half a meter up
     // from center.
-    static final String cameraName = "OV5647";
+    public static final String cameraName = "OV5647";
+    // public static final Transform3d robotToCam2 =
+    //         new Transform3d(
+    //                 new Translation3d(0.5, 0.0, 0.5),
+    //                 new Rotation3d(
+    //                         0, 0,
+    //                         0)); // Cam mounted facing forward, half a meter forward of center, half a meter up
+    // // from center.
+    // public static final String cameraName2 = "OV5647";
 }
   
 }

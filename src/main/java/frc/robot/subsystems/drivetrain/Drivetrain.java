@@ -11,6 +11,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.DifferentialDriveKinematics;
+import edu.wpi.first.math.controller.RamseteController;
 import edu.wpi.first.math.estimator.DifferentialDrivePoseEstimator;
 
 import edu.wpi.first.math.kinematics.DifferentialDriveWheelSpeeds;
@@ -18,8 +19,11 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.motorcontrol.MotorControllerGroup;
 import edu.wpi.first.wpilibj.RobotController;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 
 
 import edu.wpi.first.wpilibj.simulation.DifferentialDrivetrainSim;
@@ -30,10 +34,8 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 import java.util.Optional;
 
-
 import org.photonvision.EstimatedRobotPose;
-import org.photonvision.PhotonPoseEstimator;
-import org.photonvision.PhotonPoseEstimator.PoseStrategy;
+
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.TalonFXFeedbackDevice;
 import com.ctre.phoenix.motorcontrol.can.TalonFXConfiguration;
@@ -41,6 +43,8 @@ import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.sensors.WPI_Pigeon2;
+import com.pathplanner.lib.PathPlannerTrajectory;
+import com.pathplanner.lib.commands.PPRamseteCommand;
 import com.ctre.phoenix.motorcontrol.TalonFXSimCollection;
 import com.ctre.phoenix.sensors.BasePigeonSimCollection;
 
@@ -90,7 +94,8 @@ public class Drivetrain extends SubsystemBase implements Loggable {
 
   // public final DifferentialDrive m_differentialDrive =
   //     new DifferentialDrive(m_leftMotors, m_rightMotors);
-
+//ramsete controller
+  public final RamseteController m_ramseteController = new RamseteController();
 
  // Simulation classes help us simulate our robot
  private final BasePigeonSimCollection m_gyroSim = m_gyro.getSimCollection();
@@ -180,7 +185,8 @@ public class Drivetrain extends SubsystemBase implements Loggable {
    
 
     //Vision
-    pcw = new PhotonCameraWrapper();
+    pcw = new PhotonCameraWrapper(Constants.VisionConstants.cameraName, Constants.VisionConstants.robotToCam);
+    //pcw2 = new PhotonCameraWrapper(Constants.VisionConstants.cameraName2, Constants.VisionConstants.robotToCam2)
 
 
         
@@ -201,7 +207,9 @@ public class Drivetrain extends SubsystemBase implements Loggable {
 
   // private final WPI_Pigeon2 m_gyro = new WPI_Pigeon2(0); //fix canID
 
- 
+  public void resetOdometry(Pose2d initialPose) {
+    m_poseEstimator.resetPosition(m_gyro.getRotation2d(), nativeUnitsToDistanceMeters( m_leftMaster.getSelectedSensorPosition()), nativeUnitsToDistanceMeters( m_rightMaster.getSelectedSensorPosition()), initialPose);
+  }
 
   @Override
   public void periodic() {
@@ -311,10 +319,17 @@ public class Drivetrain extends SubsystemBase implements Loggable {
 
 
   }
+  double kFiltercoeff = 0;
+
+  @Config(name = " Smothing Filter coeff")
+  private double setSmothing(double filtervalue){
+    kFiltercoeff = filtervalue;
+    return kFiltercoeff;
+  }
 
    public void smoothDrive(double speed, double rotation){
     
-    final double kFiltercoeff = 0;//filter coefficient for the low pass filter high value means more smoothing
+    //filter coefficient for the low pass filter high value means more smoothing
      
     //apply a low pass filter to the speed input
     //takes a percentage of the new speed and the oposite percentage of the old speed and adds them together
@@ -361,17 +376,13 @@ public class Drivetrain extends SubsystemBase implements Loggable {
     m_rightMotors.stopMotor();
   }
 
-  @Config(name = "Max Output", defaultValueNumeric = 1)
 
-  // public void setMaxOutput(double maxOutput) {
-  //   m_differentialDrive.setMaxOutput(maxOutput);
-  // } 
   public void updateOdometry() {
     m_poseEstimator.update(
       m_gyro.getRotation2d(), nativeUnitsToDistanceMeters( m_leftMaster.getSelectedSensorPosition()),nativeUnitsToDistanceMeters( m_rightMaster.getSelectedSensorPosition()));
     Optional<EstimatedRobotPose> result =
             pcw.getEstimatedGlobalPose(m_poseEstimator.getEstimatedPosition());
-
+  
     if (result.isPresent()) {
         EstimatedRobotPose camPose = result.get();
         m_poseEstimator.addVisionMeasurement(
@@ -381,6 +392,17 @@ public class Drivetrain extends SubsystemBase implements Loggable {
         // move it way off the screen to make it disappear
         m_fieldSim.getObject("Cam Est Pos").setPose(new Pose2d(-100, -100, new Rotation2d()));
     }
+  //   Optional<EstimatedRobotPose> result2 =
+  //   pcw2.getEstimatedGlobalPose(m_poseEstimator.getEstimatedPosition());
+  //   if (result2.isPresent()) {
+  //     EstimatedRobotPose camPose = result2.get();
+  //     m_poseEstimator.addVisionMeasurement(
+  //             camPose.estimatedPose.toPose2d(), camPose.timestampSeconds);
+  //     m_fieldSim.getObject("Cam Est Pos").setPose(camPose.estimatedPose.toPose2d());
+  // } else {
+  //     // move it way off the screen to make it disappear
+  //     m_fieldSim.getObject("Cam Est Pos").setPose(new Pose2d(-100, -100, new Rotation2d()));
+  // }
 
     m_fieldSim.getObject("Actual Pos").setPose(m_driveSim.getPose());
     m_fieldSim.setRobotPose(m_poseEstimator.getEstimatedPosition());
@@ -399,7 +421,7 @@ public Rotation2d getRot() {
 }
 
 @Log(name = "Gyro Yaw")
-private double getGyroPos(){
+public double getGyroPos(){
   return m_gyro.getYaw();
 }
 @Log.Graph(name = "lefterror")
@@ -434,6 +456,12 @@ private double nativeUnitsToDistanceMeters(double sensorCounts){
   return positionMeters;
   }
 
+public void setSpeeds(Double left, Double right){
+    m_leftMaster.set(ControlMode.Velocity, left);
+      m_rightMaster.set(ControlMode.Velocity, right);
+      m_leftDrone.set(ControlMode.Follower, 1);
+      m_rightDrone.set(ControlMode.Follower, 3);
+  }
 
 private int moveTenFeet(){  //move 10 feet in native units
   double tenFeet = Units.feetToMeters(10);
