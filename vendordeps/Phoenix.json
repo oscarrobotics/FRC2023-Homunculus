@@ -1,6 +1,11 @@
 {
     "fileName": "Phoenix.json",
     "name": "CTRE-Phoenix (v5)",
+<<<<<<< Updated upstream
+    "version": "5.30.4",
+=======
+    "version": "5.30.4+23.0.10",
+>>>>>>> Stashed changes
     "version": "5.30.4+23.0.8",
     "frcYear": 2023,
     "uuid": "ab676553-b602-441f-a38d-f1296eff6537",
@@ -50,6 +55,11 @@
         {
             "groupId": "com.ctre.phoenixpro",
             "artifactId": "tools",
+<<<<<<< Updated upstream
+            "version": "23.0.5",
+=======
+            "version": "23.0.10",
+>>>>>>> Stashed changes
             "version": "23.0.8",
             "isJar": false,
             "skipInvalidPlatforms": true,
@@ -63,6 +73,11 @@
         {
             "groupId": "com.ctre.phoenixpro.sim",
             "artifactId": "tools-sim",
+<<<<<<< Updated upstream
+            "version": "23.0.5",
+=======
+            "version": "23.0.10",
+>>>>>>> Stashed changes
             "version": "23.0.8",
             "isJar": false,
             "skipInvalidPlatforms": true,
@@ -76,6 +91,11 @@
         {
             "groupId": "com.ctre.phoenixpro.sim",
             "artifactId": "simTalonSRX",
+<<<<<<< Updated upstream
+            "version": "23.0.5",
+=======
+            "version": "23.0.10",
+>>>>>>> Stashed changes
             "version": "23.0.8",
             "isJar": false,
             "skipInvalidPlatforms": true,

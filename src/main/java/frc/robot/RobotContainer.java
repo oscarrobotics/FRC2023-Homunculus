@@ -4,6 +4,13 @@
 
 package frc.robot;
 
+import java.util.List;
+import com.pathplanner.lib.PathConstraints;
+import com.pathplanner.lib.PathPlanner;
+import com.pathplanner.lib.PathPlannerTrajectory;
+import com.pathplanner.lib.auto.RamseteAutoBuilder;
+import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
@@ -12,6 +19,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import frc.robot.subsystems.arm.Arm;
 import frc.robot.subsystems.drivetrain.Drivetrain;
 import io.github.oblarg.oblog.Logger;
 import io.github.oblarg.oblog.annotations.Log;
@@ -19,12 +27,22 @@ import io.github.oblarg.oblog.annotations.Log;
 public class RobotContainer {
   private final CommandXboxController m_driverController = new CommandXboxController(0);
 
-  private final Drivetrain m_drivetrain = new Drivetrain();
+  private static final Drivetrain m_drivetrain = new Drivetrain();
+
+  public static final Arm m_arm = new Arm();
 
   private final SendableChooser<Command> m_chooser = new SendableChooser<>();
-  
-  private final NetworkTableInstance ntinst = NetworkTableInstance.getDefault();
 
+  RamseteAutoBuilder autoBuilder = new RamseteAutoBuilder(
+    m_drivetrain::getPose,
+    m_drivetrain::resetOdometry,
+    m_drivetrain.m_ramseteController,
+    m_drivetrain.m_kinematics,
+    m_drivetrain::setSpeeds,
+    AutonomousMap.eventMap,
+    true,
+    m_drivetrain
+  );  
   public RobotContainer() {
     
 
@@ -68,6 +86,7 @@ public class RobotContainer {
   private void configureBindings() {}
 
   public Command getAutonomousCommand() {
-    return m_chooser.getSelected();
+    List<PathPlannerTrajectory> pathGroup = PathPlanner.loadPathGroup("OneCargoAuto1", new PathConstraints(3, 4));
+    return autoBuilder.fullAuto(pathGroup);
   }
 }
