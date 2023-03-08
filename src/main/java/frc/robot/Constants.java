@@ -18,7 +18,7 @@ public final class Constants {
   public static final double gearRatio = 10; // test robot
   // public final double gearratio = 9.8; // new robot
   public static final double maxSpeed = 4.267; //m/s
-  public static final double maxTurn = 2.0; //rad/s
+  public static final double maxTurn = 10.0; //rad/s
 
   public static final double dKf = 1023.0 / 18252;
   public static final double dKp = 0.05;
