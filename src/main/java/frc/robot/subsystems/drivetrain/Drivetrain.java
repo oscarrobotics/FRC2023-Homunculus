@@ -323,7 +323,7 @@ public class Drivetrain extends SubsystemBase implements Loggable {
   }
   double kFiltercoeff = 0;
 
-  @Config(name = " Smothing Filter coeff")
+  @Config.NumberSlider(name = " Smothing Filter coeff" , min = 0, max = 0.5,defaultValue = 0 )
   private void setSmothing(double filtervalue){
     kFiltercoeff = filtervalue;
     // return kFiltercoeff;
