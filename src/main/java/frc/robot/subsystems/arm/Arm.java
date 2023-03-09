@@ -286,7 +286,7 @@ public double getArmAngle(){
   //C = acos((a^2+b^2 - c^2) /2ab)
   double a = k_pivotLenght;
   double b = k_pivotOffset;
-  double c = m_raiseEncoder.getPosition();
+  double c = m_raiseEncoder.getPosition()*(k_maxLeangle-k_minLeangle)+k_minLeangle;
   angle = Math.acos((Math.pow(a, 2)+Math.pow(b, 2)-Math.pow(c, 2))/(2*a*b)); // angle of obtuse triangle formed by arm
   angle = angle -90;// i of arm  above or below horizontal
   
@@ -305,7 +305,8 @@ public double angleToLeangle(double angle){
   double a = k_pivotLenght;
   double b = k_pivotOffset;
   double c = Math.sqrt(Math.pow(a, 2)+Math.pow(b, 2)-2*a*b*Math.cos(C));
-  return c;
+  double leangle = (c-k_minLeangle)/(k_maxLeangle-k_minLeangle);
+  return leangle;
 
 
 }
@@ -426,6 +427,7 @@ public void setClawMotion(double position){
   
 
 }
+
 
  
 @Config(name = "Extend PID", tabName = "Arm PID")
