@@ -84,7 +84,7 @@ private final double k_pivotOffset = 6; //distance between the arm pirvot point 
 private final double k_minLeangle= 0;//used for kinematics
 private final double k_maxLeangle=0;//used for kinematic
 private final double k_minLength=0;
-private final double k_maxLengh=0;
+private final double k_maxLength=0;
 private final double k_columtToFront = 0; //distance of the colloum from the front of the robot
 
 private final double k_ticksPerInchExtend=1;
@@ -209,7 +209,7 @@ private final double k_ticksPerInchGrip= 1;
 
     //motion contfiguration
     int kSlotIdxE = 0;
-    m_extendPID.setSmartMotionMaxVelocity(maxRPME, kSlotIdxE);)
+    m_extendPID.setSmartMotionMaxVelocity(maxRPME, kSlotIdxE);
     m_extendPID.setSmartMotionMinOutputVelocity(0, kSlotIdxE);
     m_extendPID.setSmartMotionMaxAccel(2000, kSlotIdxE);
     m_extendPID.setSmartMotionAllowedClosedLoopError(1, kSlotIdxE);
@@ -266,7 +266,7 @@ public Translation2d getArmPose(){
 
 double armangle = getArmAngle();
 
-double armlength = k_minLength + m_extendEncoder.getPosition();
+double armlength = k_minLength + m_extendEncoder.getPosition()/k_rangeLengthPos * (k_maxLength-k_minLength);
 
 double clawhieght = k_pivotHeight+ Math.sin(armangle)*armlength; 
 double clawlength = Math.cos(armangle)*armlength-k_columtToFront;
@@ -295,6 +295,24 @@ public double getArmAngle(){
 
   return angle;
 }
+
+public double getArmLength(){
+  double length = 0;
+  //use law of cosines because we have three sides
+  //c^2 = a^2+b^2-2ab*cos(C)
+  //a^2+b^2 - c^2 = 2ab*cos(C)
+  //C = acos((a^2+b^2 - c^2) /2ab)
+  // double a = k_pivotLenght;
+  // double b = k_pivotOffset;
+  // double c = m_raiseEncoder.getPosition()/k_rangeLena*(k_maxLeangle-k_minLeangle)+k_minLeangle;
+  double extent = m_extendEncoder.getPosition()/k_rangeLengthPos*(k_maxLength-k_minLength)+k_minLength;
+  length = extent * Math.cos(getArmAngle())- k_columtToFront;
+  return length;
+
+}
+
+
+
 public double angleToLeangle(double angle){
   //angle is the angle of the arm above or below horizontal
  //use law of cosines because we have 2 sides and an included angle
@@ -342,6 +360,11 @@ public Translation2d cartToLengths(double length, double height){
 @Log(name = "Extent Position")
 public double getExtendedPosition(){
   return m_extendEncoder.getPosition();
+}
+
+@Log(name = "Extent")
+public double getExtent(){
+  return m_extendEncoder.getPosition()/k_rangeLengthPos*(k_maxLength-k_minLength)+k_minLength;
 }
 
 @Log(name = "Raise Position")
@@ -427,11 +450,62 @@ public void setClawMotion(double position){
   
 
 }
+public void setExtendMotionSafe(double position){
+  //inpoutrange -1 to 1
+  // pos zero is fully retracted
+  //1 is fully extended
+  position = position +1;
+  position = position/2;
+  position = position * (k_rangeLengthPos-2);
+  position = position+2;
+  // calculate max extension based on arm angle so it doesnt hit the floor
+  //max extion == k_pivotHeight/Math.cos(angle)
+  
+  // final double k_horizontalPos = -50;//????? this is a guess, fill in with actual value
+  // final double k_minAngle = -30;//  ????? this is a guess, fill in with actual value by mesuring the angle of the arm
+  double angle = getArmAngle();
+  double maxExtension = position;
+  if (angle < 0){
+     maxExtension = k_pivotHeight/Math.cos(angle);
+  }
+  maxExtension = (maxExtension-k_minLength)/(k_maxLength-k_minLength)*(k_rangeLengthPos);
+
+  if (position > maxExtension){
+    position = maxExtension;
+  }
+
+
+  m_extendPID.setReference(position, ControlType.kSmartMotion);
+}
+
+public void setRaiseMotionSafe( double position){
+  //inpoutrange -1 to 1
+  //pos 0 is fully raised
+  //negative pos is goint down 
+  position = position +1;
+  position = position/2;
+  position = position * (k_rangeLeanglePos-2) *-1;
+  position = position -2;
+  // calcuate min angle/leangle based on arm extension so it doesnt hit the floor
+  
+  double lenght = getExtent();
+ // min angle = Math.cos(angle)= k_pivotHeight/length
+  double minAngle = -Math.acos(k_pivotHeight/lenght);
+  minAngle = angleToLeangle(minAngle)*k_rangeLeanglePos;
+  
+  if (position < minAngle){
+    position = minAngle;
+  }
+  
+
+  m_raisePID.setReference(position, ControlType.kSmartMotion);
+
+}
 
 
  
 @Config(name = "Extend PID", tabName = "Arm PID")
-void setExtenPIDIzF(@Config(defaultValueNumeric = kPE) double p , @Config(defaultValueNumeric = kIE) double i, @Config(defaultValueNumeric = kDE) double d, @Config(defaultValueNumeric = kIzE) double iz, @Config(defaultValueNumeric = kFE) double f){  
+void setExtenPIDIzF(@Config(defaultValueNumeric = kPE) double p , @Config(defaultValueNumeric = kIE) double i, @Config(defaultValueNumeric = kDE) double d, @Config(defaultValueNumeric = kIzE) double iz, @Config(defaultValueNumeric = kFFE) double f){  
   m_extendPID.setP(p);
   m_extendPID.setI(i);
   m_extendPID.setD(d);
@@ -441,7 +515,7 @@ void setExtenPIDIzF(@Config(defaultValueNumeric = kPE) double p , @Config(defaul
 }
 
 @Config (name = "Raise PID", tabName = "Arm PID")
-void setRaisePIDIzF(@Config(defaultValueNumeric = kPR) double p , @Config(defaultValueNumeric = kIR) double i, @Config(defaultValueNumeric = kDR) double d, @Config(defaultValueNumeric = kIzR) double iz, @Config(defaultValueNumeric = kFR) double f) {
+void setRaisePIDIzF(@Config(defaultValueNumeric = kPR) double p , @Config(defaultValueNumeric = kIR) double i, @Config(defaultValueNumeric = kDR) double d, @Config(defaultValueNumeric = kIzR) double iz, @Config(defaultValueNumeric = kFFR) double f) {
   m_raisePID.setP(p);
   m_raisePID.setI(i);
   m_raisePID.setD(d);
@@ -450,7 +524,7 @@ void setRaisePIDIzF(@Config(defaultValueNumeric = kPR) double p , @Config(defaul
 }
 
 @Config (name = "Grip PID", tabName = "Arm PID")
-void setGripPIDIzF( @Config( defaultValueNumeric = kPG) double p , @Config(defaultValueNumeric = kIG) double i, @Config(defaultValueNumeric = kDG) double d, @Config(defaultValueNumeric = kIzG) double iz, @Config(defaultValueNumeric = kFG) double f) {
+void setGripPIDIzF( @Config( defaultValueNumeric = kPG) double p , @Config(defaultValueNumeric = kIG) double i, @Config(defaultValueNumeric = kDG) double d, @Config(defaultValueNumeric = kIzG) double iz, @Config(defaultValueNumeric = kFFG) double f) {
   m_gripPID.setP(p);
   m_gripPID.setI(i);
   m_gripPID.setD(d);
