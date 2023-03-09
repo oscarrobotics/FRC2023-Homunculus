@@ -184,7 +184,7 @@ double armangle = getArmAngle();
 double armlength = k_minLength + m_extendEncoder.getPosition();
 
 double clawhieght = k_pivotHeight+ Math.sin(armangle)*armlength; 
-double clawlength =Math.cos(armangle)*armlength-k_columtToFront;
+double clawlength = Math.cos(armangle)*armlength-k_columtToFront;
 
 
 
