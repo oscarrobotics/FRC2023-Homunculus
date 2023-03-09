@@ -126,7 +126,7 @@ public class RobotContainer {
     Command fullAuto = autoBuilder.fullAuto(m_autoSelector.getSelectedAuto());
     return fullAuto;
   }
-@Log(name = "Extra Stend set", tabName = "Arm PID")
+@Log(name = "Extra Stend get", tabName = "Arm PID")
  private double getExtraStend(){
    return extrastend;
  }
