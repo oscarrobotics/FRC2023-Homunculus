@@ -48,8 +48,11 @@ private final double k_rangeLeanglePos =120;//needs to be tuned, adjust tilll th
 private final double k_rangeClaw = k_maxClaw - k_minClaw; //also should be checked and tuned
 
 
-private final double k_maxHeight = 6.25 ;// hieght in feet that the robot is alowed to be
-private final double k_pivotHeight = 22; // hieght in inches that the pivot point oi the arm is of the floor
+private final double k_maxHeight = 6.25 ;// height in feet that the robot is alowed to be
+
+private final double k_pivotHeight = 22; // height in inches that the pivot point oi the arm is of the floor
+private double k_minArmHeight = 0; // height in inches that the arm is alowed to be at the bottom
+private final double d_minArmHeight = 2;
 
 private final double k_defaultLength = 0; // the length we want the ar m to be most of the time 
 private final double k_defaultLeanglle= 0;//the lenght of the angle  motor we want most of the time 
@@ -79,13 +82,13 @@ private final double k_cubeLength3= 0 ;
 private final double k_cubeLengthS= 0 ;
 
 
-private final double k_pivotLenght = 12 ;//? the hieght of the arm pivot from the base of the angle actuator fill in actual
-private final double k_pivotOffset = 6; //distance between the arm pirvot point and the place where the angle motor attaches to the arm, 
-private final double k_minLeangle= 0;//used for kinematics
-private final double k_maxLeangle=0;//used for kinematic
-private final double k_minLength=0;
-private final double k_maxLength=0;
-private final double k_columtToFront = 0; //distance of the colloum from the front of the robot
+private final double k_pivotLenght = 17.5 ;//? the hieght of the arm pivot from the base of the angle actuator fill in actual
+private final double k_pivotOffset = 5.25; //distance between the arm pirvot point and the place where the angle motor attaches to the arm, 
+private final double k_minLeangle= 13.4;//used for kinematics
+private final double k_maxLeangle= 21.2;//used for kinematic
+private final double k_minLength= 30;
+private final double k_maxLength= 61;
+private final double k_columtToFront = 18; //distance of the colloum from the front of the robot
 
 private final double k_ticksPerInchExtend=1;
 private final double k_ticksPerInchRaise=1;
@@ -226,7 +229,7 @@ private final double k_ticksPerInchGrip= 1;
     m_gripPID.setSmartMotionMaxAccel(2000, kSlotIdxG);
     m_gripPID.setSmartMotionAllowedClosedLoopError(1, kSlotIdxG);
 
-
+    
 
 
 
@@ -477,7 +480,7 @@ public void setExtendMotionSafe(double position){
   double angle = getArmAngle();
   double maxExtension = position;
   if (angle < 0){
-     maxExtension = k_pivotHeight/Math.cos(angle);
+     maxExtension = ( k_pivotHeight-k_minArmHeight ) / Math.cos(angle);
   }
   maxExtension = (maxExtension-k_minLength)/(k_maxLength-k_minLength)*(k_rangeLengthPos);
 
@@ -501,7 +504,7 @@ public void setRaiseMotionSafe( double position){
   
   double lenght = getExtent();
  // min angle = Math.cos(angle)= k_pivotHeight/length
-  double minAngle = -Math.acos(k_pivotHeight/lenght);
+  double minAngle = -Math.acos((k_pivotHeight-k_minArmHeight)/lenght);
   minAngle = angleToLeangle(minAngle)*k_rangeLeanglePos;
   
   if (position < minAngle){
@@ -511,6 +514,13 @@ public void setRaiseMotionSafe( double position){
 
   m_raisePID.setReference(position, ControlType.kSmartMotion);
 
+}
+
+
+public void resetPosition(){
+  m_extendEncoder.setPosition(0);
+  m_raiseEncoder.setPosition(0);
+  m_gripEncoder.setPosition(0);
 }
 
 
@@ -559,5 +569,13 @@ void setRaiseMaxVelocityAndAccel(@Config(defaultValueNumeric = maxRPMR) double m
 void setGripMaxVelocityAndAccel(@Config(defaultValueNumeric = maxRPMG) double maxVelocity, @Config(defaultValueNumeric = maxAccelG) double maxAccel){
   m_gripPID.setSmartMotionMaxVelocity(maxVelocity, 0);
   m_gripPID.setSmartMotionMaxAccel(maxAccel, 0);
+}
+
+@Config.NumberSlider (name = "min height", tabName = "Arm PID", min = 0, max = 8, defaultValue = d_minArmHeight)
+void setMinArmHeight( double minHeight){
+  k_minArmHeight = minHeight;
+
+
+
 }
 }
