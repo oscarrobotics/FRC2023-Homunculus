@@ -322,9 +322,9 @@ public class Drivetrain extends SubsystemBase implements Loggable {
   double kFiltercoeff = 0;
 
   @Config(name = " Smothing Filter coeff")
-  private double setSmothing(double filtervalue){
+  private void setSmothing(double filtervalue){
     kFiltercoeff = filtervalue;
-    return kFiltercoeff;
+    // return kFiltercoeff;
   }
 
    public void smoothDrive(double speed, double rotation){
