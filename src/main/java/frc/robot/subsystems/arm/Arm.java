@@ -137,7 +137,7 @@ private final double k_ticksPerInchGrip= 1;
 
 
   public Arm(){
-  m_extendMotor = new CANSparkMax(20, MotorType.kBrushless);
+    m_extendMotor = new CANSparkMax(20, MotorType.kBrushless);
    m_raiseMotor = new CANSparkMax(21,MotorType.kBrushless);
    m_gripMotor = new CANSparkMax(22,MotorType.kBrushless) ;
    
@@ -233,7 +233,7 @@ private final double k_ticksPerInchGrip= 1;
     
 
 
-
+     
 
 
     //set some soft limit to prevent full extension (illegal)
@@ -512,6 +512,35 @@ public void resetPosition(){
   m_raiseEncoder.setPosition(0);
   m_gripEncoder.setPosition(0);
 }
+
+double zeroingspeed = 0.5;
+final double k_zeroingSpeedDefault = 0.5;
+@Config(name = "Zeroing Speed", tabName = "Arm PID" , defaultValueNumeric = k_zeroingSpeedDefault)
+public void setZeroingSpeed(double speed){
+  zeroingspeed = speed;
+}
+
+public void moveToZero(){
+  //drive the mech to the zero position using velocity or duty cycle
+  //extend drives negative to retract
+  //raise dirves positive to raise
+  // m_extendPID.setReference(zeroingspeed, ControlType.kDutyCycle);
+  // m_raisePID.setReference(zeroingspeed, ControlType.kDutyCycle);
+  // m_gripPID.setReference(zeroingspeed, ControlType.kDutyCycle);
+
+  // double velthresh = 0.2;
+  // while(m_extendEncoder.getVelocity() > velthresh || m_raiseEncoder.getVelocity() > velthresh || m_gripEncoder.getVelocity() > velthresh){
+  //   //wait for the mech to reach the zero position
+  //   wait(1);
+  // }
+  // m_extendPID.setReference(0, ControlType.kDutyCycle);
+  // m_raisePID.setReference(0, ControlType.kDutyCycle);
+  // m_gripPID.setReference(0, ControlType.kDutyCycle);
+
+
+}
+
+
 
 
  
