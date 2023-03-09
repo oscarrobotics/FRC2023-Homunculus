@@ -18,16 +18,18 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.button.CommandGenericHID;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.subsystems.arm.Arm;
 import frc.robot.subsystems.drivetrain.Drivetrain;
 import io.github.oblarg.oblog.Logger;
 import io.github.oblarg.oblog.annotations.Log;
 
+
 public class RobotContainer {
   private final CommandXboxController m_driverController = new CommandXboxController(0);
-  
 
+  private final ControllerButtons m_operator = new ControllerButtons(1);
   private final Drivetrain m_drivetrain = new Drivetrain();
 
   public static final Arm m_arm = new Arm();
@@ -92,9 +94,9 @@ public class RobotContainer {
     }, m_drivetrain));
 
     m_arm.setDefaultCommand(Commands.run(() -> {
-      m_arm.setExtentPosition(m_driverController.getLeftTriggerAxis()*2-1);
-      m_arm.setRaisedPosition(m_driverController.getRightTriggerAxis()*2-1);
-      m_arm.setClawPosition(m_driverController.button(1).getAsBoolean()?1:-1);
+      m_arm.setExtentPosition(m_operator.getLeftSlider());
+      m_arm.setRaisedPosition(m_operator.getRightSlider());
+      m_arm.setClawPosition(m_operator.arcadeWhiteLeft().getAsBoolean()?1:-1);
     }, 
     m_arm));
 
