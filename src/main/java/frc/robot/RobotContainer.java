@@ -94,7 +94,7 @@ public class RobotContainer {
 
     
     m_arm.setDefaultCommand(Commands.run(() -> {
-      m_arm.setExtentPosition(m_operator.arcadeBlackLeft().getAsBoolean()?1.2:m_operator.getLeftSlider()+1.3);
+      m_arm.setExtentPosition(m_operator.arcadeBlackLeft().getAsBoolean()?m_operator.getLeftSlider()*(1+extrastend):m_operator.getLeftSlider());
       m_arm.setRaisedPosition(m_operator.getRightSlider());
       m_arm.setClawPosition(m_operator.arcadeWhiteLeft().getAsBoolean()?1:-1);
     }, 
@@ -131,7 +131,7 @@ public class RobotContainer {
   }
 
 
-  AutonomousMap m_autonMap = new AutonomousMap();
+  AutonomousMap m_autonMap = new AutonomousMap(m_drivetrain, m_arm);
   
   public Command getAutonomousCommand() {
    RamseteAutoBuilder autoBuilder = new RamseteAutoBuilder(

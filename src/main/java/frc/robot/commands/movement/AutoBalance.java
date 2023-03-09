@@ -9,11 +9,12 @@ import io.github.oblarg.oblog.annotations.Log;
 
 public class AutoBalance extends CommandBase implements Loggable{
   
-  Drivetrain m_drivetrain = new Drivetrain();
+  Drivetrain m_drivetrain;
   Double lastAngle;
   Timer endTimer; 
   public AutoBalance(Drivetrain drive) {
     // Use addRequirements() here to declare subsystem dependencies.
+    m_drivetrain = drive;
     addRequirements(drive);
     endTimer = new Timer();
   }

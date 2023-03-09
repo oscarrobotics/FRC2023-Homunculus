@@ -19,14 +19,12 @@ public class Robot extends TimedRobot {
   private Command m_autonomousCommand;
 
   private RobotContainer m_robotContainer;
-  private Arm m_Arm;
 
   XboxController xboxController;
 
   @Override
   public void robotInit() {
     m_robotContainer = new RobotContainer();
-    m_Arm = new Arm();
     Logger.configureLoggingAndConfig(m_robotContainer, false); // true for verbose logging
   }
 
@@ -52,8 +50,6 @@ public class Robot extends TimedRobot {
     if (m_autonomousCommand != null) {
       m_autonomousCommand.schedule();
     }
-
-    m_Arm.resetPosition();
   }
 
   @Override

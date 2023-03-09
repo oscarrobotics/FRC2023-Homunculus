@@ -137,7 +137,7 @@ private final double k_ticksPerInchGrip= 1;
 
 
   public Arm(){
-    m_extendMotor = new CANSparkMax(20, MotorType.kBrushless);
+  m_extendMotor = new CANSparkMax(20, MotorType.kBrushless);
    m_raiseMotor = new CANSparkMax(21,MotorType.kBrushless);
    m_gripMotor = new CANSparkMax(22,MotorType.kBrushless) ;
    

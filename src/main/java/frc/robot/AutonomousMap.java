@@ -10,14 +10,16 @@ import frc.robot.subsystems.drivetrain.Drivetrain;
 
 public class AutonomousMap {
 
-  Arm m_arm = new Arm();
-  Drivetrain m_Drivetrain = new Drivetrain();
+  Arm arm;
+  Drivetrain drivetrain;
   static HashMap<String, Command> eventMap = new HashMap<>();
 
-  public AutonomousMap(){
+  public AutonomousMap(Drivetrain drivetrain, Arm arm){
+    this.drivetrain = drivetrain;
+    this.arm = arm;
     eventMap.put("Marker 1", new WaitCommand(3));
-    eventMap.put("Reset Position", new InstantCommand(() -> m_arm.resetPosition()));
-    eventMap.put("Auto Balance", new AutoBalance(m_Drivetrain));
+    eventMap.put("Reset Position", new InstantCommand(() -> arm.resetPosition()));
+    eventMap.put("Auto Balance", new AutoBalance(drivetrain));
   }
 
 }
