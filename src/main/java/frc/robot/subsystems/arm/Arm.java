@@ -4,6 +4,7 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import io.github.oblarg.oblog.Loggable;
+import io.github.oblarg.oblog.annotations.Config;
 import io.github.oblarg.oblog.annotations.Log;
 import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.RelativeEncoder;
@@ -42,8 +43,9 @@ private final double k_minClaw = -2.02;
 // private final double k_rangeLengthPos = k_maxLengthPos - k_minLengthPos;
 // private final double k_rangeLeanglePos = k_maxLeanglePos- k_minLeanglePos;
 private final double k_rangeLengthPos = 38.5;
-private final double k_rangeLeanglePos =120;
-private final double k_rangeClaw = k_maxClaw - k_minClaw;
+private final double k_rangeLeanglePos =120;//needs to be tuned, adjust tilll the arm is at the right angle at bottom should be nearly correct
+
+private final double k_rangeClaw = k_maxClaw - k_minClaw; //also should be checked and tuned
 
 
 private final double k_maxHeight = 6.25 ;// hieght in feet that the robot is alowed to be
@@ -89,17 +91,52 @@ private final double k_ticksPerInchExtend=1;
 private final double k_ticksPerInchRaise=1;
 private final double k_ticksPerInchGrip= 1;
 
+  //pid constants
+  //extend
+ public final double kPE = 5.0;
+ public final double kIE = 0.00;//was 0.05
+ public final double kDE = 0.00;//was 0.01
+ public final double kIzE = 2;
+ public final double kFFE = 0;
+ public final double kMaxOutputE = 0.8; //arm oout?
+ public final double kMinOutputE = -0.3;//arm in?
+ public final double maxRPME = 5700;
+
+//raise
+  public final double kPR = 0.05;
+  public final double kIR = 0.000;//was 0.0005
+  public final double kDR = 0.00;//was 0.001
+  public final double kIzR = 2;
+  public final double kFFR = 0;
+  public final double kMaxOutputR = 0.8;//arm up?
+  public final double kMinOutputR = -0.3;//arm down?
+  public final double maxRPMR = 5700;
+
+//grip
+  public final double kPG = 1;
+  public final double kIG = 0;
+  public final double kDG = 0;
+  public final double kIzG = 0;
+  public final double kFFG = 0; 
+  public final double kMaxOutputG = 0.6;//grip open?
+  public final double kMinOutputG = -0.6;//grip close?
+  public final double maxRPMG = 5700;
+
+
 // private final AbsoluteEncoder m_Encoder;
+
+
+
 
   public Arm(){
     m_extendMotor = new CANSparkMax(20, MotorType.kBrushless);
    m_raiseMotor = new CANSparkMax(21,MotorType.kBrushless);
    m_gripMotor = new CANSparkMax(22,MotorType.kBrushless) ;
    
-   //TODO: manage if too snappy; be super careful with limits however
-   m_extendMotor.setSmartCurrentLimit(5, 5, 0); 
-   m_raiseMotor.setSmartCurrentLimit(5,5,0);
-   m_gripMotor.setSmartCurrentLimit(5,5,0);
+   //cuewnt limit
+   m_extendMotor.setSmartCurrentLimit(10 , 20,0); 
+   m_raiseMotor.setSmartCurrentLimit(10,20,0);
+   m_gripMotor.setSmartCurrentLimit(10,10,0);
 
    m_extendMotor.setIdleMode(IdleMode.kBrake);
    m_raiseMotor.setIdleMode(IdleMode.kBrake);
@@ -119,31 +156,54 @@ private final double k_ticksPerInchGrip= 1;
     m_gripEncoder.setPositionConversionFactor(k_ticksPerInchGrip);
 
 
-
+// pid controllers
     m_extendPID = m_extendMotor.getPIDController();
     m_raisePID = m_raiseMotor.getPIDController();
     m_gripPID = m_gripMotor.getPIDController();
 
-    m_extendPID.setP(5.0);
-    m_extendPID.setI(0.05);
-    m_extendPID.setD(0.01);
-    m_extendPID.setIZone(2);
-    m_extendPID.setFF(0);
-    m_extendPID.setOutputRange(-0.3, 0.8);
 
-    m_raisePID.setP(0.05);
-    m_raisePID.setI(0.0005);
-    m_raisePID.setD(0.001);
-    m_raisePID.setIZone(2);
-    m_raisePID.setFF(0);
-    m_raisePID.setOutputRange(-0.3, 0.8);
 
-    m_gripPID.setP(1);
-    m_gripPID.setI(0);
-    m_gripPID.setD(0);
-    m_gripPID.setIZone(0);
-    m_gripPID.setFF(0);
-    m_gripPID.setOutputRange(-0.4, 0.4);
+
+    // m_extendPID.setP(5.0);
+    // m_extendPID.setI(0.05);
+    // m_extendPID.setD(0.01);
+    // m_extendPID.setIZone(2);
+    // m_extendPID.setFF(0);
+    // m_extendPID.setOutputRange(-0.3, 0.8);
+    m_extendPID.setP(kPE);
+    m_extendPID.setI(kIE);
+    m_extendPID.setD(kDE);
+    m_extendPID.setIZone(kIzE);
+    m_extendPID.setFF(kFFE);
+    m_extendPID.setOutputRange(kMinOutputE, kMaxOutputE);
+
+
+    // m_raisePID.setP(0.05);
+    // m_raisePID.setI(0.0005);
+    // m_raisePID.setD(0.001);
+    // m_raisePID.setIZone(2);
+    // m_raisePID.setFF(0);
+    // m_raisePID.setOutputRange(-0.3, 0.8);
+    m_raisePID.setP(kPR);
+    m_raisePID.setI(kIR);
+    m_raisePID.setD(kDR);
+    m_raisePID.setIZone(kIzR);
+    m_raisePID.setFF(kFFR);
+    m_raisePID.setOutputRange(kMinOutputR, kMaxOutputR);
+    // m_gripPID.setP(1);
+    // m_gripPID.setI(0);
+    // m_gripPID.setD(0);
+    // m_gripPID.setIZone(0);
+    // m_gripPID.setFF(0);
+    // m_gripPID.setOutputRange(-0.4, 0.4);
+    m_gripPID.setP(kPG);
+    m_gripPID.setI(kIG);
+    m_gripPID.setD(kDG);
+    m_gripPID.setIZone(kIzG);
+    m_gripPID.setFF(kFFG);
+    m_gripPID.setOutputRange(kMinOutputG, kMaxOutputG);
+
+    //motion contfiguration
 
 
 
@@ -268,6 +328,8 @@ public double getGripPosition(){
 }
 
 
+
+
 public void setExtentPosition(double position){
   //inpoutrange -1 to 1
   // pos zero is fully retracted
@@ -304,4 +366,34 @@ public void setClawPosition(double position){
   
 
 }
+
+
+@Config(name = "Extend PID", tabName = "Arm PID",)
+void setExtenPIDIzF(@Config(defaultValueNumeric = kPE) double p , @Config(defaultValueNumeric = kIE) double i, @Config(defaultValueNumeric = kDE) double d, @Config(defaultValueNumeric = kIzE) double iz, @Config(defaultValueNumeric = kFE) double f){  
+  m_extendPID.setP(p);
+  m_extendPID.setI(i);
+  m_extendPID.setD(d);
+  m_extendPID.setIZone(iz);
+  m_extendPID.setFF(f);
+
+}
+
+@Config (name = "Raise PID", tabName = "Arm PID")
+void setRaisePIDIzF(@Config(defaultValueNumeric = kPR) double p , @Config(defaultValueNumeric = kIR) double i, @Config(defaultValueNumeric = kDR) double d, @Config(defaultValueNumeric = kIzR) double iz, @Config(defaultValueNumeric = kFR) double f) {
+  m_raisePID.setP(p);
+  m_raisePID.setI(i);
+  m_raisePID.setD(d);
+  m_raisePID.setIZone(iz);
+  m_raisePID.setFF(f);
+}
+
+@Config (name = "Grip PID", tabName = "Arm PID")
+void setGripPIDIzF( @Config( defaultValueNumeric = kPG) double p , @Config(defaultValueNumeric = kIG) double i, @Config(defaultValueNumeric = kDG) double d, @Config(defaultValueNumeric = kIzG) double iz, @Config(defaultValueNumeric = kFG) double f) {
+  m_gripPID.setP(p);
+  m_gripPID.setI(i);
+  m_gripPID.setD(d);
+  m_gripPID.setIZone(iz);
+  m_gripPID.setFF(f);
+}
+
 }

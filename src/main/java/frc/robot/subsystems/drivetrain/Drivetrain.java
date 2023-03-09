@@ -487,4 +487,16 @@ public CommandBase movingCommand(){
     }
   };
 }
+
+@Config(name = "set Drive pid" )
+public void setDrivePID(@Config(defaultValueNumeric = Constants.dKp) double p, @Config(defaultValueNumeric = Constants.dKi) double i, @Config(defaultValueNumeric = Constants.dKd) double d, @Config(defaultValueNumeric = Constants.dKf) double f){
+  m_leftMaster.config_kP(0, p);
+  m_leftMaster.config_kI(0, i);
+  m_leftMaster.config_kD(0, d);
+  m_leftMaster.config_kF(0, f);
+  m_rightMaster.config_kP(0, p);
+  m_rightMaster.config_kI(0, i);
+  m_rightMaster.config_kD(0, d);
+  m_rightMaster.config_kF(0, f);
+
 }
