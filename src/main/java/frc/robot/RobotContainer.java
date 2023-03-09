@@ -131,7 +131,7 @@ public class RobotContainer {
    return extrastend;
  }
 
- @Config(name = "Extra Stend set", tabName = "Arm PID", defaultValueNumeric = k_extrastend)
+ @Config.NumberSlider(name = "Extra Stend set", tabName = "Arm PID", min = 0, max = .4, defaultValue = k_extrastend)
   private void setExtraStend(double value){
     extrastend = value;
   }
