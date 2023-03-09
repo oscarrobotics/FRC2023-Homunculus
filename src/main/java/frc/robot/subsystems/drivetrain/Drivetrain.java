@@ -68,10 +68,12 @@ public class Drivetrain extends SubsystemBase implements Loggable {
 
   //motor groups
   @Log.MotorController(name = "Left Motors", tabName = "Drivetrain")
-  private final MotorControllerGroup m_leftMotors =
+  public
+  final MotorControllerGroup m_leftMotors =
       new MotorControllerGroup(m_leftMaster, m_leftDrone);
   @Log.MotorController(name = "Right Motors", tabName = "Drivetrain")
-  private final MotorControllerGroup m_rightMotors =
+  public
+  final MotorControllerGroup m_rightMotors =
       new MotorControllerGroup(m_rightMaster, m_rightDrone);
 
   //camera
@@ -368,8 +370,6 @@ public class Drivetrain extends SubsystemBase implements Loggable {
   //   m_differentialDrive.tankDrive(leftSpeed, rightSpeed);
   // }
 
-
-
   public void stop() {
     // m_differentialDrive.stopMotor();
     m_leftMotors.stopMotor();
@@ -424,6 +424,12 @@ public Rotation2d getRot() {
 public double getGyroPos(){
   return m_gyro.getYaw();
 }
+
+@Log(name = "Gyro Roll")
+public double getGyroRoll(){
+  return m_gyro.getRoll();
+}
+
 @Log.Graph(name = "lefterror")
 public double lerror(){
   return m_leftMaster.getClosedLoopError();

@@ -138,7 +138,6 @@ public class RobotContainer {
   Command resetPosition = Commands.run(() -> {
     m_arm.resetPosition();
   }, m_arm);
-
   
 @Log(name = "Extra Stend get", tabName = "Arm PID")
  private double getExtraStend(){
