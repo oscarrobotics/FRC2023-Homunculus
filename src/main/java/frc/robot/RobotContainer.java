@@ -26,6 +26,7 @@ import io.github.oblarg.oblog.annotations.Log;
 
 public class RobotContainer {
   private final CommandXboxController m_driverController = new CommandXboxController(0);
+  
 
   private final Drivetrain m_drivetrain = new Drivetrain();
 
@@ -68,6 +69,15 @@ public class RobotContainer {
     //   if (m_driverController.getLeftTriggerAxis()>0.5){
     //     m_drivetrain.curvatureDrive(m_driverController.getLeftY() * Smodifier, m_driverController.getRightX()*Smodifier, m_driverController.leftBumper().getAsBoolean());
     //   }else{
+
+
+
+
+
+
+
+
+      
     //   m_drivetrain.arcadeDrive(m_driverController.getLeftY() * Smodifier,
     //       m_driverController.getRightX() * Smodifier);
     //   }
@@ -80,6 +90,15 @@ public class RobotContainer {
       m_drivetrain.smoothDrive(m_driverController.getLeftY() * Math.abs(m_driverController.getLeftY())* Smodifier * Constants.maxSpeed,
           m_driverController.getRightX() * Math.abs(m_driverController.getRightX())* Tmodifier * Constants.maxTurn);
     }, m_drivetrain));
+
+    m_arm.setDefaultCommand(Commands.run(() -> {
+      m_arm.setExtentPosition(m_driverController.getLeftTriggerAxis()*2-1);
+      m_arm.setRaisedPosition(m_driverController.getRightTriggerAxis()*2-1);
+      m_arm.setClawPosition(m_driverController.button(1).getAsBoolean()?1:-1);
+    }, 
+    m_arm));
+
+
    
 
 

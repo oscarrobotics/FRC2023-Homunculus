@@ -7,9 +7,12 @@ import io.github.oblarg.oblog.Loggable;
 import io.github.oblarg.oblog.annotations.Log;
 import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.RelativeEncoder;
+import com.revrobotics.CANSparkMax.ControlType;
+import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.revrobotics.SparkMaxAbsoluteEncoder.Type;
+import com.revrobotics.SparkMaxPIDController;
 
 public class Arm extends SubsystemBase implements Loggable{
   
@@ -18,12 +21,30 @@ public final CANSparkMax m_raiseMotor;
 public final CANSparkMax m_gripMotor;
 
 RelativeEncoder  m_extendEncoder ;
-    RelativeEncoder  m_raiseEncoder ;
-    RelativeEncoder m_gripEncoder;
+RelativeEncoder m_raiseEncoder ;
+RelativeEncoder m_gripEncoder;
 
-private final double k_maxLengthPos = 0;//postion at the max length we mesures in units
-private final double k_maxLeanglePos = 0 ; //max length of the angle control in units
-private final double k_maxClaw = 0;
+SparkMaxPIDController m_extendPID;
+SparkMaxPIDController m_raisePID;
+SparkMaxPIDController m_gripPID;
+
+
+private final double k_maxLengthPos = -1.09;//postion at the max length we mesures in units
+private final double k_minLengthPos = -40;//postion at the max length we mesures in units
+
+
+
+private final double k_maxLeanglePos = 84.3 ; //max length of the angle control in units
+private final double k_minLeanglePos = 0 ; //max length of the angle control in units
+private final double k_maxClaw = 42.14;
+private final double k_minClaw = -2.02;
+
+// private final double k_rangeLengthPos = k_maxLengthPos - k_minLengthPos;
+// private final double k_rangeLeanglePos = k_maxLeanglePos- k_minLeanglePos;
+private final double k_rangeLengthPos = 38.5;
+private final double k_rangeLeanglePos =120;
+private final double k_rangeClaw = k_maxClaw - k_minClaw;
+
 
 private final double k_maxHeight = 6.25 ;// hieght in feet that the robot is alowed to be
 private final double k_pivotHeight = 22; // hieght in inches that the pivot point oi the arm is of the floor
@@ -71,16 +92,22 @@ private final double k_ticksPerInchGrip= 1;
 // private final AbsoluteEncoder m_Encoder;
 
   public Arm(){
-    m_extendMotor = new CANSparkMax(5, MotorType.kBrushless);
-   m_raiseMotor = new CANSparkMax(0,MotorType.kBrushless);
-   m_gripMotor = new CANSparkMax(0,MotorType.kBrushless) ;
+    m_extendMotor = new CANSparkMax(20, MotorType.kBrushless);
+   m_raiseMotor = new CANSparkMax(21,MotorType.kBrushless);
+   m_gripMotor = new CANSparkMax(22,MotorType.kBrushless) ;
    
-   m_extendMotor.setSmartCurrentLimit(2, 2, 0);
-   m_raiseMotor.setSmartCurrentLimit(2,2,0);
-   m_gripMotor.setSmartCurrentLimit(2,2,0);
+   m_extendMotor.setSmartCurrentLimit(5, 5, 0);
+   m_raiseMotor.setSmartCurrentLimit(5,5,0);
+   m_gripMotor.setSmartCurrentLimit(5,5,0);
+
+   m_extendMotor.setIdleMode(IdleMode.kBrake);
+   m_raiseMotor.setIdleMode(IdleMode.kBrake);
+   m_gripMotor.setIdleMode(IdleMode.kBrake);
     
+   
+
     
-  
+  //encoder
     m_extendEncoder = m_extendMotor.getEncoder();
     m_raiseEncoder = m_raiseMotor.getEncoder();
     m_gripEncoder = m_gripMotor.getEncoder();
@@ -89,6 +116,35 @@ private final double k_ticksPerInchGrip= 1;
     m_extendEncoder.setPositionConversionFactor(k_ticksPerInchExtend);
     m_raiseEncoder.setPositionConversionFactor(k_ticksPerInchRaise );
     m_gripEncoder.setPositionConversionFactor(k_ticksPerInchGrip);
+
+
+
+    m_extendPID = m_extendMotor.getPIDController();
+    m_raisePID = m_raiseMotor.getPIDController();
+    m_gripPID = m_gripMotor.getPIDController();
+
+    m_extendPID.setP(5.0);
+    m_extendPID.setI(0.05);
+    m_extendPID.setD(0.01);
+    m_extendPID.setIZone(2);
+    m_extendPID.setFF(0);
+    m_extendPID.setOutputRange(-0.3, 0.8);
+
+    m_raisePID.setP(0.05);
+    m_raisePID.setI(0.0005);
+    m_raisePID.setD(0.001);
+    m_raisePID.setIZone(2);
+    m_raisePID.setFF(0);
+    m_raisePID.setOutputRange(-0.3, 0.8);
+
+    m_gripPID.setP(1);
+    m_gripPID.setI(0);
+    m_gripPID.setD(0);
+    m_gripPID.setIZone(0);
+    m_gripPID.setFF(0);
+    m_gripPID.setOutputRange(-0.4, 0.4);
+
+
 
     //set some soft limit to prevent full extension (illegal)
   }
@@ -119,14 +175,14 @@ private final double k_ticksPerInchGrip= 1;
     return m_extendMotor.getOutputCurrent();
   }
 
-@Log.String(name = "Arm Pose")
+@Log.ToString(name = "Arm Pose")
 public Translation2d getArmPose(){
 
 double armangle = getArmAngle();
 
 double armlength = k_minLength + m_extendEncoder.getPosition();
 
-double clawhieght = k_pivotHieght+ Math.sin(armangle)*armlength; 
+double clawhieght = k_pivotHeight+ Math.sin(armangle)*armlength; 
 double clawlength =Math.cos(armangle)*armlength-k_columtToFront;
 
 
@@ -146,7 +202,7 @@ public double getArmAngle(){
   double b = k_pivotOffset;
   double c = m_raiseEncoder.getPosition();
   angle = Math.acos((Math.pow(a, 2)+Math.pow(b, 2)-Math.pow(c, 2))/(2*a*b)); // angle of obtuse triangle formed by arm
-  angle = angle -90;// angle of arm  above or below horizontal
+  angle = angle -90;// i of arm  above or below horizontal
   
 
 
@@ -159,7 +215,7 @@ public double angleToLeangle(double angle){
   //c^2 = a^2+b^2-2ab*cos(C)
   // solve for c 
   //C =  the  moving angle of the arm
-  C = angle + 90;
+  double C = angle + 90;
   double a = k_pivotLenght;
   double b = k_pivotOffset;
   double c = Math.sqrt(Math.pow(a, 2)+Math.pow(b, 2)-2*a*b*Math.cos(C));
@@ -174,35 +230,77 @@ public Translation2d radialToLengths(double angle, double length){
  //length is the distance from the front of the robot to the desired position
 
  double leangle = angleToLeangle(angle);
- double length = length/Math.cos(angle) - k_columtToFront;
+ length = length/Math.cos(angle) - k_columtToFront;
 
  
 
-  return new Translation2d(leangle,lenght);
+  return new Translation2d(leangle,length);
 }
 
-public Translation2d cartToLengths(double lenght, double height){
+public Translation2d cartToLengths(double length, double height){
   //calculate the lengths of the arm and angle motor to get to the desired position
   //height is the hieght of the desired position
   //length is the distance from the front of the robot to the desired position
   height = height - k_pivotHeight;
-  lenght = lenght + k_columtToFront;
-  double angle = Math.atan(height/lenght);
+  length = length + k_columtToFront;
+  double angle = Math.atan(height/length);
   double leangle = angleToLeangle(angle);
-  double length = length/Math.cos(angle);
+  length = length/Math.cos(angle);
  
   
  
-   return new Translation2d(leangle,lenght);
+   return new Translation2d(leangle,length);
  }
 
-@Log.graph(name = "Extent Position")
-m_extendEncoder.getPosition();
+@Log(name = "Extent Position")
+public double getExtendedPosition(){
+  return m_extendEncoder.getPosition();
+}
 
-@Log.graph(name = "Raise Position")
-m_raiseEncoder.getPosition();
+@Log(name = "Raise Position")
+public double getRaisedPosition(){
+  return m_raiseEncoder.getPosition();
+}
+@Log(name = "Grip Position")
+public double getGripPosition(){
+  return m_gripEncoder.getPosition();
+}
 
-@Log.graph(name = "Grip Position")
-m_gripEncoder.getPosition();
 
+public void setExtentPosition(double position){
+  //inpoutrange -1 to 1
+  // pos zero is fully retracted
+  //1 is fully extended
+  position = position +1;
+  position = position/2;
+  position = position * (k_rangeLengthPos-2);
+  position = position+2;
+
+  m_extendPID.setReference(position, ControlType.kPosition);
+}
+public void setRaisedPosition(double position){
+  //inpoutrange -1 to 1
+  //pos 0 is fully raised
+  //negative pos is goint down 
+  position = position +1;
+  position = position/2;
+  position = position * (k_rangeLeanglePos-2) *-1;
+  position = position -2;
+
+  m_raisePID.setReference(position, ControlType.kPosition);
+
+
+}
+public void setClawPosition(double position){
+  //inpoutrange -1 to 1
+  //pos 0 is fully raised
+  //negative pos is goint down 
+  position = position +1;
+  position = position/2;
+  position = position * k_rangeClaw ;
+
+  m_gripPID.setReference(position, ControlType.kPosition);
+  
+
+}
 }
