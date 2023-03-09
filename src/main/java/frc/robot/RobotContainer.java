@@ -41,7 +41,7 @@ public class RobotContainer {
   private final NetworkTableInstance ntinst = NetworkTableInstance.getDefault();
 
   final private double k_extrastend = 0;
-  private double extrastend = k_extrastend
+  private double extrastend = k_extrastend;
 
   public RobotContainer() {
     
@@ -102,7 +102,7 @@ public class RobotContainer {
     }, 
     m_arm));
 
-
+ 
    
 
 
@@ -126,6 +126,13 @@ public class RobotContainer {
     Command fullAuto = autoBuilder.fullAuto(m_autoSelector.getSelectedAuto());
     return fullAuto;
   }
+
+  @Config.Command(name = "Reset Position", tabName = "Arm PID")
+  Command resetPosition = Commands.run(() -> {
+    m_arm.resetPosition();
+  }, m_arm);
+
+  
 @Log(name = "Extra Stend get", tabName = "Arm PID")
  private double getExtraStend(){
    return extrastend;
