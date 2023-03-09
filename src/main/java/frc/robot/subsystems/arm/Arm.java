@@ -133,11 +133,11 @@ private final double k_ticksPerInchGrip= 1;
 
 
   public Arm(){
-    m_extendMotor = new CANSparkMax(20, MotorType.kBrushless);
+   m_extendMotor = new CANSparkMax(20, MotorType.kBrushless);
    m_raiseMotor = new CANSparkMax(21,MotorType.kBrushless);
    m_gripMotor = new CANSparkMax(22,MotorType.kBrushless) ;
    
-   //cuewnt limit
+   //current limit
    m_extendMotor.setSmartCurrentLimit(10 , 20,0); 
    m_raiseMotor.setSmartCurrentLimit(10,20,0);
    m_gripMotor.setSmartCurrentLimit(10,10,0);
@@ -209,7 +209,7 @@ private final double k_ticksPerInchGrip= 1;
 
     //motion contfiguration
     int kSlotIdxE = 0;
-    m_extendPID.setSmartMotionMaxVelocity(maxRPME, kSlotIdxE);)
+    m_extendPID.setSmartMotionMaxVelocity(maxRPME, kSlotIdxE);
     m_extendPID.setSmartMotionMinOutputVelocity(0, kSlotIdxE);
     m_extendPID.setSmartMotionMaxAccel(2000, kSlotIdxE);
     m_extendPID.setSmartMotionAllowedClosedLoopError(1, kSlotIdxE);
@@ -246,20 +246,31 @@ private final double k_ticksPerInchGrip= 1;
   //   return m_Encoder.getPosition();
   // }
 
-  // @Log(name = "Check if Stalled")
+  // @Log.BooleanBox(name = "Check if Stalled")
   // public boolean checkIfStalled(){
   //   //Check pulse per 10 ms. If the rate of pulse immediately drops, then we are stalled.
-  //   boolean isStalled = (m_armMotor.getOutputCurrent() < Constants.voltageDropThreshold);
+  //   var isStalled = ( getOutputCurrent() != 0 && getExtendMotorPulse() < Constants.voltageDropThreshold || getGripMotorPulse() < Constants.voltageDropThreshold || getRaiseMotorPulse() < Constants.voltageDropThreshold);
   //   if(isStalled){
-  //     m_armMotor.setSmartCurrentLimit(0, 0); //TBD
+  //     m_gripMotor.setSmartCurrentLimit(0, 0); //TBD
   //   }
   //   return isStalled;
   // }
 
-  @Log.Graph(name = "Arm Motor Pulse")
-  public double getMotorPulse(){
-    return m_extendMotor.getOutputCurrent();
-  }
+  @Log.Graph(name = "Extend Motor Pulse")
+    public double getExtendMotorPulse(){
+      return m_extendMotor.getOutputCurrent();
+    }
+
+    @Log.Graph(name = "Raise Motor Pulse")
+    public double getRaiseMotorPulse(){ 
+      return m_raiseMotor.getOutputCurrent(); 
+    }
+
+  @Log.Graph(name = "Grip Motor Pulse")
+    public double getGripMotorPulse(){
+      return m_gripMotor.getOutputCurrent();
+    }
+
 
 @Log.ToString(name = "Arm Pose")
 public Translation2d getArmPose(){
@@ -431,7 +442,7 @@ public void setClawMotion(double position){
 
  
 @Config(name = "Extend PID", tabName = "Arm PID")
-void setExtenPIDIzF(@Config(defaultValueNumeric = kPE) double p , @Config(defaultValueNumeric = kIE) double i, @Config(defaultValueNumeric = kDE) double d, @Config(defaultValueNumeric = kIzE) double iz, @Config(defaultValueNumeric = kFE) double f){  
+void setExtenPIDIzF(@Config(defaultValueNumeric = kPE) double p , @Config(defaultValueNumeric = kIE) double i, @Config(defaultValueNumeric = kDE) double d, @Config(defaultValueNumeric = kIzE) double iz, @Config(defaultValueNumeric = kFFE) double f){  
   m_extendPID.setP(p);
   m_extendPID.setI(i);
   m_extendPID.setD(d);
@@ -441,7 +452,7 @@ void setExtenPIDIzF(@Config(defaultValueNumeric = kPE) double p , @Config(defaul
 }
 
 @Config (name = "Raise PID", tabName = "Arm PID")
-void setRaisePIDIzF(@Config(defaultValueNumeric = kPR) double p , @Config(defaultValueNumeric = kIR) double i, @Config(defaultValueNumeric = kDR) double d, @Config(defaultValueNumeric = kIzR) double iz, @Config(defaultValueNumeric = kFR) double f) {
+void setRaisePIDIzF(@Config(defaultValueNumeric = kPR) double p , @Config(defaultValueNumeric = kIR) double i, @Config(defaultValueNumeric = kDR) double d, @Config(defaultValueNumeric = kIzR) double iz, @Config(defaultValueNumeric = kFFR) double f) {
   m_raisePID.setP(p);
   m_raisePID.setI(i);
   m_raisePID.setD(d);
@@ -450,7 +461,7 @@ void setRaisePIDIzF(@Config(defaultValueNumeric = kPR) double p , @Config(defaul
 }
 
 @Config (name = "Grip PID", tabName = "Arm PID")
-void setGripPIDIzF( @Config( defaultValueNumeric = kPG) double p , @Config(defaultValueNumeric = kIG) double i, @Config(defaultValueNumeric = kDG) double d, @Config(defaultValueNumeric = kIzG) double iz, @Config(defaultValueNumeric = kFG) double f) {
+void setGripPIDIzF( @Config( defaultValueNumeric = kPG) double p , @Config(defaultValueNumeric = kIG) double i, @Config(defaultValueNumeric = kDG) double d, @Config(defaultValueNumeric = kIzG) double iz, @Config(defaultValueNumeric = kFFG) double f) {
   m_gripPID.setP(p);
   m_gripPID.setI(i);
   m_gripPID.setD(d);

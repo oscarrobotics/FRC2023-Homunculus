@@ -23,6 +23,7 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.subsystems.arm.Arm;
 import frc.robot.subsystems.drivetrain.Drivetrain;
 import io.github.oblarg.oblog.Logger;
+import io.github.oblarg.oblog.annotations.Config;
 import io.github.oblarg.oblog.annotations.Log;
 
 
@@ -84,8 +85,10 @@ public class RobotContainer {
           m_driverController.getRightX() * Math.abs(m_driverController.getRightX())* Tmodifier * Constants.maxTurn);
     }, m_drivetrain));
 
+    
     m_arm.setDefaultCommand(Commands.run(() -> {
-      m_arm.setExtentPosition(m_operator.getLeftSlider());
+      buttonConfig();
+      m_arm.setExtentPosition(m_operator.arcadeBlackLeft().getAsBoolean()?1.2:m_operator.getLeftSlider()+1.3);
       m_arm.setRaisedPosition(m_operator.getRightSlider());
       m_arm.setClawPosition(m_operator.arcadeWhiteLeft().getAsBoolean()?1:-1);
     }, 
@@ -97,7 +100,20 @@ public class RobotContainer {
 
   }
 
-  private void configureBindings() {}
+  private void configureBindings() {
+    
+  }
+
+  @Log(name = "Get button Configs", tabName = "Buttons")
+  public double getSliderConfig(){
+    return m_operator.getLeftSlider();
+  }
+
+  @Config.NumberSlider(name = "Set left slider")
+  public double setLeftSliderConfig(){
+    m_operator.getLeftSlider();
+  }
+
 
   AutonomousMap m_autonMap = new AutonomousMap();
   
