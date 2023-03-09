@@ -102,7 +102,7 @@ private final double k_ticksPerInchGrip= 1;
  public final double kIzE = 2;
  public final double kFFE = 0;
  public final double kMaxOutputE = 0.8; //arm oout?
- public final double kMinOutputE = -0.3;//arm in?
+ public final double kMinOutputE = 0.3;//arm in?
  public final double maxRPME = 5700;
  public final double maxAccelE = 2000;
 
@@ -112,8 +112,9 @@ private final double k_ticksPerInchGrip= 1;
   public final double kDR = 0.00;//was 0.001
   public final double kIzR = 2;
   public final double kFFR = 0;
-  public final double kMaxOutputR = 0.8;//arm up?
-  public final double kMinOutputR = -0.3;//arm down?
+  public final double kMaxOutputR = 0.3;//arm down?
+  public final double kMinOutputR = 0.8;//arm up?
+  
   public final double maxRPMR = 5700;
   public final double maxAccelR = 2000;
 
@@ -125,7 +126,7 @@ private final double k_ticksPerInchGrip= 1;
   public final double kIzG = 0;
   public final double kFFG = 0; 
   public final double kMaxOutputG = 0.6;//grip open?
-  public final double kMinOutputG = -0.6;//grip close?
+  public final double kMinOutputG = 0.6;//grip close?
   public final double maxRPMG = 5700;
   public final double maxAccelG = 2000;
 
@@ -182,7 +183,7 @@ private final double k_ticksPerInchGrip= 1;
     m_extendPID.setD(kDE);
     m_extendPID.setIZone(kIzE);
     m_extendPID.setFF(kFFE);
-    m_extendPID.setOutputRange(kMinOutputE, kMaxOutputE);
+    m_extendPID.setOutputRange(-kMinOutputE, kMaxOutputE);
 
 
     // m_raisePID.setP(0.05);
@@ -196,7 +197,7 @@ private final double k_ticksPerInchGrip= 1;
     m_raisePID.setD(kDR);
     m_raisePID.setIZone(kIzR);
     m_raisePID.setFF(kFFR);
-    m_raisePID.setOutputRange(kMinOutputR, kMaxOutputR);
+    m_raisePID.setOutputRange(-kMinOutputR, kMaxOutputR);
     // m_gripPID.setP(1);
     // m_gripPID.setI(0);
     // m_gripPID.setD(0);
@@ -208,7 +209,7 @@ private final double k_ticksPerInchGrip= 1;
     m_gripPID.setD(kDG);
     m_gripPID.setIZone(kIzG);
     m_gripPID.setFF(kFFG);
-    m_gripPID.setOutputRange(kMinOutputG, kMaxOutputG);
+    m_gripPID.setOutputRange(-kMinOutputG, kMaxOutputG);
 
     //motion contfiguration
     int kSlotIdxE = 0;
@@ -570,6 +571,28 @@ void setGripMaxVelocityAndAccel(@Config(defaultValueNumeric = maxRPMG) double ma
   m_gripPID.setSmartMotionMaxVelocity(maxVelocity, 0);
   m_gripPID.setSmartMotionMaxAccel(maxAccel, 0);
 }
+
+
+@Config (name = "Extend Max Output", tabName = "Arm PID")
+void setExtendMaxOutput(@Config(defaultValueNumeric = kMaxOutputE) double outPower, @Config(defaultValueNumeric = kMinOutputE) double inPower){
+  
+  m_extendPID.setOutputRange(-inPower, outPower);
+}
+
+
+@Config (name = "Raise Max Output", tabName = "Arm PID")
+void setRaiseMaxOutput(@Config(defaultValueNumeric = kMinOutputR) double upPower, @Config(defaultValueNumeric = kMaxOutputR) double downPower){
+  
+  m_raisePID.setOutputRange(-upPower, downPower);
+}
+
+@Config (name = "Grip Max Output", tabName = "Arm PID")
+void setGripMaxOutput(@Config(defaultValueNumeric = kMaxOutputG) double gripPower, @Config(defaultValueNumeric = kMinOutputG) double releasePower){
+  
+  m_gripPID.setOutputRange(-gripPower, releasePower);
+}
+
+ 
 
 @Config.NumberSlider (name = "min height", tabName = "Arm PID", min = 0, max = 8, defaultValue = d_minArmHeight)
 void setMinArmHeight( double minHeight){
