@@ -23,6 +23,7 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.subsystems.arm.Arm;
 import frc.robot.subsystems.drivetrain.Drivetrain;
 import io.github.oblarg.oblog.Logger;
+import io.github.oblarg.oblog.annotations.Config;
 import io.github.oblarg.oblog.annotations.Log;
 
 
@@ -38,6 +39,9 @@ public class RobotContainer {
   public final AutonomousSelector m_autoSelector = new AutonomousSelector();
   
   private final NetworkTableInstance ntinst = NetworkTableInstance.getDefault();
+
+  final private double k_extrastend = 0;
+  private double extrastend = k_extrastend
 
   public RobotContainer() {
     
@@ -84,8 +88,15 @@ public class RobotContainer {
           m_driverController.getRightX() * Math.abs(m_driverController.getRightX())* Tmodifier * Constants.maxTurn);
     }, m_drivetrain));
 
+    // m_arm.setDefaultCommand(Commands.run(() -> {
+    //   m_arm.setExtentPosition(m_operator.getLeftSlider());
+    //   m_arm.setRaisedPosition(m_operator.getRightSlider());
+    //   m_arm.setClawPosition(m_operator.arcadeWhiteLeft().getAsBoolean()?1:-1);
+    // }, 
+    // m_arm));
+
     m_arm.setDefaultCommand(Commands.run(() -> {
-      m_arm.setExtentPosition(m_operator.getLeftSlider());
+      m_arm.setExtentPosition(m_operator.arcadeBlackLeft().getAsBoolean()? m_operator.getLeftSlider()+extrastend:m_operator.getLeftSlider());
       m_arm.setRaisedPosition(m_operator.getRightSlider());
       m_arm.setClawPosition(m_operator.arcadeWhiteLeft().getAsBoolean()?1:-1);
     }, 
@@ -115,4 +126,15 @@ public class RobotContainer {
     Command fullAuto = autoBuilder.fullAuto(m_autoSelector.getSelectedAuto());
     return fullAuto;
   }
+@Log(name = "Extra Stend set", tabName = "Arm PID")
+ private double getExtraStend(){
+   return extrastend;
+ }
+
+ @Config(name = "Extra Stend set", tabName = "Arm PID", defaultValueNumeric = k_extrastend)
+  private void setExtraStend(double value){
+    extrastend = value;
+  }
+
+
 }
