@@ -489,10 +489,12 @@ public void setExtendMotionSafe(double position){
   double angle = getArmAngle();
   double maxExtension = position;
   if (angle < 0){
-     maxExtension = ( k_pivotHeight-k_minArmHeight ) / Math.cos(angle);
+     maxExtension = Math.min(( k_pivotHeight-k_minArmHeight ) / Math.cos(angle), (40+k_columtToFront /Math.cos(angle)));
   }
 
-  
+  if (angle > 0){
+    maxExtension = 40+k_columtToFront /Math.cos(angle);
+  }
 
 
   maxExtension = (maxExtension-k_minLength)/(k_maxLength-k_minLength)*(k_rangeLengthPos);
