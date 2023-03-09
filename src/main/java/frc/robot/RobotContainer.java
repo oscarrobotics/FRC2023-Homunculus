@@ -30,24 +30,15 @@ public class RobotContainer {
   private final CommandXboxController m_driverController = new CommandXboxController(0);
 
   private final ControllerButtons m_operator = new ControllerButtons(1);
+
   private final Drivetrain m_drivetrain = new Drivetrain();
 
   public static final Arm m_arm = new Arm();
 
-  SendableChooser<Command> m_chooser = new SendableChooser<>();
+  public final AutonomousSelector m_autoSelector = new AutonomousSelector();
   
   private final NetworkTableInstance ntinst = NetworkTableInstance.getDefault();
 
-  RamseteAutoBuilder autoBuilder = new RamseteAutoBuilder(
-    m_drivetrain::getPose,
-    m_drivetrain::resetOdometry,
-    m_drivetrain.m_ramseteController,
-    m_drivetrain.m_kinematics,
-    m_drivetrain::setSpeeds,
-    AutonomousMap.eventMap,
-    true,
-    m_drivetrain
-  );  
   public RobotContainer() {
     
 
@@ -108,9 +99,20 @@ public class RobotContainer {
 
   private void configureBindings() {}
 
+  AutonomousMap m_autonMap = new AutonomousMap();
   
   public Command getAutonomousCommand() {
-    List<PathPlannerTrajectory> pathGroup = PathPlanner.loadPathGroup("OneCargoAuto1", new PathConstraints(3, 4));
-    return autoBuilder.fullAuto(pathGroup);
+   RamseteAutoBuilder autoBuilder = new RamseteAutoBuilder(
+    m_drivetrain::getPose,
+    m_drivetrain::resetOdometry,
+    m_drivetrain.m_ramseteController,
+    m_drivetrain.m_kinematics,
+    m_drivetrain::setSpeeds,
+    AutonomousMap.eventMap,
+    true,
+    m_drivetrain
+  );   
+    Command fullAuto = autoBuilder.fullAuto(m_autoSelector.getSelectedAuto());
+    return fullAuto;
   }
 }
