@@ -119,14 +119,14 @@ private final double k_ticksPerInchGrip= 1;
     return m_extendMotor.getOutputCurrent();
   }
 
-@Log.String(name = "Arm Pose")
+@Log(name = "Arm Pose")
 public Translation2d getArmPose(){
 
 double armangle = getArmAngle();
 
 double armlength = k_minLength + m_extendEncoder.getPosition();
 
-double clawhieght = k_pivotHieght+ Math.sin(armangle)*armlength; 
+double clawhieght = k_pivotHeight+ Math.sin(armangle)*armlength; 
 double clawlength =Math.cos(armangle)*armlength-k_columtToFront;
 
 
@@ -159,7 +159,7 @@ public double angleToLeangle(double angle){
   //c^2 = a^2+b^2-2ab*cos(C)
   // solve for c 
   //C =  the  moving angle of the arm
-  C = angle + 90;
+  double C = angle + 90;
   double a = k_pivotLenght;
   double b = k_pivotOffset;
   double c = Math.sqrt(Math.pow(a, 2)+Math.pow(b, 2)-2*a*b*Math.cos(C));
@@ -174,35 +174,40 @@ public Translation2d radialToLengths(double angle, double length){
  //length is the distance from the front of the robot to the desired position
 
  double leangle = angleToLeangle(angle);
- double length = length/Math.cos(angle) - k_columtToFront;
+  length = length/Math.cos(angle) - k_columtToFront;
 
  
 
-  return new Translation2d(leangle,lenght);
+  return new Translation2d(leangle,length);
 }
 
-public Translation2d cartToLengths(double lenght, double height){
+public Translation2d cartToLengths(double length, double height){
   //calculate the lengths of the arm and angle motor to get to the desired position
   //height is the hieght of the desired position
   //length is the distance from the front of the robot to the desired position
   height = height - k_pivotHeight;
-  lenght = lenght + k_columtToFront;
-  double angle = Math.atan(height/lenght);
+  length = length + k_columtToFront;
+  double angle = Math.atan(height/length);
   double leangle = angleToLeangle(angle);
-  double length = length/Math.cos(angle);
+   length = length/Math.cos(angle);
  
   
  
-   return new Translation2d(leangle,lenght);
+   return new Translation2d(leangle,length);
  }
 
-@Log.graph(name = "Extent Position")
-m_extendEncoder.getPosition();
+@Log.Graph(name = "Extent Position")
+public double getExtendPosition(){
+  return m_extendEncoder.getPosition();
+}
 
-@Log.graph(name = "Raise Position")
-m_raiseEncoder.getPosition();
-
-@Log.graph(name = "Grip Position")
-m_gripEncoder.getPosition();
+@Log.Graph(name = "Raise Position")
+public double getRaisePosition(){
+  return m_raiseEncoder.getPosition();
+}
+@Log.Graph(name = "Grip Position")
+public double getGripPosition(){
+  return m_gripEncoder.getPosition();
+}
 
 }

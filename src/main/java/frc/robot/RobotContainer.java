@@ -31,7 +31,7 @@ public class RobotContainer {
 
   public static final Arm m_arm = new Arm();
 
-  private final SendableChooser<Command> m_chooser = new SendableChooser<>();
+  SendableChooser<Command> m_chooser = new SendableChooser<>();
   
   private final NetworkTableInstance ntinst = NetworkTableInstance.getDefault();
 
@@ -87,6 +87,7 @@ public class RobotContainer {
 
   private void configureBindings() {}
 
+  
   public Command getAutonomousCommand() {
     List<PathPlannerTrajectory> pathGroup = PathPlanner.loadPathGroup("OneCargoAuto1", new PathConstraints(3, 4));
     return autoBuilder.fullAuto(pathGroup);
