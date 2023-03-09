@@ -87,7 +87,6 @@ public class RobotContainer {
 
     
     m_arm.setDefaultCommand(Commands.run(() -> {
-      buttonConfig();
       m_arm.setExtentPosition(m_operator.arcadeBlackLeft().getAsBoolean()?1.2:m_operator.getLeftSlider()+1.3);
       m_arm.setRaisedPosition(m_operator.getRightSlider());
       m_arm.setClawPosition(m_operator.arcadeWhiteLeft().getAsBoolean()?1:-1);
@@ -110,7 +109,7 @@ public class RobotContainer {
   }
 
   @Config.NumberSlider(name = "Set left slider")
-  public double setLeftSliderConfig(){
+  public void setLeftSliderConfig(){
     m_operator.getLeftSlider();
   }
 
