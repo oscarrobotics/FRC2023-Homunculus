@@ -101,6 +101,7 @@ private final double k_ticksPerInchGrip= 1;
  public final double kMaxOutputE = 0.8; //arm oout?
  public final double kMinOutputE = -0.3;//arm in?
  public final double maxRPME = 5700;
+ public final double maxAccelE = 2000;
 
 //raise
   public final double kPR = 0.05;
@@ -111,6 +112,8 @@ private final double k_ticksPerInchGrip= 1;
   public final double kMaxOutputR = 0.8;//arm up?
   public final double kMinOutputR = -0.3;//arm down?
   public final double maxRPMR = 5700;
+  public final double maxAccelR = 2000;
+
 
 //grip
   public final double kPG = 1;
@@ -121,6 +124,7 @@ private final double k_ticksPerInchGrip= 1;
   public final double kMaxOutputG = 0.6;//grip open?
   public final double kMinOutputG = -0.6;//grip close?
   public final double maxRPMG = 5700;
+  public final double maxAccelG = 2000;
 
 
 // private final AbsoluteEncoder m_Encoder;
@@ -204,6 +208,27 @@ private final double k_ticksPerInchGrip= 1;
     m_gripPID.setOutputRange(kMinOutputG, kMaxOutputG);
 
     //motion contfiguration
+    int kSlotIdxE = 0;
+    m_extendPID.setSmartMotionMaxVelocity(maxRPME, kSlotIdxE);)
+    m_extendPID.setSmartMotionMinOutputVelocity(0, kSlotIdxE);
+    m_extendPID.setSmartMotionMaxAccel(2000, kSlotIdxE);
+    m_extendPID.setSmartMotionAllowedClosedLoopError(1, kSlotIdxE);
+
+    int kSlotIdxR = 0;
+    m_raisePID.setSmartMotionMaxVelocity(maxRPMR, kSlotIdxR);
+    m_raisePID.setSmartMotionMinOutputVelocity(0, kSlotIdxR);
+    m_raisePID.setSmartMotionMaxAccel(2000, kSlotIdxR);
+    m_raisePID.setSmartMotionAllowedClosedLoopError(1, kSlotIdxR);
+
+    int kSlotIdxG = 0;
+    m_gripPID.setSmartMotionMaxVelocity(maxRPMG, kSlotIdxG);
+    m_gripPID.setSmartMotionMinOutputVelocity(0, kSlotIdxG);
+    m_gripPID.setSmartMotionMaxAccel(2000, kSlotIdxG);
+    m_gripPID.setSmartMotionAllowedClosedLoopError(1, kSlotIdxG);
+
+
+
+
 
 
 
@@ -367,8 +392,43 @@ public void setClawPosition(double position){
 
 }
 
+public void setExtendMotion(double position){
+  //inpoutrange -1 to 1
+  // pos zero is fully retracted
+  //1 is fully extended
+  position = position +1;
+  position = position/2;
+  position = position * (k_rangeLengthPos-2);
+  position = position+2;
 
-@Config(name = "Extend PID", tabName = "Arm PID",)
+  m_extendPID.setReference(position, ControlType.kSmartMotion);
+}
+public void setRaiseMotion(double position){
+  //inpoutrange -1 to 1
+  //pos 0 is fully raised
+  //negative pos is goint down 
+  position = position +1;
+  position = position/2;
+  position = position * (k_rangeLeanglePos-2) *-1;
+  position = position -2;
+
+  m_raisePID.setReference(position, ControlType.kSmartMotion);
+}
+public void setClawMotion(double position){
+  //inpoutrange -1 to 1
+  //pos 0 is fully raised
+  //negative pos is goint down 
+  position = position +1;
+  position = position/2;
+  position = position * k_rangeClaw ;
+
+  m_gripPID.setReference(position, ControlType.kSmartMotion);
+  
+
+}
+
+ 
+@Config(name = "Extend PID", tabName = "Arm PID")
 void setExtenPIDIzF(@Config(defaultValueNumeric = kPE) double p , @Config(defaultValueNumeric = kIE) double i, @Config(defaultValueNumeric = kDE) double d, @Config(defaultValueNumeric = kIzE) double iz, @Config(defaultValueNumeric = kFE) double f){  
   m_extendPID.setP(p);
   m_extendPID.setI(i);
@@ -396,4 +456,21 @@ void setGripPIDIzF( @Config( defaultValueNumeric = kPG) double p , @Config(defau
   m_gripPID.setFF(f);
 }
 
+@Config (name = "Extend Max Motion", tabName = "Arm PID")
+void setExtendMaxVelocityAndAccel(@Config(defaultValueNumeric = maxRPME) double maxVelocity, @Config(defaultValueNumeric = maxAccelE) double maxAccel){
+  m_extendPID.setSmartMotionMaxVelocity(maxVelocity, 0);
+  m_extendPID.setSmartMotionMaxAccel(maxAccel, 0);
+}
+
+@Config (name = "Raise Max Motion", tabName = "Arm PID")
+void setRaiseMaxVelocityAndAccel(@Config(defaultValueNumeric = maxRPMR) double maxVelocity, @Config(defaultValueNumeric = maxAccelR) double maxAccel){
+  m_raisePID.setSmartMotionMaxVelocity(maxVelocity, 0);
+  m_raisePID.setSmartMotionMaxAccel(maxAccel, 0);
+}
+
+@Config (name = "Grip Max Motion", tabName = "Arm PID")
+void setGripMaxVelocityAndAccel(@Config(defaultValueNumeric = maxRPMG) double maxVelocity, @Config(defaultValueNumeric = maxAccelG) double maxAccel){
+  m_gripPID.setSmartMotionMaxVelocity(maxVelocity, 0);
+  m_gripPID.setSmartMotionMaxAccel(maxAccel, 0);
+}
 }
