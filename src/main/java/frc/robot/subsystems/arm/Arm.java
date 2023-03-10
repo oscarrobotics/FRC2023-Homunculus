@@ -94,6 +94,9 @@ private final double k_ticksPerInchExtend=1;
 private final double k_ticksPerInchRaise=1;
 private final double k_ticksPerInchGrip= 1;
 
+public final double k_targetExtPosHigh = 0;
+private final double k_targetRaisePosHigh = 0;
+
   //pid constants
   //extend
  public final double kPE = 5.0;
@@ -103,7 +106,7 @@ private final double k_ticksPerInchGrip= 1;
  public final double kFFE = 0;
  public final double kMaxOutputE = 0.8; //arm oout?
  public final double kMinOutputE = 0.3;//arm in?
- public final double maxRPME = 2700;
+ public final double maxRPME = 5700;
  public final double maxAccelE = 2000;
 
 //raise
@@ -115,7 +118,7 @@ private final double k_ticksPerInchGrip= 1;
   public final double kMaxOutputR = 0.3;//arm down?
   public final double kMinOutputR = 0.8;//arm up?
   
-  public final double maxRPMR = 2700;
+  public final double maxRPMR = 5700;
   public final double maxAccelR = 2000;
 
 
@@ -127,20 +130,8 @@ private final double k_ticksPerInchGrip= 1;
   public final double kFFG = 0; 
   public final double kMaxOutputG = 0.6;//grip open?
   public final double kMinOutputG = 0.6;//grip close?
-  public final double maxRPMG = 2700;
+  public final double maxRPMG = 5700;
   public final double maxAccelG = 2000;
-
-  @Log.Graph(name = "Extend Setpoint")
-  public double vExtendPos = 0;
-  @Log.Graph(name = "Raise Setpoint")
-  public double vRaisePos = 0;
-  @Log.Graph(name = "Grip Setpoint")
-  public double vGripPos = 0;
-
-  @Log.Graph(name = "minArmHeight")
-  public double vMaxExtention = 0;
-  @Log.Graph(name = "minAgnle")
-  public double vMinAngle = 0;
 
 
 // private final AbsoluteEncoder m_Encoder;
@@ -149,14 +140,14 @@ private final double k_ticksPerInchGrip= 1;
 
 
   public Arm(){
-    m_extendMotor = new CANSparkMax(20, MotorType.kBrushless);
+  m_extendMotor = new CANSparkMax(20, MotorType.kBrushless);
    m_raiseMotor = new CANSparkMax(21,MotorType.kBrushless);
    m_gripMotor = new CANSparkMax(22,MotorType.kBrushless) ;
    
    //cuewnt limit
-   m_extendMotor.setSmartCurrentLimit(10 , 20,0); 
-   m_raiseMotor.setSmartCurrentLimit(10,20,0);
-   m_gripMotor.setSmartCurrentLimit(10,10,0);
+   m_extendMotor.setSmartCurrentLimit(3, 6,0); 
+   m_raiseMotor.setSmartCurrentLimit(3,6,0);
+   m_gripMotor.setSmartCurrentLimit(3,6,0);
 
    m_extendMotor.setIdleMode(IdleMode.kBrake);
    m_raiseMotor.setIdleMode(IdleMode.kBrake);
@@ -242,10 +233,6 @@ private final double k_ticksPerInchGrip= 1;
     m_gripPID.setSmartMotionMaxAccel(2000, kSlotIdxG);
     m_gripPID.setSmartMotionAllowedClosedLoopError(1, kSlotIdxG);
 
-    
-
-
-     
 
 
     //set some soft limit to prevent full extension (illegal)
@@ -404,7 +391,6 @@ public void setExtentPosition(double position){
   position = position * (k_rangeLengthPos-2);
   position = position+2;
 
-  vExtendPos = position;
   m_extendPID.setReference(position, ControlType.kPosition);
 }
 public void setRaisedPosition(double position){
@@ -416,20 +402,18 @@ public void setRaisedPosition(double position){
   position = position * (k_rangeLeanglePos-2) *-1;
   position = position -2;
 
-  vRaisePos = position;
   m_raisePID.setReference(position, ControlType.kPosition);
 
 
 }
-public void setGripPosition(double position){
+public void setClawPosition(double position){
   //inpoutrange -1 to 1
   //pos 0 is fully raised
   //negative pos is goint down 
   position = position +1;
   position = position/2;
   position = position * k_rangeClaw ;
-  
-  vGripPos = position;
+
   m_gripPID.setReference(position, ControlType.kPosition);
   
 
@@ -444,8 +428,6 @@ public void setExtendMotion(double position){
   position = position * (k_rangeLengthPos-2);
   position = position+2;
 
-
-  vExtendPos = position;
   m_extendPID.setReference(position, ControlType.kSmartMotion);
 }
 public void setRaiseMotion(double position){
@@ -457,10 +439,9 @@ public void setRaiseMotion(double position){
   position = position * (k_rangeLeanglePos-2) *-1;
   position = position -2;
 
-  vRaisePos = position;
   m_raisePID.setReference(position, ControlType.kSmartMotion);
 }
-public void setGripMotion(double position){
+public void setClawMotion(double position){
   //inpoutrange -1 to 1
   //pos 0 is fully raised
   //negative pos is goint down 
@@ -468,7 +449,6 @@ public void setGripMotion(double position){
   position = position/2;
   position = position * k_rangeClaw ;
 
-  vGripPos = position;
   m_gripPID.setReference(position, ControlType.kSmartMotion);
   
 
@@ -489,24 +469,15 @@ public void setExtendMotionSafe(double position){
   double angle = getArmAngle();
   double maxExtension = position;
   if (angle < 0){
-     maxExtension = Math.min(( k_pivotHeight-k_minArmHeight ) / Math.cos(angle), (40+k_columtToFront /Math.cos(angle)));
+     maxExtension = ( k_pivotHeight-k_minArmHeight ) / Math.cos(angle);
   }
-
-  if (angle > 0){
-    maxExtension = 40+k_columtToFront /Math.cos(angle);
-  }
-
-
   maxExtension = (maxExtension-k_minLength)/(k_maxLength-k_minLength)*(k_rangeLengthPos);
-
-
-  
 
   if (position > maxExtension){
     position = maxExtension;
   }
-  vMaxExtention = maxExtension;
-  vExtendPos = position;
+
+
   m_extendPID.setReference(position, ControlType.kSmartMotion);
 }
 
@@ -522,15 +493,14 @@ public void setRaiseMotionSafe( double position){
   
   double lenght = getExtent();
  // min angle = Math.cos(angle)= k_pivotHeight/length
-
   double minAngle = -Math.acos((k_pivotHeight-k_minArmHeight)/lenght);
   minAngle = angleToLeangle(minAngle)*k_rangeLeanglePos;
   
   if (position < minAngle){
     position = minAngle;
   }
-  vMinAngle = minAngle;
-  vRaisePos = position;
+  
+
   m_raisePID.setReference(position, ControlType.kSmartMotion);
 
 }
@@ -541,35 +511,6 @@ public void resetPosition(){
   m_raiseEncoder.setPosition(0);
   m_gripEncoder.setPosition(0);
 }
-
-double zeroingspeed = 0.5;
-final double k_zeroingSpeedDefault = 0.5;
-@Config(name = "Zeroing Speed", tabName = "Arm PID" , defaultValueNumeric = k_zeroingSpeedDefault)
-public void setZeroingSpeed(double speed){
-  zeroingspeed = speed;
-}
-
-public void moveToZero(){
-  //drive the mech to the zero position using velocity or duty cycle
-  //extend drives negative to retract
-  //raise dirves positive to raise
-  // m_extendPID.setReference(zeroingspeed, ControlType.kDutyCycle);
-  // m_raisePID.setReference(zeroingspeed, ControlType.kDutyCycle);
-  // m_gripPID.setReference(zeroingspeed, ControlType.kDutyCycle);
-
-  // double velthresh = 0.2;
-  // while(m_extendEncoder.getVelocity() > velthresh || m_raiseEncoder.getVelocity() > velthresh || m_gripEncoder.getVelocity() > velthresh){
-  //   //wait for the mech to reach the zero position
-  //   wait(1);
-  // }
-  // m_extendPID.setReference(0, ControlType.kDutyCycle);
-  // m_raisePID.setReference(0, ControlType.kDutyCycle);
-  // m_gripPID.setReference(0, ControlType.kDutyCycle);
-
-
-}
-
-
 
 
  
