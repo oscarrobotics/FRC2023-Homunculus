@@ -4,22 +4,22 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 
-public class TargetMap {
+public  class TargetMap {
 
-  Pose2d[] blueTargetPoses = new Pose2d[9];
-  Pose2d[] redTargetPoses = new Pose2d[9];
-  Translation2d[] coneArmTargets= new Translation2d[3];
-  Translation2d[] cubeArmTargets= new Translation2d[3];
+  public static Pose2d[] blueTargetPoses = new Pose2d[9];
+  public static Pose2d[] redTargetPoses = new Pose2d[9];
+  public static Translation2d[] coneArmTargets= new Translation2d[3];
+  public static Translation2d[] cubeArmTargets= new Translation2d[3];
 
-  Pose2d[] blueStationPose = new Pose2d[4];
-  Pose2d[] redStationPose = new Pose2d[4];
-  Translation2d[] stationArmTargets = new Translation2d[4];
+  public static Pose2d[] blueStationPose = new Pose2d[4];
+  public static Pose2d[] redStationPose = new Pose2d[4];
+  public static Translation2d[] stationArmTargets = new Translation2d[4];
 
-  Pose2d[] blueChargeingPose = new Pose2d[3];
-  Pose2d[] redChargeingPose = new Pose2d[3];
+  public static Pose2d[] blueChargeingPose = new Pose2d[3];
+  public static Pose2d[] redChargeingPose = new Pose2d[3];
 
-  Pose2d[] blueChargeingPose2bot = new Pose2d[2];
-  Pose2d[] redChargeingPose2bot = new Pose2d[2];
+  public static Pose2d[] blueChargeingPose2bot = new Pose2d[2];
+  public static Pose2d[] redChargeingPose2bot = new Pose2d[2];
 
   TargetMap() {
       //collum 1 is bottom of field

@@ -1,6 +1,13 @@
 package frc.robot.subsystems.arm;
 
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
+
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import io.github.oblarg.oblog.Loggable;
@@ -401,8 +408,31 @@ public double getRaisedPosition(){
 public double getGripPosition(){
   return m_gripEncoder.getPosition();
 }
+ public void setArmPosition(Translation2d position){
+    //takes in a pose and sets the arm to that position
+    Translation2d setpoints = cartToLengths(position.getX(), position.getY());
 
+    setExtentPosition(setpoints.getY());
+    setRaisedPosition(setpoints.getX());
 
+    //  setExtendMotion(setpoints.getY());
+    //  setRaiseMotion(setpoints.getX());  
+
+    //   setExtendMotionSafe(setpoints.getY());
+    //   setRaiseMotionSafe(setpoints.getX());
+
+ }
+ public Command dropCargo(Translation2d position){
+   return new SequentialCommandGroup(
+     new InstantCommand(()->setGripPosition(0)),
+     new InstantCommand(()->setArmPosition(position)),
+     new WaitCommand(0.5),
+     new InstantCommand(()->setGripPosition(1)),
+     new WaitCommand(0.5),
+     new InstantCommand(()->setGripPosition(0)),
+     new InstantCommand(()->setArmPosition(new Translation2d(0,0)))
+   );
+ }
 
 
 public void setExtentPosition(double position){
