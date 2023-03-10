@@ -15,6 +15,9 @@ public class TargetMap {
   Pose2d[] redStationPose = new Pose2d[4];
   Translation2d[] stationArmTargets = new Translation2d[4];
 
+  Pose2d[] blueChargeingPose = new Pose2d[3];
+  Pose2d[] redChargeingPose = new Pose2d[3];
+
 
   TargetMap() {
       //collum 1 is bottom of field
@@ -28,15 +31,15 @@ public class TargetMap {
       blueTargetPoses[7] = new Pose2d(new Translation2d(2, 4.43), new Rotation2d(Math.toRadians(180)));  
       blueTargetPoses[8] = new Pose2d(new Translation2d(2, 4.98), new Rotation2d(Math.toRadians(180)));
 
-      redTargetPoses[0] = new Pose2d(new Translation2d(14.54, 0.52), new Rotation2d(Math.toRadians(0)));
-      redTargetPoses[1] = new Pose2d(new Translation2d(14.54, 1.06), new Rotation2d(Math.toRadians(0)));
-      redTargetPoses[2] = new Pose2d(new Translation2d(14.54, 1.62), new Rotation2d(Math.toRadians(0)));
-      redTargetPoses[3] = new Pose2d(new Translation2d(14.54, 2.19), new Rotation2d(Math.toRadians(0)));
+      redTargetPoses[8] = new Pose2d(new Translation2d(14.54, 0.52), new Rotation2d(Math.toRadians(0)));
+      redTargetPoses[7] = new Pose2d(new Translation2d(14.54, 1.06), new Rotation2d(Math.toRadians(0)));
+      redTargetPoses[6] = new Pose2d(new Translation2d(14.54, 1.62), new Rotation2d(Math.toRadians(0)));
+      redTargetPoses[5] = new Pose2d(new Translation2d(14.54, 2.19), new Rotation2d(Math.toRadians(0)));
       redTargetPoses[4] = new Pose2d(new Translation2d(14.54, 2.75), new Rotation2d(Math.toRadians(0)));
-      redTargetPoses[5] = new Pose2d(new Translation2d(14.54, 3.31), new Rotation2d(Math.toRadians(0)));
-      redTargetPoses[6] = new Pose2d(new Translation2d(14.54, 3.87), new Rotation2d(Math.toRadians(0)));
-      redTargetPoses[7] = new Pose2d(new Translation2d(14.54, 4.43), new Rotation2d(Math.toRadians(0)));
-      redTargetPoses[8] = new Pose2d(new Translation2d(14.54, 4.98), new Rotation2d(Math.toRadians(0)));
+      redTargetPoses[3] = new Pose2d(new Translation2d(14.54, 3.31), new Rotation2d(Math.toRadians(0)));
+      redTargetPoses[2] = new Pose2d(new Translation2d(14.54, 3.87), new Rotation2d(Math.toRadians(0)));
+      redTargetPoses[1] = new Pose2d(new Translation2d(14.54, 4.43), new Rotation2d(Math.toRadians(0)));
+      redTargetPoses[0] = new Pose2d(new Translation2d(14.54, 4.98), new Rotation2d(Math.toRadians(0)));
 
       coneArmTargets[0] = new Translation2d(0.25, 0.25); //0
       coneArmTargets[1] = new Translation2d(0.61, 97); //87 4inchs higher
@@ -65,6 +68,8 @@ public class TargetMap {
       stationArmTargets[3] = new Translation2d(0.51, .69); //.69
 
 
+      //charging stations
+      // goes from bottom to top
 
 
 
