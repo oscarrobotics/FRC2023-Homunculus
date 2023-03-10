@@ -18,6 +18,8 @@ public class TargetMap {
   Pose2d[] blueChargeingPose = new Pose2d[3];
   Pose2d[] redChargeingPose = new Pose2d[3];
 
+  Pose2d[] blueChargeingPose2bot = new Pose2d[2];
+  Pose2d[] redChargeingPose2bot = new Pose2d[2];
 
   TargetMap() {
       //collum 1 is bottom of field
@@ -69,8 +71,21 @@ public class TargetMap {
 
 
       //charging stations
-      // goes from bottom to top
+      // goes from bottom to top facing the grid
+      blueChargeingPose[0] = new Pose2d(new Translation2d(3.90, 1.93), new Rotation2d(Math.toRadians(180)));
+      blueChargeingPose[1] = new Pose2d(new Translation2d(3.90, 2.72), new Rotation2d(Math.toRadians(180)));
+      blueChargeingPose[2] = new Pose2d(new Translation2d(3.90, 3.52), new Rotation2d(Math.toRadians(180)));
 
+      redChargeingPose[0] = new Pose2d(new Translation2d(12.64, 1.93), new Rotation2d(Math.toRadians(0)));
+      redChargeingPose[1] = new Pose2d(new Translation2d(12.64, 2.72), new Rotation2d(Math.toRadians(0)));
+      redChargeingPose[2] = new Pose2d(new Translation2d(12.64, 3.52), new Rotation2d(Math.toRadians(0)));
+
+      // charging staion posers that onlly leave room for 2 robots
+      blueChargeingPose2bot[0] = new Pose2d(new Translation2d(3.90, 2.2), new Rotation2d(Math.toRadians(180)));
+      blueChargeingPose2bot[1] = new Pose2d(new Translation2d(3.90, 3.3), new Rotation2d(Math.toRadians(180)));
+
+      redChargeingPose2bot[0] = new Pose2d(new Translation2d(12.64, 2.2), new Rotation2d(Math.toRadians(0)));
+      redChargeingPose2bot[1] = new Pose2d(new Translation2d(12.64, 3.3), new Rotation2d(Math.toRadians(0)));
 
 
   }
