@@ -170,8 +170,17 @@ public static Pose2d getChargeingPose2bot(int idx){
     return blueChargeingPose2bot[idx];
   }
 }
-  
+public static Translation2d getArmTarget(int idx){
+  //get alliance color
+  int col = idx%9;
+  int row = (int)Math.floor(idx/9.0);
+  if (col%3==1){
+    return cubeArmTargets[row];
+  }
+  else 
+    return coneArmTargets[row];
 
-  
+
+}
   
 }
