@@ -88,11 +88,16 @@ public class AutonomousSelector extends SubsystemBase implements Loggable{
     
   }
 
-  public List<PathPlannerTrajectory> getSelectedAuto() {
-    return autoPaths.get(m_autoSelected);
+  public int getSelectedAuto() {
+    return m_autoSelected;
   }
 
-  @Config.NumberSlider(name = "Auto Selectcor", min = 0, max = 6, blockIncrement = 1)
+  public List<PathPlannerTrajectory> getAutoPath(int i) {
+    return autoPaths.get(i);
+  }
+
+
+  @Config.NumberSlider(name = "Auto Selectcor", min = -1, max = 6, blockIncrement = 1 ,defaultValue = -1)
   void setauto1(double auto1){
     m_autoSelected = (int)auto1;
   }
