@@ -244,23 +244,23 @@ private final double k_ticksPerInchGrip= 1;
     m_gripPID.setOutputRange(-kMinOutputG, kMaxOutputG);
 
     //motion contfiguration
-    int kSlotIdxE = 0;
-    m_extendPID.setSmartMotionMaxVelocity(maxRPME, kSlotIdxE);
-    m_extendPID.setSmartMotionMinOutputVelocity(0, kSlotIdxE);
-    m_extendPID.setSmartMotionMaxAccel(2000, kSlotIdxE);
-    m_extendPID.setSmartMotionAllowedClosedLoopError(1, kSlotIdxE);
+    // int kSlotIdxE = 0;
+    // m_extendPID.setSmartMotionMaxVelocity(maxRPME, kSlotIdxE);
+    // m_extendPID.setSmartMotionMinOutputVelocity(0, kSlotIdxE);
+    // m_extendPID.setSmartMotionMaxAccel(2000, kSlotIdxE);
+    // m_extendPID.setSmartMotionAllowedClosedLoopError(1, kSlotIdxE);
 
-    int kSlotIdxR = 0;
-    m_raisePID.setSmartMotionMaxVelocity(maxRPMR, kSlotIdxR);
-    m_raisePID.setSmartMotionMinOutputVelocity(0, kSlotIdxR);
-    m_raisePID.setSmartMotionMaxAccel(2000, kSlotIdxR);
-    m_raisePID.setSmartMotionAllowedClosedLoopError(1, kSlotIdxR);
+    // int kSlotIdxR = 0;
+    // m_raisePID.setSmartMotionMaxVelocity(maxRPMR, kSlotIdxR);
+    // m_raisePID.setSmartMotionMinOutputVelocity(0, kSlotIdxR);
+    // m_raisePID.setSmartMotionMaxAccel(2000, kSlotIdxR);
+    // m_raisePID.setSmartMotionAllowedClosedLoopError(1, kSlotIdxR);
 
-    int kSlotIdxG = 0;
-    m_gripPID.setSmartMotionMaxVelocity(maxRPMG, kSlotIdxG);
-    m_gripPID.setSmartMotionMinOutputVelocity(0, kSlotIdxG);
-    m_gripPID.setSmartMotionMaxAccel(2000, kSlotIdxG);
-    m_gripPID.setSmartMotionAllowedClosedLoopError(1, kSlotIdxG);
+    // int kSlotIdxG = 0;
+    // m_gripPID.setSmartMotionMaxVelocity(maxRPMG, kSlotIdxG);
+    // m_gripPID.setSmartMotionMinOutputVelocity(0, kSlotIdxG);
+    // m_gripPID.setSmartMotionMaxAccel(2000, kSlotIdxG);
+    // m_gripPID.setSmartMotionAllowedClosedLoopError(1, kSlotIdxG);
 
 
 
