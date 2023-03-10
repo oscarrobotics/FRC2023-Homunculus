@@ -154,9 +154,9 @@ private final double k_ticksPerInchGrip= 1;
    m_gripMotor = new CANSparkMax(22,MotorType.kBrushless) ;
    
    //cuewnt limit
-   m_extendMotor.setSmartCurrentLimit(10 , 20,0); 
-   m_raiseMotor.setSmartCurrentLimit(10,20,0);
-   m_gripMotor.setSmartCurrentLimit(10,10,0);
+   m_extendMotor.setSmartCurrentLimit(6 , 10,0); 
+   m_raiseMotor.setSmartCurrentLimit(6,10,0);
+   m_gripMotor.setSmartCurrentLimit(6,8,0);
 
    m_extendMotor.setIdleMode(IdleMode.kBrake);
    m_raiseMotor.setIdleMode(IdleMode.kBrake);
