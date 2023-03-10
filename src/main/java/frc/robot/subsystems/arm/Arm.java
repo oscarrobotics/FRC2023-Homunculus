@@ -10,6 +10,7 @@ import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.CANSparkMax.ControlType;
 import com.revrobotics.CANSparkMax.IdleMode;
+import com.revrobotics.CANSparkMax.SoftLimitDirection;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.revrobotics.SparkMaxAbsoluteEncoder.Type;
@@ -43,7 +44,7 @@ private final double k_minClaw = -2.02;
 // private final double k_rangeLengthPos = k_maxLengthPos - k_minLengthPos;
 // private final double k_rangeLeanglePos = k_maxLeanglePos- k_minLeanglePos;
 private final double k_rangeLengthPos = 38.5;
-private final double k_rangeLeanglePos =120;//needs to be tuned, adjust tilll the arm is at the right angle at bottom should be nearly correct
+private final double k_rangeLeanglePos =100;//needs to be tuned, adjust tilll the arm is at the right angle at bottom should be nearly correct
 
 private final double k_rangeClaw = k_maxClaw - k_minClaw; //also should be checked and tuned
 
@@ -161,6 +162,14 @@ private final double k_ticksPerInchGrip= 1;
    m_extendMotor.setIdleMode(IdleMode.kBrake);
    m_raiseMotor.setIdleMode(IdleMode.kBrake);
    m_gripMotor.setIdleMode(IdleMode.kBrake);
+
+    m_extendMotor.setSoftLimit(SoftLimitDirection.kForward, (float)k_rangeLengthPos);
+    m_raiseMotor.setSoftLimit(SoftLimitDirection.kReverse, (float)-k_rangeLeanglePos);
+
+    m_extendMotor.setSoftLimit(SoftLimitDirection.kReverse, 0);
+    m_raiseMotor.setSoftLimit(SoftLimitDirection.kForward, 0);
+
+
     
    
 
@@ -210,6 +219,7 @@ private final double k_ticksPerInchGrip= 1;
     m_raisePID.setIZone(kIzR);
     m_raisePID.setFF(kFFR);
     m_raisePID.setOutputRange(-kMinOutputR, kMaxOutputR);
+    
     // m_gripPID.setP(1);
     // m_gripPID.setI(0);
     // m_gripPID.setD(0);
