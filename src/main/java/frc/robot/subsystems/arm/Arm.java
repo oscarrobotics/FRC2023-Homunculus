@@ -149,6 +149,9 @@ private final double k_ticksPerInchGrip= 1;
   public double vMaxExtention = 0;
   @Log.Graph(name = "minAgnle")
   public double vMinAngle = 0;
+  public double k_targetRaisePosHigh;
+  public double k_targetExtPosHigh;
+  public double k_targetGripPosHigh;
 
 
 // private final AbsoluteEncoder m_Encoder;
@@ -420,12 +423,12 @@ public double getGripPosition(){
  }
  public Command dropCargo(Translation2d position){
    return new SequentialCommandGroup(
-     new InstantCommand(()->setGripPosition(0)),
+     new InstantCommand(()->setClawPosition(0)),
      new InstantCommand(()->setArmPosition(position)),
      new WaitCommand(0.5),
-     new InstantCommand(()->setGripPosition(1)),
+     new InstantCommand(()->setClawPosition(1)),
      new WaitCommand(0.5),
-     new InstantCommand(()->setGripPosition(0)),
+     new InstantCommand(()->setClawPosition(0)),
      new InstantCommand(()->setArmPosition(new Translation2d(0,0)))
    );
  }

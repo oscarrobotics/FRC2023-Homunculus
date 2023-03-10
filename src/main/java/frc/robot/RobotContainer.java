@@ -96,7 +96,7 @@ public class RobotContainer {
     m_arm.setDefaultCommand(Commands.run(() -> {
       m_arm.setExtentPosition(m_operator.arcadeBlackLeft().getAsBoolean()?m_operator.getLeftSlider()*(1+extrastend):m_operator.getLeftSlider());
       m_arm.setRaisedPosition(m_operator.getRightSlider());
-      m_arm.setGripPosition(m_operator.arcadeWhiteLeft().getAsBoolean()?1:-1);
+      m_arm.setClawPosition(m_operator.arcadeWhiteLeft().getAsBoolean()?1:-1);
     }, 
     m_arm));
 
