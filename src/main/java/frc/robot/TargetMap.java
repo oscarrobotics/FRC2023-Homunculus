@@ -3,6 +3,9 @@ package frc.robot;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.RobotState;
+
 
 public  class TargetMap {
 
@@ -89,5 +92,95 @@ public  class TargetMap {
 
 
   }
+
+  public static Pose2d getBlueTargetPose(int target) {
+    return blueTargetPoses[target%9];
+  }
+
+  public static Pose2d getRedTargetPose(int target) {
+    return redTargetPoses[target%9];
+  }
+  public static Pose2d getBlueStationPose(int target) {
+    return blueStationPose[target%4];
+  }
+  public static Pose2d getRedStationPose(int target) {
+    return redStationPose[target%4];
+  }
+  public static Pose2d getBlueChargeingPose(int target) {
+    return blueChargeingPose[target%3];
+  }
+  public static Pose2d getRedChargeingPose(int target) {
+    return redChargeingPose[target%3];
+  }
+  public static Pose2d getBlueChargeingPose2bot(int target) {
+    return blueChargeingPose2bot[target%2];
+  }
+  public static Pose2d getRedChargeingPose2bot(int target) {
+    return redChargeingPose2bot[target%2];
+  }
+  public static Translation2d getRedConeArmTarget(int target) {
+    return coneArmTargets[target%3];
+  }
+  public static Translation2d getBlueConeArmTarget(int target) {
+    return coneArmTargets[target%3];
+  }
+  public static Translation2d getRedCubeArmTarget(int target) {
+    return cubeArmTargets[target%3];
+  }
+  public static Translation2d getBlueCubeArmTarget(int target) {
+    return cubeArmTargets[target%3];
+  }
+  public static Translation2d getRedStationArmTarget(int target) {
+    return stationArmTargets[target%4];
+  }
+  public static Translation2d getBlueStationArmTarget(int target) {
+    return stationArmTargets[target%4];
+
+  }
+public static Pose2d getTargetPose(int idx){
+  //get alliance color
+   if (DriverStation.getAlliance() == DriverStation.Alliance.Red) {
+    return redTargetPoses[idx];
+  } else {
+    return blueTargetPoses[idx];
+  }
+}
+public static Pose2d getStationPose(int idx){
+  //get alliance color
+   if (DriverStation.getAlliance() == DriverStation.Alliance.Red) {
+    return redStationPose[idx];
+  } else {
+    return blueStationPose[idx];
+  }
+  
+}
+public static Pose2d getChargeingPose(int idx){
+  //get alliance color
+   if (DriverStation.getAlliance() == DriverStation.Alliance.Red) {
+    return redChargeingPose[idx];
+  } else {
+    return blueChargeingPose[idx];
+  }
+}
+public static Pose2d getChargeingPose2bot(int idx){
+  //get alliance color
+   if (DriverStation.getAlliance() == DriverStation.Alliance.Red) {
+    return redChargeingPose2bot[idx];
+  } else {
+    return blueChargeingPose2bot[idx];
+  }
+}
+public static Translation2d getArmTarget(int idx){
+  //get alliance color
+  int col = idx%9;
+  int row = (int)Math.floor(idx/9.0);
+  if (col%3==1){
+    return cubeArmTargets[row];
+  }
+  else 
+    return coneArmTargets[row];
+
+
+}
   
 }

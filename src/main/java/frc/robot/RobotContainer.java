@@ -18,6 +18,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandGenericHID;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.subsystems.arm.Arm;
@@ -99,6 +100,25 @@ public class RobotContainer {
       m_arm.setClawPosition(m_operator.arcadeWhiteLeft().getAsBoolean()?1:-1);
     }, 
     m_arm));
+
+    //set driver buttons
+    // m_driverController.x().whileTrue(m_drivetrain.goToPoseCommand(
+    //   TargetMap.getTargetPose( TargetSelector.getTargetIdx()), 
+    //   3, 3));
+    // m_driverController.y().whileTrue(m_drivetrain.goToPoseCommand(TargetMap.getStationPose(0),3,3));
+    // m_driverController.b().whileTrue(m_drivetrain.goToPoseCommand(TargetMap.getStationPose(1),3,3));
+    // m_driverController.a().whileTrue(m_drivetrain.goToPoseCommand(TargetMap.getStationPose(2),3,3));
+      
+
+    // //set the operator buttons for the arm
+    // //sets the arm to the currently selected target
+    // m_operator.arcadeBlackRight().whileTrue(new InstantCommand(()->{
+    //   m_arm.setArmPosition(TargetMap.getArmTarget(TargetSelector.getTargetIdx()));
+    // }, m_arm));
+    // //sets the arm to the target dual station
+    // m_operator.arcadeWhiteRight().whileTrue(new InstantCommand(()->{
+    //   m_arm.setArmPosition(TargetMap.stationArmTargets[0]);
+    // }, m_arm));
 
     //set the butons on the strat conm to select the target for autoalignment, NOT for autonomous
    m_operator.sc1().onTrue(Commands.run(()->{TargetSelector.setA();}));
