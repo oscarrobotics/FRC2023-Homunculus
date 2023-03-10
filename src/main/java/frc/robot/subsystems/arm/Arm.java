@@ -1,6 +1,13 @@
 package frc.robot.subsystems.arm;
 
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
+
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import io.github.oblarg.oblog.Loggable;
@@ -10,6 +17,7 @@ import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.CANSparkMax.ControlType;
 import com.revrobotics.CANSparkMax.IdleMode;
+import com.revrobotics.CANSparkMax.SoftLimitDirection;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.revrobotics.SparkMaxAbsoluteEncoder.Type;
@@ -43,7 +51,7 @@ private final double k_minClaw = -2.02;
 // private final double k_rangeLengthPos = k_maxLengthPos - k_minLengthPos;
 // private final double k_rangeLeanglePos = k_maxLeanglePos- k_minLeanglePos;
 private final double k_rangeLengthPos = 38.5;
-private final double k_rangeLeanglePos =120;//needs to be tuned, adjust tilll the arm is at the right angle at bottom should be nearly correct
+private final double k_rangeLeanglePos =100;//needs to be tuned, adjust tilll the arm is at the right angle at bottom should be nearly correct
 
 private final double k_rangeClaw = k_maxClaw - k_minClaw; //also should be checked and tuned
 
@@ -94,9 +102,6 @@ private final double k_ticksPerInchExtend=1;
 private final double k_ticksPerInchRaise=1;
 private final double k_ticksPerInchGrip= 1;
 
-public final double k_targetExtPosHigh = 0;
-private final double k_targetRaisePosHigh = 0;
-
   //pid constants
   //extend
  public final double kPE = 5.0;
@@ -133,6 +138,18 @@ private final double k_targetRaisePosHigh = 0;
   public final double maxRPMG = 5700;
   public final double maxAccelG = 2000;
 
+  @Log.Graph(name = "Extend Setpoint")
+  public double vExtendPos = 0;
+  @Log.Graph(name = "Raise Setpoint")
+  public double vRaisePos = 0;
+  @Log.Graph(name = "Grip Setpoint")
+  public double vGripPos = 0;
+
+  @Log.Graph(name = "minArmHeight")
+  public double vMaxExtention = 0;
+  @Log.Graph(name = "minAgnle")
+  public double vMinAngle = 0;
+
 
 // private final AbsoluteEncoder m_Encoder;
 
@@ -145,13 +162,21 @@ private final double k_targetRaisePosHigh = 0;
    m_gripMotor = new CANSparkMax(22,MotorType.kBrushless) ;
    
    //cuewnt limit
-   m_extendMotor.setSmartCurrentLimit(3, 6,0); 
-   m_raiseMotor.setSmartCurrentLimit(3,6,0);
-   m_gripMotor.setSmartCurrentLimit(3,6,0);
+   m_extendMotor.setSmartCurrentLimit(6 , 10,0); 
+   m_raiseMotor.setSmartCurrentLimit(6,10,0);
+   m_gripMotor.setSmartCurrentLimit(6,8,0);
 
    m_extendMotor.setIdleMode(IdleMode.kBrake);
    m_raiseMotor.setIdleMode(IdleMode.kBrake);
    m_gripMotor.setIdleMode(IdleMode.kBrake);
+
+    m_extendMotor.setSoftLimit(SoftLimitDirection.kForward, (float)k_rangeLengthPos);
+    m_raiseMotor.setSoftLimit(SoftLimitDirection.kReverse, (float)-k_rangeLeanglePos);
+
+    m_extendMotor.setSoftLimit(SoftLimitDirection.kReverse, 0);
+    m_raiseMotor.setSoftLimit(SoftLimitDirection.kForward, 0);
+
+
     
    
 
@@ -201,6 +226,7 @@ private final double k_targetRaisePosHigh = 0;
     m_raisePID.setIZone(kIzR);
     m_raisePID.setFF(kFFR);
     m_raisePID.setOutputRange(-kMinOutputR, kMaxOutputR);
+    
     // m_gripPID.setP(1);
     // m_gripPID.setI(0);
     // m_gripPID.setD(0);
@@ -378,8 +404,31 @@ public double getRaisedPosition(){
 public double getGripPosition(){
   return m_gripEncoder.getPosition();
 }
+ public void setArmPosition(Translation2d position){
+    //takes in a pose and sets the arm to that position
+    Translation2d setpoints = cartToLengths(position.getX(), position.getY());
 
+    setExtentPosition(setpoints.getY());
+    setRaisedPosition(setpoints.getX());
 
+    //  setExtendMotion(setpoints.getY());
+    //  setRaiseMotion(setpoints.getX());  
+
+    //   setExtendMotionSafe(setpoints.getY());
+    //   setRaiseMotionSafe(setpoints.getX());
+
+ }
+ public Command dropCargo(Translation2d position){
+   return new SequentialCommandGroup(
+     new InstantCommand(()->setGripPosition(0)),
+     new InstantCommand(()->setArmPosition(position)),
+     new WaitCommand(0.5),
+     new InstantCommand(()->setGripPosition(1)),
+     new WaitCommand(0.5),
+     new InstantCommand(()->setGripPosition(0)),
+     new InstantCommand(()->setArmPosition(new Translation2d(0,0)))
+   );
+ }
 
 
 public void setExtentPosition(double position){
