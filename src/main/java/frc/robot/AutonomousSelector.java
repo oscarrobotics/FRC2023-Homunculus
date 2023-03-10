@@ -4,16 +4,25 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-
+import io.github.oblarg.oblog.Loggable;
+import io.github.oblarg.oblog.annotations.Config;
+import io.github.oblarg.oblog.annotations.Log;
+import io.github.oblarg.oblog.annotations.Log.Field2d;
+import java.util.ArrayList;
 import java.util.List;
 import com.pathplanner.lib.PathConstraints;
 import com.pathplanner.lib.PathPlanner;
 import com.pathplanner.lib.PathPlannerTrajectory;
-public class AutonomousSelector extends SubsystemBase{
+public class AutonomousSelector extends SubsystemBase implements Loggable{
 
-  SendableChooser<List <PathPlannerTrajectory>> m_chooser;
+  // SendableChooser<List <PathPlannerTrajectory>> m_chooser;
 
+  int m_autoSelected;
+  ArrayList<List<PathPlannerTrajectory>> autoPaths = new ArrayList<List<PathPlannerTrajectory>>();
+  ArrayList<String> autoNames = new ArrayList<String>();
   public AutonomousSelector(){
+    
+
     List<PathPlannerTrajectory> oneCargoAuto1 = 
         PathPlanner.loadPathGroup(
           "OneCargoAuto1", 
@@ -43,16 +52,33 @@ public class AutonomousSelector extends SubsystemBase{
           "ThreeCargoAuto", 
           new PathConstraints(3, 3));
     
-    m_chooser = new SendableChooser<>();
-    m_chooser.setDefaultOption("One Cargo Auto 1", oneCargoAuto1);
-    m_chooser.addOption("One Cargo Auto 2", oneCargoAuto2);
-    m_chooser.addOption("One Cargo Auto 3", oneCargoAuto3);
-    m_chooser.addOption("Two Cargo Auto 1", twoCargoAuto1);
-    m_chooser.addOption("Two Cargo Auto 2", twoCargoAuto2);
-    m_chooser.addOption("Two Cargo Auto 3", twoCargoAuto3);
-    m_chooser.addOption("Three Cargo Auto", threeCargoAuto); //NOT RECCOMENDED
+    autoPaths.add(oneCargoAuto1);
+    autoPaths.add(oneCargoAuto2);
+    autoPaths.add(oneCargoAuto3);
+    autoPaths.add(twoCargoAuto1);
+    autoPaths.add(twoCargoAuto2);
+    autoPaths.add(twoCargoAuto3);
+    autoPaths.add(threeCargoAuto);
+
+    autoNames.add("One Cargo Auto 1");
+    autoNames.add("One Cargo Auto 2");
+    autoNames.add("One Cargo Auto 3");
+    autoNames.add("Two Cargo Auto 1");
+    autoNames.add("Two Cargo Auto 2");
+    autoNames.add("Two Cargo Auto 3");
+    autoNames.add("Three Cargo Auto");
+
+
+    // m_chooser = new SendableChooser<>();
+    // m_chooser.setDefaultOption("One Cargo Auto 1", oneCargoAuto1);
+    // // m_chooser.addOption("One Cargo Auto 2", oneCargoAuto2);
+    // // m_chooser.addOption("One Cargo Auto 3", oneCargoAuto3);
+    // // m_chooser.addOption("Two Cargo Auto 1", twoCargoAuto1);
+    // // m_chooser.addOption("Two Cargo Auto 2", twoCargoAuto2);
+    // // m_chooser.addOption("Two Cargo Auto 3", twoCargoAuto3);
+    // // m_chooser.addOption("Three Cargo Auto", threeCargoAuto); //NOT RECCOMENDED
     
-    SmartDashboard.putData(m_chooser);
+    // SmartDashboard.putData(m_chooser);
 
   }
   
@@ -63,7 +89,23 @@ public class AutonomousSelector extends SubsystemBase{
   }
 
   public List<PathPlannerTrajectory> getSelectedAuto() {
-    return m_chooser.getSelected();
+    return autoPaths.get(m_autoSelected);
   }
 
-}
+  @Config.NumberSlider(name = "Auto Selectcor", min = 0, max = 6, blockIncrement = 1)
+  void setauto1(double auto1){
+    m_autoSelected = (int)auto1;
+  }
+
+  @Log.ToString(name = "Selected Auto")
+  String getSelectedAutoName(){
+    return autoNames.get(m_autoSelected);
+  }
+
+
+
+
+  }
+
+
+
