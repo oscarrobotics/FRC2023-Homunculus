@@ -19,6 +19,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandGenericHID;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -176,6 +177,22 @@ public class RobotContainer {
     return fullAuto;
     
   }
+  //  public Command getAutonomousCommand2() {
+  //   //cammad drive backwards 3 meters wait 2 seconds then drive forward 1.2 meters then back .2 meters using just veloity control 
+  //   return new SequentialCommandGroup(
+  //    new InstantCommand(()->m_drivetrain.setSpeeds(-1, -1)),
+  //    new WaitCommand(0.5),
+  //    new InstantCommand(()->setClawPosition(1)),
+  //    new WaitCommand(0.5),
+  //    new InstantCommand(()->setClawPosition(0)),
+  //    new InstantCommand(()->setArmPosition(new Translation2d(0,0)))
+  //  );
+    
+
+
+  //  }
+    
+
 
   @Config.Command(name = "Reset Position", tabName = "Arm PID")
   Command resetPosition = Commands.run(() -> {
