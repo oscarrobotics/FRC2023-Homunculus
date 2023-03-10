@@ -100,6 +100,12 @@ public class RobotContainer {
     }, 
     m_arm));
 
+    //set driver buttons
+    // m_driverController.x().whileTrue(m_drivetrain.goToPoseCommand(
+    //   TargetMap.getTargetPose( TargetSelector.getTargetIdx()), 
+    //   3, 3));
+
+
     //set the butons on the strat conm to select the target for autoalignment, NOT for autonomous
    m_operator.sc1().onTrue(Commands.run(()->{TargetSelector.setA();}));
     m_operator.sc2().onTrue(Commands.run(()->{TargetSelector.setB();}));
