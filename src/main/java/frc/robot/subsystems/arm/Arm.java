@@ -1,10 +1,22 @@
 package frc.robot.subsystems.arm;
 
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.networktables.GenericEntry;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
+import frc.robot.ControllerButtons;
+import frc.robot.RobotContainer;
 import io.github.oblarg.oblog.Loggable;
 import io.github.oblarg.oblog.annotations.Log;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
+
+import java.math.RoundingMode;
+
 import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.CANSparkMax.ControlType;
@@ -15,7 +27,7 @@ import com.revrobotics.SparkMaxAbsoluteEncoder.Type;
 import com.revrobotics.SparkMaxPIDController;
 
 public class Arm extends SubsystemBase implements Loggable{
-  
+
 public final CANSparkMax m_extendMotor;
 public final CANSparkMax m_raiseMotor;
 public final CANSparkMax m_gripMotor;
@@ -41,7 +53,10 @@ private final double k_minClaw = -2.02;
 
 // private final double k_rangeLengthPos = k_maxLengthPos - k_minLengthPos;
 // private final double k_rangeLeanglePos = k_maxLeanglePos- k_minLeanglePos;
+public final double k_buttonMinRange = -1;
+public final double k_buttonMaxRange = 1;
 private final double k_rangeLengthPos = 38.5;
+private final double k_rangeMinPos = 0.0;
 private final double k_rangeLeanglePos =120;
 private final double k_rangeClaw = k_maxClaw - k_minClaw;
 
@@ -88,14 +103,29 @@ private final double k_columtToFront = 0; //distance of the colloum from the fro
 private final double k_ticksPerInchExtend=1;
 private final double k_ticksPerInchRaise=1;
 private final double k_ticksPerInchGrip= 1;
+private GenericEntry m_kP;
+
+public final double k_targetExtPosHigh = 0.0;
+public final double k_targetRaisePosHigh = 0.0;
+public double k_targetGripPosHigh;
 
 // private final AbsoluteEncoder m_Encoder;
-
   public Arm(){
-    m_extendMotor = new CANSparkMax(20, MotorType.kBrushless);
+  
+    m_kP =
+      Shuffleboard.getTab("Arm")
+          .add("Arm P", 0.05)
+          .withWidget("Number Slider")
+          .withPosition(1, 1)
+          .withSize(2, 1)
+          .getEntry();
+
+   m_extendMotor = new CANSparkMax(20, MotorType.kBrushless);
    m_raiseMotor = new CANSparkMax(21,MotorType.kBrushless);
    m_gripMotor = new CANSparkMax(22,MotorType.kBrushless) ;
    
+   m_gripMotor.setInverted(true);
+   m_raiseMotor.setInverted(true);
    //TODO: manage if too snappy; be super careful with limits however
    m_extendMotor.setSmartCurrentLimit(5, 5, 0); 
    m_raiseMotor.setSmartCurrentLimit(5,5,0);
@@ -125,7 +155,7 @@ private final double k_ticksPerInchGrip= 1;
     m_gripPID = m_gripMotor.getPIDController();
 
     m_extendPID.setP(5.0);
-    m_extendPID.setI(0.05);
+    m_extendPID.setI(0.00);
     m_extendPID.setD(0.01);
     m_extendPID.setIZone(2);
     m_extendPID.setFF(0);
@@ -146,7 +176,6 @@ private final double k_ticksPerInchGrip= 1;
     m_gripPID.setOutputRange(-0.4, 0.4);
 
 
-
     //set some soft limit to prevent full extension (illegal)
   }
 
@@ -154,6 +183,7 @@ private final double k_ticksPerInchGrip= 1;
   public void periodic() {
     // This method will be called once per scheduler run
     // checkIfStalled();
+    m_raisePID.setP(m_kP.getDouble(0.05)); 
   }
 
   // @Log(name = "Pivot Encoder Counts", tabName = "Arm")
@@ -267,28 +297,56 @@ public double getGripPosition(){
   return m_gripEncoder.getPosition();
 }
 
+public void resetPosition(){
+  m_extendEncoder.setPosition(0);
+  m_raiseEncoder.setPosition(0);
+  m_gripEncoder.setPosition(0);
+}
+// public Command dropCargo(Translation2d position){
+//   return new SequentialCommandGroup(
+//     new InstantCommand(()->setClawPosition(0)),
+//     new InstantCommand(()->setArmPosition(position)),
+//     new WaitCommand(0.5),
+//     new InstantCommand(()->setClawPosition(1)),
+//     new WaitCommand(0.5),
+//     new InstantCommand(()->setClawPosition(0)),
+//     new InstantCommand(()->setArmPosition(new Translation2d(0,0)))
+//   );
 
 public void setExtentPosition(double position){
   //inpoutrange -1 to 1
   // pos zero is fully retracted
   //1 is fully extended
-  position = position +1;
-  position = position/2;
-  position = position * (k_rangeLengthPos-2);
-  position = position+2;
+  //Check math, rangeconverter class
 
-  m_extendPID.setReference(position, ControlType.kPosition);
+  //using linear conversion from button values -> CANSparkMax ticks
+  position = ((position - k_buttonMinRange) /
+        (k_buttonMaxRange - k_buttonMinRange)) * 
+        (k_rangeLengthPos - 0) + 0;
+  // position = position +1;
+  // position = position/2;
+  // position = position * (k_rangeLengthPos-2);
+  // position = position+2;
+
+  m_extendPID.setReference(position, CANSparkMax.ControlType.kPosition);
+  SmartDashboard.putNumber("targetPos", position);
 }
 public void setRaisedPosition(double position){
   //inpoutrange -1 to 1
   //pos 0 is fully raised
   //negative pos is goint down 
-  position = position +1;
-  position = position/2;
-  position = position * (k_rangeLeanglePos-2) *-1;
-  position = position -2;
+  // position = ((getRaisedPosition() - k_buttonMinRange) /
+  // (k_buttonMaxRange - k_buttonMinRange)) * 
+  // (k_rangeLeanglePos - 0) + 0;
+  // position = position +1;
+  // position = position/2;
+  // position = position * (k_rangeLeanglePos-2) *-1;
+  // position = position -2;
+  position = ((position - k_buttonMinRange) /
+  (k_buttonMaxRange - k_buttonMinRange)) * 
+  (k_rangeLeanglePos - 0) + 0;
 
-  m_raisePID.setReference(position, ControlType.kPosition);
+  m_raisePID.setReference(position, CANSparkMax.ControlType.kPosition);
 
 
 }
@@ -296,12 +354,11 @@ public void setClawPosition(double position){
   //inpoutrange -1 to 1
   //pos 0 is fully raised
   //negative pos is goint down 
-  position = position +1;
-  position = position/2;
-  position = position * k_rangeClaw ;
+  // position = position +1;
+  // position = position/2;
+  // position = position * k_rangeClaw ;
+ position =  (RobotContainer.m_operator.arcadeWhiteLeft().getAsBoolean() ? -10 : 40);
 
-  m_gripPID.setReference(position, ControlType.kPosition);
-  
-
+ m_gripPID.setReference(position, CANSparkMax.ControlType.kPosition);
 }
 }

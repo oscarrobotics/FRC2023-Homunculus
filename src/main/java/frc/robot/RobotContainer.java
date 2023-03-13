@@ -18,6 +18,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandGenericHID;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.subsystems.arm.Arm;
@@ -29,10 +30,11 @@ import io.github.oblarg.oblog.annotations.Log;
 public class RobotContainer {
   private final CommandXboxController m_driverController = new CommandXboxController(0);
 
-  private final ControllerButtons m_operator = new ControllerButtons(1);
+  public static final ControllerButtons m_operator = new ControllerButtons(1);
   private final Drivetrain m_drivetrain = new Drivetrain();
 
   public static final Arm m_arm = new Arm();
+  public static final AutonomousSelector m_pathSelect = new AutonomousSelector();
 
   SendableChooser<Command> m_chooser = new SendableChooser<>();
   
@@ -96,13 +98,10 @@ public class RobotContainer {
     m_arm.setDefaultCommand(Commands.run(() -> {
       m_arm.setExtentPosition(m_operator.getLeftSlider());
       m_arm.setRaisedPosition(m_operator.getRightSlider());
-      m_arm.setClawPosition(m_operator.arcadeWhiteLeft().getAsBoolean()?1:-1);
+      m_arm.setClawPosition(m_operator.arcadeWhiteLeft().getAsBoolean()?-1:1);
     }, 
     m_arm));
-
-
    
-
 
   }
 
@@ -110,7 +109,20 @@ public class RobotContainer {
 
   
   public Command getAutonomousCommand() {
-    List<PathPlannerTrajectory> pathGroup = PathPlanner.loadPathGroup("OneCargoAuto1", new PathConstraints(3, 4));
-    return autoBuilder.fullAuto(pathGroup);
+    // List<PathPlannerTrajectory> pathGroup = m_pathSelect.getAutoPath();
+    // return autoBuilder.fullAuto(pathGroup);
+    return new RunCommand(() -> m_drivetrain.arcadeDriveV(-0.7, 0), m_drivetrain)
+      .withTimeout(4.75)
+      .finallyDo((i) -> m_drivetrain.arcadeDriveV(0, 0));
+
+  }
+
+  @Log(name = "exslider", tabName = "arm")
+  double getExtSlider(){
+    return m_operator.getLeftSlider();
+  }
+
+  public double getSliderPos(){
+    return m_operator.getLeftSlider();
   }
 }
