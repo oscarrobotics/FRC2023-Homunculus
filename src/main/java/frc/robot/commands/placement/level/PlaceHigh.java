@@ -31,7 +31,7 @@ public class PlaceHigh extends SequentialCommandGroup{
           new InstantCommand(() -> arm.setRaisedPosition(initRaisePos + raiseError * 0.5)),
           new InstantCommand(() -> arm.setClawPosition(initGripPos + arm.k_targetGripPosHigh - initGripPos)),
           new WaitCommand(0.5),
-          new InstantCommand(() -> arm.setClawPosition(-0.8)),
+          new InstantCommand(() -> arm.setClawPosition(-0.5)),
           new InstantCommand(() -> arm.setRaisedPosition(0)),
           new InstantCommand(() -> arm.setClawPosition(0)))
           )

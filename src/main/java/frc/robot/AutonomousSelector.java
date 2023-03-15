@@ -4,6 +4,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import io.github.oblarg.oblog.annotations.Config;
 
 import java.util.List;
 import com.pathplanner.lib.PathConstraints;
@@ -62,6 +63,7 @@ public class AutonomousSelector extends SubsystemBase{
     
   }
 
+  @Config(name = "Auton selector", tabName = "Autonomous")
   public List<PathPlannerTrajectory> getSelectedAuto() {
     return m_chooser.getSelected();
   }

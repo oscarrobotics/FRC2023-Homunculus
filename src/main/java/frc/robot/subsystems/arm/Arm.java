@@ -104,7 +104,7 @@ private final double k_ticksPerInchGrip= 1;
 
   //pid constants
   //extend
- public final double kPE = 5.0;
+ public final double kPE = 3.0;
  public final double kIE = 0.00;//was 0.05
  public final double kDE = 0.00;//was 0.01
  public final double kIzE = 2;
