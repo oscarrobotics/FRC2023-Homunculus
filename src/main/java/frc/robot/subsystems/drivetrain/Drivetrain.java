@@ -214,6 +214,15 @@ public class Drivetrain extends SubsystemBase implements Loggable {
 
   // private final WPI_Pigeon2 m_gyro = new WPI_Pigeon2(0); //fix canID
 
+  public void setSpeedsCONT(double left, double right) {
+    //continuously set speeds until interrupted do not use lightly
+    while(true) {
+      
+    m_leftMaster.set(ControlMode.Velocity, left);
+    m_rightMaster.set(ControlMode.Velocity, right);
+    }
+  }
+
   public void resetOdometry(Pose2d initialPose) {
     m_poseEstimator.resetPosition(m_gyro.getRotation2d(), nativeUnitsToDistanceMeters( m_leftMaster.getSelectedSensorPosition()), nativeUnitsToDistanceMeters( m_rightMaster.getSelectedSensorPosition()), initialPose);
   }

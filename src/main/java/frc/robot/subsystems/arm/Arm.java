@@ -169,15 +169,17 @@ private final double k_ticksPerInchGrip= 1;
    m_raiseMotor.setSmartCurrentLimit(6,10,0);
    m_gripMotor.setSmartCurrentLimit(6,8,0);
 
+
+   // neutral mode
    m_extendMotor.setIdleMode(IdleMode.kBrake);
    m_raiseMotor.setIdleMode(IdleMode.kBrake);
    m_gripMotor.setIdleMode(IdleMode.kBrake);
 
-    m_extendMotor.setSoftLimit(SoftLimitDirection.kForward, (float)k_rangeLengthPos);
-    m_raiseMotor.setSoftLimit(SoftLimitDirection.kReverse, (float)-k_rangeLeanglePos);
+    // m_extendMotor.setSoftLimit(SoftLimitDirection.kForward, (float)k_rangeLengthPos);
+    // m_raiseMotor.setSoftLimit(SoftLimitDirection.kReverse, (float)-k_rangeLeanglePos);
 
-    m_extendMotor.setSoftLimit(SoftLimitDirection.kReverse, 0);
-    m_raiseMotor.setSoftLimit(SoftLimitDirection.kForward, 0);
+    // m_extendMotor.setSoftLimit(SoftLimitDirection.kReverse, 0);
+    // m_raiseMotor.setSoftLimit(SoftLimitDirection.kForward, 0);
 
 
     
@@ -244,23 +246,23 @@ private final double k_ticksPerInchGrip= 1;
     m_gripPID.setOutputRange(-kMinOutputG, kMaxOutputG);
 
     //motion contfiguration
-    int kSlotIdxE = 0;
-    m_extendPID.setSmartMotionMaxVelocity(maxRPME, kSlotIdxE);
-    m_extendPID.setSmartMotionMinOutputVelocity(0, kSlotIdxE);
-    m_extendPID.setSmartMotionMaxAccel(2000, kSlotIdxE);
-    m_extendPID.setSmartMotionAllowedClosedLoopError(1, kSlotIdxE);
+    // int kSlotIdxE = 0;
+    // m_extendPID.setSmartMotionMaxVelocity(maxRPME, kSlotIdxE);
+    // m_extendPID.setSmartMotionMinOutputVelocity(0, kSlotIdxE);
+    // m_extendPID.setSmartMotionMaxAccel(2000, kSlotIdxE);
+    // m_extendPID.setSmartMotionAllowedClosedLoopError(1, kSlotIdxE);
 
-    int kSlotIdxR = 0;
-    m_raisePID.setSmartMotionMaxVelocity(maxRPMR, kSlotIdxR);
-    m_raisePID.setSmartMotionMinOutputVelocity(0, kSlotIdxR);
-    m_raisePID.setSmartMotionMaxAccel(2000, kSlotIdxR);
-    m_raisePID.setSmartMotionAllowedClosedLoopError(1, kSlotIdxR);
+    // int kSlotIdxR = 0;
+    // m_raisePID.setSmartMotionMaxVelocity(maxRPMR, kSlotIdxR);
+    // m_raisePID.setSmartMotionMinOutputVelocity(0, kSlotIdxR);
+    // m_raisePID.setSmartMotionMaxAccel(2000, kSlotIdxR);
+    // m_raisePID.setSmartMotionAllowedClosedLoopError(1, kSlotIdxR);
 
-    int kSlotIdxG = 0;
-    m_gripPID.setSmartMotionMaxVelocity(maxRPMG, kSlotIdxG);
-    m_gripPID.setSmartMotionMinOutputVelocity(0, kSlotIdxG);
-    m_gripPID.setSmartMotionMaxAccel(2000, kSlotIdxG);
-    m_gripPID.setSmartMotionAllowedClosedLoopError(1, kSlotIdxG);
+    // int kSlotIdxG = 0;
+    // m_gripPID.setSmartMotionMaxVelocity(maxRPMG, kSlotIdxG);
+    // m_gripPID.setSmartMotionMinOutputVelocity(0, kSlotIdxG);
+    // m_gripPID.setSmartMotionMaxAccel(2000, kSlotIdxG);
+    // m_gripPID.setSmartMotionAllowedClosedLoopError(1, kSlotIdxG);
 
 
 
@@ -442,7 +444,7 @@ public void setExtentPosition(double position){
   position = position/2;
   position = position * (k_rangeLengthPos-2);
   position = position+2;
-
+  vExtendPos=position;
   m_extendPID.setReference(position, ControlType.kPosition);
 }
 public void setRaisedPosition(double position){
@@ -453,6 +455,7 @@ public void setRaisedPosition(double position){
   position = position/2;
   position = position * (k_rangeLeanglePos-2) *-1;
   position = position -2;
+  vRaisePos=position;
 
   m_raisePID.setReference(position, ControlType.kPosition);
 
@@ -465,7 +468,7 @@ public void setClawPosition(double position){
   position = position +1;
   position = position/2;
   position = position * k_rangeClaw ;
-
+  vGripPos=position;
   m_gripPID.setReference(position, ControlType.kPosition);
   
 
@@ -479,7 +482,7 @@ public void setExtendMotion(double position){
   position = position/2;
   position = position * (k_rangeLengthPos-2);
   position = position+2;
-
+  vExtendPos=position;
   m_extendPID.setReference(position, ControlType.kSmartMotion);
 }
 public void setRaiseMotion(double position){
@@ -490,7 +493,7 @@ public void setRaiseMotion(double position){
   position = position/2;
   position = position * (k_rangeLeanglePos-2) *-1;
   position = position -2;
-
+  vRaisePos=position;
   m_raisePID.setReference(position, ControlType.kSmartMotion);
 }
 public void setClawMotion(double position){
@@ -500,7 +503,7 @@ public void setClawMotion(double position){
   position = position +1;
   position = position/2;
   position = position * k_rangeClaw ;
-
+  vGripPos=position;
   m_gripPID.setReference(position, ControlType.kSmartMotion);
   
 
@@ -528,7 +531,8 @@ public void setExtendMotionSafe(double position){
   if (position > maxExtension){
     position = maxExtension;
   }
-
+  vExtendPos=position;
+  vMaxExtention = maxExtension;
 
   m_extendPID.setReference(position, ControlType.kSmartMotion);
 }
@@ -551,7 +555,8 @@ public void setRaiseMotionSafe( double position){
   if (position < minAngle){
     position = minAngle;
   }
-  
+  vRaisePos=position;
+  vMinAngle = minAngle;
 
   m_raisePID.setReference(position, ControlType.kSmartMotion);
 
