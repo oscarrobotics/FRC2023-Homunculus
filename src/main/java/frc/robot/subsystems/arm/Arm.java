@@ -111,7 +111,7 @@ private final double k_ticksPerInchGrip= 1;
   //extend
  public final double kPE = 1.0;//0.14
  public final double kIE = 0.00;//was 0.05
- public final double kDE = 0.001;//was 0.01
+ public final double kDE = 0.0000;//was 0.01
  public final double kIzE = 2;
  public final double kFFE = 0.0;
  public final double kMaxOutputE = 0.4; //arm oout?
@@ -122,7 +122,7 @@ private final double k_ticksPerInchGrip= 1;
 //raise
   public final double kPR = 0.6;//0.6
   public final double kIR = 0.000;//was 0.0005
-  public final double kDR = 0.001;//was 0.001
+  public final double kDR = 0.0000;//was 0.001
   public final double kIzR = 2;
   public final double kFFR = 0.0;
   public final double kMaxOutputR = 0.4;//arm up
@@ -170,8 +170,8 @@ private final double k_ticksPerInchGrip= 1;
    
    //cuewnt limit
    m_extendMotor.setSmartCurrentLimit(50 , 50,0); 
-   m_raiseMotor.setSmartCurrentLimit(10,15,0);
-   m_gripMotor.setSmartCurrentLimit(6,8,0);
+   m_raiseMotor.setSmartCurrentLimit(50,50,0);
+   m_gripMotor.setSmartCurrentLimit(16,28,0);
 
    m_extendMotor.setSoftLimit(SoftLimitDirection.kForward, (float)k_rangeLengthPos);
     m_extendMotor.setSoftLimit(SoftLimitDirection.kReverse, (float)-1);
@@ -321,8 +321,8 @@ double armangle = getArmAngle();
 
 double armlength = k_minLength + m_extendEncoder.getPosition()/k_rangeLengthPos * (k_maxLength-k_minLength);
 
-double clawhieght = k_pivotHeight+ Math.sin(armangle)*armlength; 
-double clawlength = Math.cos(armangle)*armlength-k_columtToFront;
+double clawhieght = k_pivotHeight+ Math.sin(Math.toRadians(armangle))*armlength; 
+double clawlength = Math.cos(Math.toRadians(armangle))*armlength-k_columtToFront;
 
 
 
