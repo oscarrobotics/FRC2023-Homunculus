@@ -47,12 +47,12 @@ public  class TargetMap {
       redTargetPoses[0] = new Pose2d(new Translation2d(14.54, 4.98), new Rotation2d(Math.toRadians(0)));
 
       coneArmTargets[0] = new Translation2d(0.25, 0.25); //0
-      coneArmTargets[1] = new Translation2d(0.61, 97); //87 4inchs higher
-      coneArmTargets[2] = new Translation2d(1.01, 0.127); //117 4inchs higher
+      coneArmTargets[1] = new Translation2d(0.61, 0.97); //87 4inchs higher
+      coneArmTargets[2] = new Translation2d(1.01, 1.27); //117 4inchs higher
 
       cubeArmTargets[0] = new Translation2d(0.25, 0.25); //0
-      cubeArmTargets[1] = new Translation2d(0.61, 75); //60 6inchs higher
-      cubeArmTargets[2] = new Translation2d(1.01, 0.105); //90 6inchs higher
+      cubeArmTargets[1] = new Translation2d(0.61, 0.75); //60 6inchs higher
+      cubeArmTargets[2] = new Translation2d(1.01, 1.05); //90 6inchs higher
 
       //charging stations
       //top to bottom third is ground sigle sitation 4th is lined up with single station

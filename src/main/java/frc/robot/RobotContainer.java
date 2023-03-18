@@ -97,11 +97,17 @@ public class RobotContainer {
 
     
     m_arm.setDefaultCommand(Commands.run(() -> {
-      m_arm.setExtentPosition(m_operator.arcadeBlackLeft().getAsBoolean()?m_operator.getLeftSlider()*(1+extrastend):m_operator.getLeftSlider());
-      m_arm.setRaisedPosition(m_operator.getRightSlider());
+      m_arm.setExtendPosition(m_operator.getLeftSlider());
+      m_arm.setRaisePosition(m_operator.getRightSlider());
       m_arm.setClawPosition(m_operator.arcadeWhiteLeft().getAsBoolean()?1:-1);
     }, 
     m_arm));
+    // m_arm.setDefaultCommand(Commands.run(() -> {
+    //   m_arm.setExtendMotion(m_operator.getLeftSlider());
+    //   m_arm.setRaiseMotion(m_operator.getRightSlider());
+    //   m_arm.setClawMotion(m_operator.arcadeWhiteLeft().getAsBoolean()?1:-1);
+    // }, 
+    // m_arm));
 
     //set driver buttons
     // m_driverController.x().whileTrue(m_drivetrain.goToPoseCommand(
@@ -177,27 +183,31 @@ public class RobotContainer {
     return fullAuto;
     
   }
-  //  public Command getAutonomousCommand2() {
-  //   //cammad drive backwards 3 meters wait 2 seconds then drive forward 1.2 meters then back .2 meters using just veloity control 
-  //   return new SequentialCommandGroup(
-  //    new InstantCommand(()->m_drivetrain.setSpeeds(-1, -1)),
-  //    new WaitCommand(0.5),
-  //    new InstantCommand(()->setClawPosition(1)),
-  //    new WaitCommand(0.5),
-  //    new InstantCommand(()->setClawPosition(0)),
-  //    new InstantCommand(()->setArmPosition(new Translation2d(0,0)))
-  //  );
+   public Command getAutonomousCommand2() {
+    //cammad drive backwards 3 meters wait 2 seconds then drive forward 1.2 meters then back .2 meters using just velocity control
+    return new SequentialCommandGroup(
+     new InstantCommand(()->m_drivetrain.setSpeedsCONT(-1, -1)).withTimeout(2),
+     new WaitCommand(2),
+      new InstantCommand(()->m_drivetrain.setSpeedsCONT(1, 1)).withTimeout(1.2),
+      new WaitCommand(0.5),
+      new InstantCommand(()->m_drivetrain.setSpeedsCONT(-1, -1)).withTimeout(.2),
+      new InstantCommand(()->m_drivetrain.setSpeedsCONT(0, 0)).withTimeout(5));
+
+   }
+ 
+   
     
 
 
-  //  }
-    
+   
+  
 
 
   @Config.Command(name = "Reset Position", tabName = "Arm PID")
-  Command resetPosition = Commands.run(() -> {
+  InstantCommand resetPosition = new InstantCommand(() -> {
     m_arm.resetPosition();
   }, m_arm);
+
   
 @Log(name = "Extra Stend get", tabName = "Arm PID")
  private double getExtraStend(){
