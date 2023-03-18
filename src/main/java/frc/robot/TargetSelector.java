@@ -78,6 +78,7 @@ public class TargetSelector implements Loggable {
     row[1] = true;
     column[1] = true;
     grid[1] = true;
+    update();
 
   }
 
@@ -182,9 +183,9 @@ static void update(){
     for(int i = 0; i < 3; i++){
       for(int j = 0; j < 3; j++){
         for(int k = 0; k < 3; k++){
-          gtarget[i][j][k] = grid[i];
-          ctarget[i][j][k] = column[j];
-          rtarget[i][j][k] = row[k];
+          gtarget[i][j][k] = grid[k];
+          ctarget[i][j][k] = column[i];
+          rtarget[i][j][k] = row[j];
         }
       }
     }

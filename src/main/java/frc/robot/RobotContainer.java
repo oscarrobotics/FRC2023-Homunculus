@@ -49,6 +49,8 @@ public class RobotContainer {
 
   final private double k_extrastend = 0;
   private double extrastend = k_extrastend;
+  Boolean safe = false;
+    Boolean motion = false;
 
   public RobotContainer() {
     
@@ -57,7 +59,7 @@ public class RobotContainer {
     ntinst.startServer();
 
     
-    // m_drivetrain.setDefaultCommand(Commands.run(() -> {
+    // m_drivetrain.setDefaultCommand(new InstantCommand (() -> {
     //   double Smodifier = m_driverController.getRightTriggerAxis() * 0.5 + 0.5-m_driverController.getLeftTriggerAxis()*0.5;
     //   double Tmodifer =1-(( m_driverController.leftBumper().getAsBoolean()?0:1 )* (m_driverController.getRightTriggerAxis()>0.5?1:0)*0.4);
       
@@ -67,7 +69,7 @@ public class RobotContainer {
     // }, m_drivetrain));
 
 
-    // m_drivetrain.setDefaultCommand(Commands.run(() -> {
+    // m_drivetrain.setDefaultCommand(new InstantCommand (() -> {
     //   double Smodifier = m_driverController.getRightTriggerAxis() * 0.5 + 0.5-m_driverController.getLeftTriggerAxis()*0.5;
     //   // double Tmodifer =1-(( m_driverController.leftBumper().getAsBoolean()?0:1 )* (m_driverController.getRightTriggerAxis()>0.5?1:0)*0.4);
     //   if (m_driverController.getLeftTriggerAxis()>0.5){
@@ -95,20 +97,56 @@ public class RobotContainer {
           m_driverController.getRightX() * Math.abs(m_driverController.getRightX())* Tmodifier * Constants.maxTurn);
     }, m_drivetrain));
 
-    
+      
+
+    m_operator.arcadeBlackLeft().onTrue(new InstantCommand(()->{
+      safe = true;
+      motion = false;
+
+    }));
+    m_operator.arcadeBlackLeft().onFalse(new InstantCommand(()->{
+      safe = false;
+      motion = false;
+
+    }));
+    m_operator.arcadeBlackRight().onTrue(new InstantCommand(()->{
+      safe = false;
+      motion = true;
+
+    }));
+    m_operator.arcadeBlackRight().onFalse(new InstantCommand(()->{
+      safe = false;
+      motion = false;
+
+    }));
+
+
+    if(!safe && !motion){  
+      m_arm.setDefaultCommand(Commands.run(() -> {
+        m_arm.setExtendPosition(m_operator.getLeftSlider());
+        m_arm.setRaisePosition(-m_operator.getRightSlider());
+        // m_arm.setClawPosition(m_operator.arcadeWhiteLeft().getAsBoolean()?1:-1);
+      }, 
+      m_arm));
+  }
+  m_operator.arcadeWhiteLeft().onTrue(new InstantCommand(()->{m_arm.toggleGrip();}));
+  
+  if(safe && !motion){  
     m_arm.setDefaultCommand(Commands.run(() -> {
-      m_arm.setExtendPosition(m_operator.getLeftSlider());
-      m_arm.setRaisePosition(m_operator.getRightSlider());
+      m_arm.setExtendPositionSafe(m_operator.getLeftSlider());
+      m_arm.setRaisePositionSafe(-m_operator.getRightSlider());
       m_arm.setClawPosition(m_operator.arcadeWhiteLeft().getAsBoolean()?1:-1);
     }, 
     m_arm));
-    // m_arm.setDefaultCommand(Commands.run(() -> {
-    //   m_arm.setExtendMotion(m_operator.getLeftSlider());
-    //   m_arm.setRaiseMotion(m_operator.getRightSlider());
-    //   m_arm.setClawMotion(m_operator.arcadeWhiteLeft().getAsBoolean()?1:-1);
-    // }, 
-    // m_arm));
-
+}
+if(!safe && motion){
+    m_arm.setDefaultCommand(Commands.run(() -> {
+      m_arm.setExtendMotion(m_operator.getLeftSlider());
+      m_arm.setRaiseMotion(-m_operator.getRightSlider());
+      m_arm.setClawMotion(m_operator.arcadeWhiteLeft().getAsBoolean()?1:-1);
+    }, 
+    m_arm));
+    }
     //set driver buttons
     // m_driverController.x().whileTrue(m_drivetrain.goToPoseCommand(
     //   TargetMap.getTargetPose( TargetSelector.getTargetIdx()), 
@@ -129,17 +167,17 @@ public class RobotContainer {
     // }, m_arm));
 
     //set the butons on the strat conm to select the target for autoalignment, NOT for autonomous
-   m_operator.sc1().onTrue(Commands.run(()->{TargetSelector.setA();}));
-    m_operator.sc2().onTrue(Commands.run(()->{TargetSelector.setB();}));
-    m_operator.sc3().onTrue(Commands.run(()->{TargetSelector.setC();}));
+   m_operator.sc1().onTrue( new InstantCommand (()->{TargetSelector.setA();}));
+    m_operator.sc2().onTrue(new InstantCommand (()->{TargetSelector.setB();}));
+    m_operator.sc3().onTrue(new InstantCommand (()->{TargetSelector.setC();}));
 
-    m_operator.sc4().onTrue(Commands.run(()->{TargetSelector.setLeft();}));
-    m_operator.sc5().onTrue(Commands.run(()->{TargetSelector.setMid();}));
-    m_operator.sc6().onTrue(Commands.run(()->{TargetSelector.setRight();}));
+    m_operator.sc4().onTrue(new InstantCommand (()->{TargetSelector.setLeft();}));
+    m_operator.sc5().onTrue(new InstantCommand (()->{TargetSelector.setMid();}));
+    m_operator.sc6().onTrue(new InstantCommand (()->{TargetSelector.setRight();}));
 
-    m_operator.scSideTop().onTrue(Commands.run(()->{TargetSelector.setBack();}));
-    m_operator.scSideMid().onTrue(Commands.run(()->{TargetSelector.setMid();}));
-    m_operator.scSideBot().onTrue(Commands.run(()->{TargetSelector.setFront();}));
+    m_operator.scSideTop().onTrue(new InstantCommand (()->{TargetSelector.setBack();}));
+    m_operator.scSideMid().onTrue(new InstantCommand (()->{TargetSelector.setMid();}));
+    m_operator.scSideBot().onTrue(new InstantCommand (()->{TargetSelector.setFront();}));
 
 
   }

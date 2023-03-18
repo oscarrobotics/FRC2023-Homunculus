@@ -39,7 +39,7 @@ SparkMaxPIDController m_raisePID;
 SparkMaxPIDController m_gripPID;
 
 
-private final double k_maxLengthPos = 38.3;//postion at the max length we mesures in units
+private final double k_maxLengthPos = 55;//38.3//postion at the max length we mesures in units
 private final double k_minLengthPos = 0;//postion at the max length we mesures in units
 
 
@@ -51,7 +51,7 @@ private final double k_minClawPos = -10;
 
 // private final double k_rangeLengthPos = k_maxLengthPos - k_minLengthPos;
 // private final double k_rangeLeanglePos = k_maxLeanglePos- k_minLeanglePos;
-private final double k_rangeLengthPos = 38.3;
+private final double k_rangeLengthPos = 55;
 private final double k_rangeLeanglePos =116;//needs to be tuned, adjust tilll the arm is at the right angle at bottom should be nearly correct
 
 private final double k_rangeClawPos = k_maxClawPos - k_minClawPos; //also should be checked and tuned
@@ -100,7 +100,7 @@ private final double k_minLeangle= Units.inchesToMeters(14.87);
 // private final double k_maxLeangle= Units.inchesToMeters(21.2);//used for kinemati
 private final double k_maxLeangle= Units.inchesToMeters(21.0);
 private final double k_minLength= Units.inchesToMeters(30.75);
-private final double k_maxLength= Units.inchesToMeters(59);
+private final double k_maxLength= Units.inchesToMeters(70);//59
 private final double k_columtToFront = Units.inchesToMeters(18); //distance of the colloum from the front of the robot
 
 private final double k_ticksPerInchExtend=1;
@@ -380,16 +380,30 @@ public double getArmLength(){
 
 
 public double angleToLeangle(double angle){
+  //TAKES DEGREES
   //angle is the angle of the arm above or below horizontal
  //use law of cosines because we have 2 sides and an included angle
   //c^2 = a^2+b^2-2ab*cos(C)
   // solve for c 
   //C =  the  moving angle of the arm
+double measuredmin = -23.8;
+double measuredmax = 62;
+double calcmin =-26.9;
+double calcmax = 52.4;
+double zerooffset = -5.27;
+
+
+  angle =   (angle-measuredmin)/(calcmax-calcmin)*(measuredmax-measuredmin)+calcmin; 
+
+
+
+
   double C = angle + 90;
+  C = Math.toRadians(angle);
   double a = k_pivotLenght;
   double b = k_pivotOffset;
   double c = Math.sqrt(Math.pow(a, 2)+Math.pow(b, 2)-2*a*b*Math.cos(C));
-  double leangle = (c-k_minLeangle)/(k_maxLeangle-k_minLeangle);
+  double leangle = (c-k_minLeangle)/(k_maxLeangle-k_minLeangle)*k_maxLeanglePos;
   return leangle;
 
 
@@ -539,7 +553,73 @@ public void setClawMotion(double position){
   m_gripPID.setReference(position, CANSparkMax.ControlType.kSmartMotion,0);
   
 
+}public void setExtendPositionSafe(double position){
+  //inpoutrange -1 to 1
+  // pos zero is fully retracted
+  //1 is fully extended
+  position = position +1;
+  position = position/2;
+  position = position * (k_rangeLengthPos-2);
+  position = position+2;
+
+  position = position +1;
+  position = position/2;
+  position = position * (k_rangeLengthPos-2);
+  position = position+2;
+  // calculate max extension based on arm angle so it doesnt hit the floor
+  //max extion == k_pivotHeight/Math.cos(angle)
+  
+  // final double k_horizontalPos = -50;//????? this is a guess, fill in with actual value
+  // final double k_minAngle = -30;//  ????? this is a guess, fill in with actual value by mesuring the angle of the arm
+  double angle = Math.toRadians( getArmAngle());
+  double maxExtension = position;
+  if (angle < 0){
+     maxExtension = ( k_pivotHeight-k_minArmHeight ) / Math.cos(angle);
+  }
+  maxExtension = (maxExtension-k_minLength)/(k_maxLength-k_minLength)*(k_rangeLengthPos);
+
+  if (position > maxExtension){
+    position = maxExtension;
+  }
+  vExtendPos=position;
+  vMaxExtention = maxExtension;
+
+
+  vExtendPos=position;
+  m_extendPID.setReference(position, CANSparkMax.ControlType.kPosition);
 }
+public void setRaisePositionSafe(double position){
+  //inpoutrange -1 to 1
+  //pos 0 is fully raised
+  //negative pos is goint down 
+  position = position +1;
+  position = position/2;
+  position = position * (k_rangeLeanglePos-2) *-1;
+  position = position -2;
+
+
+  double lenght = getExtent();
+ // min angle = Math.cos(angle)= k_pivotHeight/length
+  double minAngle = -Math.acos((k_pivotHeight-k_minArmHeight)/lenght);
+  minAngle = angleToLeangle(minAngle)*k_rangeLeanglePos;
+
+
+  if (position < minAngle){
+    position = minAngle;
+  }
+  vRaisePos=position;
+  vMinAngle = minAngle;
+
+
+  vRaisePos=position;
+
+  
+
+  m_raisePID.setReference(position, CANSparkMax.ControlType.kPosition);
+
+
+}
+
 public void setExtendMotionSafe(double position){
   //inpoutrange -1 to 1
   // pos zero is fully retracted
@@ -581,11 +661,11 @@ public void setRaiseMotionSafe( double position){
   
   double lenght = getExtent();
  // min angle = Math.cos(angle)= k_pivotHeight/length
-  double minAngle = -Math.acos((k_pivotHeight-k_minArmHeight)/lenght);
-  minAngle = angleToLeangle(minAngle)*k_rangeLeanglePos;
+  double minAngle =Math.toDegrees( -Math.acos((k_pivotHeight-k_minArmHeight)/lenght));
+  double minLeangle = angleToLeangle(minAngle)*k_rangeLeanglePos;
   
-  if (position < minAngle){
-    position = minAngle;
+  if (position < minLeangle){
+    position = minLeangle;
   }
   vRaisePos=position;
   vMinAngle = minAngle;
@@ -593,7 +673,13 @@ public void setRaiseMotionSafe( double position){
   m_raisePID.setReference(position, CANSparkMax.ControlType.kSmartMotion);
 
 }
+public void toggleGrip(){
+  if(m_gripEncoder.getPosition()<30)
+    setClawPosition(.9);
+  else 
+    setClawPosition(-1);
 
+}
 
 public void resetPosition(){
   m_extendEncoder.setPosition(0);
