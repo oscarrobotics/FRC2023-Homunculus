@@ -45,8 +45,8 @@ public class AutoBalance extends CommandBase implements Loggable{
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    m_drivetrain.m_leftMotors.stopMotor();
-    m_drivetrain.m_rightMotors.stopMotor();
+    // m_drivetrain.m_leftMotors.stopMotor();
+    // m_drivetrain.m_rightMotors.stopMotor();
   }
 
 

@@ -13,7 +13,7 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.DifferentialDriveKinematics;
 import edu.wpi.first.math.controller.RamseteController;
 import edu.wpi.first.math.estimator.DifferentialDrivePoseEstimator;
-
+import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.kinematics.DifferentialDriveWheelSpeeds;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
@@ -72,14 +72,14 @@ public class Drivetrain extends SubsystemBase implements Loggable {
   private final WPI_Pigeon2 m_gyro = new WPI_Pigeon2(0);
 
   //motor groups
-  @Log.MotorController(name = "Left Motors", tabName = "Drivetrain")
-  public
-  final MotorControllerGroup m_leftMotors =
-      new MotorControllerGroup(m_leftMaster, m_leftDrone);
-  @Log.MotorController(name = "Right Motors", tabName = "Drivetrain")
-  public
-  final MotorControllerGroup m_rightMotors =
-      new MotorControllerGroup(m_rightMaster, m_rightDrone);
+  // @Log.MotorController(name = "Left Motors", tabName = "Drivetrain")
+  // public
+  // final MotorControllerGroup m_leftMotors =
+  //     new MotorControllerGroup(m_leftMaster, m_leftDrone);
+  // @Log.MotorController(name = "Right Motors", tabName = "Drivetrain")
+  // public
+  // final MotorControllerGroup m_rightMotors =
+  //     new MotorControllerGroup(m_rightMaster, m_rightDrone);
 
   //camera
   public PhotonCameraWrapper pcw;
@@ -105,7 +105,7 @@ public class Drivetrain extends SubsystemBase implements Loggable {
   public final RamseteController m_ramseteController = new RamseteController();
 
  // Simulation classes help us simulate our robot
- private final BasePigeonSimCollection m_gyroSim = m_gyro.getSimCollection();
+//  private final BasePigeonSimCollection m_gyroSim = m_gyro.getSimCollection();
  private final TalonFXSimCollection m_leftDriveSim = m_leftMaster.getSimCollection();
  private final TalonFXSimCollection m_rightDriveSim = m_rightMaster.getSimCollection();
 
@@ -116,26 +116,32 @@ public class Drivetrain extends SubsystemBase implements Loggable {
  final int k100msPerSecond = 10;
 
 
- private final Field2d m_fieldSim = new Field2d();
- private final LinearSystem<N2, N2, N2> m_drivetrainSystem =
-         LinearSystemId.identifyDrivetrainSystem(1.98, 0.2, 1.5, 0.3);
- private final DifferentialDrivetrainSim m_driveSim =
-         new DifferentialDrivetrainSim(
-                 m_drivetrainSystem,
-                 DCMotor.getFalcon500(2),
-                 8,
-                 Constants.wheelBaseWidth,
-                 Constants.wheelRad,
-                 null);
+//  private final Field2d m_fieldSim = new Field2d();
+//  private final LinearSystem<N2, N2, N2> m_drivetrainSystem =
+//          LinearSystemId.identifyDrivetrainSystem(1.98, 0.2, 1.5, 0.3);
+//  private final DifferentialDrivetrainSim m_driveSim =
+//          new DifferentialDrivetrainSim(
+//                  m_drivetrainSystem,
+//                  DCMotor.getFalcon500(2),
+//                  8,
+//                  Constants.wheelBaseWidth,
+//                  Constants.wheelRad,
+//                  null);
 
-
+  private SlewRateLimiter driveSmother = new SlewRateLimiter(6,-6,0);
   public Drivetrain() {
 
     m_gyro.reset(); 
+    // m_gyro.inver
   
-    m_rightMotors.setInverted(true);
-    m_rightMaster.setInverted(true);
-    m_rightDrone.setInverted(true);
+    // m_rightMotors.setInverted(true);
+    // m_rightMaster.setInverted(true);
+    // m_rightDrone.setInverted(true);
+
+    m_rightMaster.setInverted(false);
+    m_rightDrone.setInverted(false);
+    m_leftMaster.setInverted(true);
+    m_leftDrone.setInverted(true);
 
     m_leftMaster.setNeutralMode(NeutralMode.Brake);
     m_leftDrone.setNeutralMode(NeutralMode.Brake);
@@ -177,7 +183,7 @@ public class Drivetrain extends SubsystemBase implements Loggable {
 
 
     //Odometry
-    m_rightMotors.setInverted(true);
+    // m_rightMotors.setInverted(true);
     
     m_leftMaster.configSelectedFeedbackSensor(FeedbackDevice.IntegratedSensor, 0, 0);
     m_rightMaster.configSelectedFeedbackSensor(FeedbackDevice.IntegratedSensor, 0, 0);
@@ -237,9 +243,9 @@ public class Drivetrain extends SubsystemBase implements Loggable {
   @Override
   public void simulationPeriodic() {
       /* Pass the robot battery voltage to the simulated Talon SRXs */
-      m_leftDriveSim.setBusVoltage(RobotController.getBatteryVoltage());
-      m_rightDriveSim.setBusVoltage(RobotController.getBatteryVoltage());
-      updateOdometry();
+      // m_leftDriveSim.setBusVoltage(RobotController.getBatteryVoltage());
+      // m_rightDriveSim.setBusVoltage(RobotController.getBatteryVoltage());
+      // updateOdometry();
       /*
        * CTRE simulation is low-level, so SimCollection inputs
        * and outputs are not affected by SetInverted(). Only
@@ -254,15 +260,15 @@ public class Drivetrain extends SubsystemBase implements Loggable {
        * using getInverted() so we can catch a possible bug in the
        * robot code where the wrong value is passed to setInverted().
        */
-      m_driveSim.setInputs(m_leftDriveSim.getMotorOutputLeadVoltage(),
-                           -m_rightDriveSim.getMotorOutputLeadVoltage());
+      // m_driveSim.setInputs(m_leftDriveSim.getMotorOutputLeadVoltage(),
+      //                      -m_rightDriveSim.getMotorOutputLeadVoltage());
   
       /*
        * Advance the model by 20 ms. Note that if you are running this
        * subsystem in a separate thread or have changed the nominal
        * timestep of TimedRobot, this value needs to match it.
        */
-      m_driveSim.update(0.02);
+      // m_driveSim.update(0.02);
   
       /*
        * Update all of our sensors.
@@ -278,24 +284,24 @@ public class Drivetrain extends SubsystemBase implements Loggable {
        * the output any further.
        * If we had observed that a positive voltage results in a negative
        * sensor velocity, we would need to negate the output once more.
-       */
-      m_leftDriveSim.setIntegratedSensorRawPosition(
-                      distanceToNativeUnits(
-                          m_driveSim.getLeftPositionMeters()
-                      ));
-      m_leftDriveSim.setIntegratedSensorRawPosition(
-                      velocityToNativeUnits(
-                          m_driveSim.getLeftVelocityMetersPerSecond()
-                      ));
-      m_rightDriveSim.setIntegratedSensorRawPosition(
-                      distanceToNativeUnits(
-                          -m_driveSim.getRightPositionMeters()
-                      ));
-      m_rightDriveSim.setIntegratedSensorRawPosition(
-                      velocityToNativeUnits(
-                          -m_driveSim.getRightVelocityMetersPerSecond()
-                      ));
-      m_gyroSim.setRawHeading(m_driveSim.getHeading().getDegrees());
+      //  */
+      // m_leftDriveSim.setIntegratedSensorRawPosition(
+      //                 distanceToNativeUnits(
+      //                     m_driveSim.getLeftPositionMeters()
+      //                 ));
+      // m_leftDriveSim.setIntegratedSensorRawPosition(
+      //                 velocityToNativeUnits(
+      //                     m_driveSim.getLeftVelocityMetersPerSecond()
+      //                 ));
+      // m_rightDriveSim.setIntegratedSensorRawPosition(
+      //                 distanceToNativeUnits(
+      //                     -m_driveSim.getRightPositionMeters()
+      //                 ));
+      // m_rightDriveSim.setIntegratedSensorRawPosition(
+      //                 velocityToNativeUnits(
+      //                     -m_driveSim.getRightVelocityMetersPerSecond()
+      //                 ));
+      // m_gyroSim.setRawHeading(m_driveSim.getHeading().getDegrees());
 
   }
 
@@ -336,12 +342,12 @@ public class Drivetrain extends SubsystemBase implements Loggable {
 
   }
   double kFiltercoeff = 0;
-
-  @Config.NumberSlider(name = " Smothing Filter coeff" , min = 0, max = 0.5,defaultValue = 0 )
-  private void setSmothing(double filtervalue){
-    kFiltercoeff = filtervalue;
-    // return kFiltercoeff;
-  }
+   
+  // @Config.NumberSlider(name = " Smothing Filter coeff" , min = 0, max = 0.5,defaultValue = 0 )
+  // private void setSmothing(double filtervalue){
+  //   kFiltercoeff = filtervalue;
+  //   // return kFiltercoeff;
+  // }
 
    public void smoothDrive(double speed, double rotation){
     
@@ -349,8 +355,8 @@ public class Drivetrain extends SubsystemBase implements Loggable {
      
     //apply a low pass filter to the speed input
     //takes a percentage of the new speed and the oposite percentage of the old speed and adds them together
-    speed = speed * (1-kFiltercoeff) + filtspeed * kFiltercoeff ;
-    
+    // speed = speed * (1-kFiltercoeff) + filtspeed * kFiltercoeff ;
+    speed = driveSmother.calculate(speed);
     //use the differntial drive invers kinematics class to set the motor controllers directly in velocity control mode
     DifferentialDriveWheelSpeeds wheelSpeeds = m_kinematics.toWheelSpeeds(new ChassisSpeeds(speed, 0, rotation));
     
@@ -384,11 +390,13 @@ public class Drivetrain extends SubsystemBase implements Loggable {
   //   m_differentialDrive.tankDrive(leftSpeed, rightSpeed);
   // }
 
-  public void stop() {
-    // m_differentialDrive.stopMotor();
-    m_leftMotors.stopMotor();
-    m_rightMotors.stopMotor();
-  }
+  // public void stop() {
+  //   // m_differentialDrive.stopMotor();
+  //   m_leftMotors.stopMotor();
+  //   m_rightMotors.stopMotor();
+
+
+  // }
 
 
   public Command followTrajectoryCommand(PathPlannerTrajectory traj, boolean isFirstPath) {
@@ -422,19 +430,23 @@ public Command goToPoseCommand(Pose2d tpose, double speed, double accel) {
 }
 
   public void updateOdometry() {
+    Rotation2d rotation = m_gyro.getRotation2d();
+    rotation = rotation.times(-1);
     m_poseEstimator.update(
-      m_gyro.getRotation2d(), nativeUnitsToDistanceMeters( m_leftMaster.getSelectedSensorPosition()),nativeUnitsToDistanceMeters( m_rightMaster.getSelectedSensorPosition()));
+      rotation, nativeUnitsToDistanceMeters( m_rightMaster.getSelectedSensorPosition()),nativeUnitsToDistanceMeters( m_leftMaster.getSelectedSensorPosition()));
     Optional<EstimatedRobotPose> result =
             pcw.getEstimatedGlobalPose(m_poseEstimator.getEstimatedPosition());
-  
-    if (result.isPresent()) {
+    
+    // System.out.println("left"+native-
+      if (result.isPresent()) {
         EstimatedRobotPose camPose = result.get();
         m_poseEstimator.addVisionMeasurement(
                 camPose.estimatedPose.toPose2d(), camPose.timestampSeconds);
-        m_fieldSim.getObject("Cam Est Pos").setPose(camPose.estimatedPose.toPose2d());
+        // System.out.println("got camera");
+        // m_fieldSim.getObject("Cam Est Pos").setPose(camPose.estimatedPose.toPose2d());
     } else {
         // move it way off the screen to make it disappear
-        m_fieldSim.getObject("Cam Est Pos").setPose(new Pose2d(-100, -100, new Rotation2d()));
+        // m_fieldSim.getObject("Cam Est Pos").setPose(new Pose2d(-100, -100, new Rotation2d()));
     }
   //   Optional<EstimatedRobotPose> result2 =
   //   pcw2.getEstimatedGlobalPose(m_poseEstimator.getEstimatedPosition());
@@ -448,10 +460,24 @@ public Command goToPoseCommand(Pose2d tpose, double speed, double accel) {
   //     m_fieldSim.getObject("Cam Est Pos").setPose(new Pose2d(-100, -100, new Rotation2d()));
   // }
 
-    m_fieldSim.getObject("Actual Pos").setPose(m_driveSim.getPose());
-    m_fieldSim.setRobotPose(m_poseEstimator.getEstimatedPosition());
+    // m_fieldSim.getObject("Actual Pos").setPose(m_driveSim.getPose());
+    // m_fieldSim.setRobotPose(m_poseEstimator.getEstimatedPosition());
 }
-// @Log.ToString(name = "Pose")
+
+@Log(name = "left enc")
+public double getLeftPositionMeters(){
+  return nativeUnitsToDistanceMeters(m_leftMaster.getSelectedSensorPosition());
+
+}
+@Log(name = "right enc")
+public double getRightPositionMeters(){
+  return nativeUnitsToDistanceMeters(m_rightMaster.getSelectedSensorPosition());
+  
+}
+
+
+
+@Log.ToString(name = "Pose")
 public Pose2d getPose() {
     return m_poseEstimator.getEstimatedPosition();
 }
@@ -474,14 +500,14 @@ public double getGyroRoll(){
   return m_gyro.getRoll();
 }
 
-@Log.Graph(name = "lefterror")
-public double lerror(){
-  return m_leftMaster.getClosedLoopError();
-}
-@Log.Graph(name = "righterror")
-public double rerror(){
-  return m_rightMaster.getClosedLoopError();
-}
+// @Log.Graph(name = "lefterror")
+// public double lerror(){
+//   return m_leftMaster.getClosedLoopError();
+// }
+// @Log.Graph(name = "righterror")
+// public double rerror(){
+//   return m_rightMaster.getClosedLoopError();
+// }
 
 
 
@@ -544,17 +570,17 @@ public CommandBase movingCommand(){
   };
 }
 
-@Config(name = "set Drive pid" )
-public void setDrivePID(@Config(defaultValueNumeric = Constants.dKp) double p, @Config(defaultValueNumeric = Constants.dKi) double i, @Config(defaultValueNumeric = Constants.dKd) double d, @Config(defaultValueNumeric = Constants.dKf) double f){
-  m_leftMaster.config_kP(0, p);
-  m_leftMaster.config_kI(0, i);
-  m_leftMaster.config_kD(0, d);
-  m_leftMaster.config_kF(0, f);
-  m_rightMaster.config_kP(0, p);
-  m_rightMaster.config_kI(0, i);
-  m_rightMaster.config_kD(0, d);
-  m_rightMaster.config_kF(0, f);
+// @Config(name = "set Drive pid" )
+// public void setDrivePID(@Config(defaultValueNumeric = Constants.dKp) double p, @Config(defaultValueNumeric = Constants.dKi) double i, @Config(defaultValueNumeric = Constants.dKd) double d, @Config(defaultValueNumeric = Constants.dKf) double f){
+//   m_leftMaster.config_kP(0, p);
+//   m_leftMaster.config_kI(0, i);
+//   m_leftMaster.config_kD(0, d);
+//   m_leftMaster.config_kF(0, f);
+//   m_rightMaster.config_kP(0, p);
+//   m_rightMaster.config_kI(0, i);
+//   m_rightMaster.config_kD(0, d);
+//   m_rightMaster.config_kF(0, f);
 
-}
+// }
 
 }

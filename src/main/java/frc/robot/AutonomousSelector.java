@@ -18,7 +18,8 @@ public class AutonomousSelector implements Loggable{
   // SendableChooser<List <PathPlannerTrajectory>> m_chooser;
 
   int m_autoSelected;
-  ArrayList<List<PathPlannerTrajectory>> m_chooser = new ArrayList<List<PathPlannerTrajectory>>();
+  SendableChooser<List<PathPlannerTrajectory>> m_chooser = new SendableChooser<>();
+  ArrayList<List<PathPlannerTrajectory>> m_chooser2 = new ArrayList<>();
   ArrayList<String> autoNames = new ArrayList<String>();
   public AutonomousSelector(){
   
@@ -58,22 +59,39 @@ public class AutonomousSelector implements Loggable{
         PathPlanner.loadPathGroup(
           "dropCube3AndLeaveComnityEndAtStation", 
           new PathConstraints(3, 3));
-      List<PathPlannerTrajectory> LeaveComnityEndAtStation = 
+    List<PathPlannerTrajectory> LeaveComnityEndAtStation = 
         PathPlanner.loadPathGroup(
           "LeaveComnityEndAtStation", 
           new PathConstraints(3, 3));
     
-
-    m_chooser.add(oneCargoAuto1);
-    m_chooser.add(oneCargoAuto2);
-    m_chooser.add(oneCargoAuto3);
-    m_chooser.add(twoCargoAuto1);
-    m_chooser.add(twoCargoAuto2);
-    m_chooser.add(twoCargoAuto3);
-    m_chooser.add(threeCargoAuto); //NOT RECCOMENDED
-    m_chooser.add(dropCone3AndLeaveComnityEndAtStation);
-    m_chooser.add(dropCube3AndLeaveComnityEndAtStation);
-   m_chooser.add(LeaveComnityEndAtStation);
+    List<PathPlannerTrajectory> BasicAuto = 
+          PathPlanner.loadPathGroup(
+            "BasicAuto", 
+            new PathConstraints(3, 3));
+      
+    m_chooser.addOption("oneCargoAuto1", oneCargoAuto1);
+    m_chooser.addOption("oneCargoAuto2",oneCargoAuto2);
+    m_chooser.addOption("oneCargoAuto3",oneCargoAuto3);
+    m_chooser.addOption("twoCargoAuto1",twoCargoAuto1);
+    m_chooser.addOption("twoCargoAuto2",twoCargoAuto2);
+    m_chooser.addOption("twoCargoAuto3",twoCargoAuto3);
+    m_chooser.addOption("threeCargoAuto",threeCargoAuto); //NOT RECCOMENDED
+    m_chooser.addOption("dropCone3AndLeaveComnityEndAtStation",dropCone3AndLeaveComnityEndAtStation);
+    m_chooser.addOption("dropCube3AndLeaveComnityEndAtStation",dropCube3AndLeaveComnityEndAtStation);
+    m_chooser.addOption("LeaveComnityEndAtStation",LeaveComnityEndAtStation);
+    m_chooser.addOption("BasicAuto",BasicAuto);
+    
+    m_chooser2.add(oneCargoAuto1);
+    m_chooser2.add(oneCargoAuto2);
+    m_chooser2.add(oneCargoAuto3);
+    m_chooser2.add(twoCargoAuto1);
+    m_chooser2.add(twoCargoAuto2);
+    m_chooser2.add(twoCargoAuto3);
+    m_chooser2.add(threeCargoAuto); //NOT RECCOMENDED
+    m_chooser2.add(dropCone3AndLeaveComnityEndAtStation);
+    m_chooser2.add(dropCube3AndLeaveComnityEndAtStation);
+   m_chooser2.add(LeaveComnityEndAtStation);
+   m_chooser2.add(BasicAuto);
   
    autoNames.add("One Cargo Auto 1");
   autoNames.add("One Cargo Auto 2");
@@ -85,6 +103,8 @@ public class AutonomousSelector implements Loggable{
   autoNames.add("Drop Cone 3 and Leave Community End at Station");
   autoNames.add("Drop Cube 3 and Leave Community End at Station");
   autoNames.add("Leave Community End at Station");
+  autoNames.add("BasicAuto");
+  SmartDashboard.putData("choose auto path" ,m_chooser);
 
   }
 
@@ -93,7 +113,7 @@ public class AutonomousSelector implements Loggable{
   }
 
   public List<PathPlannerTrajectory> getAutoPath(int i) {
-    return m_chooser.get(i);
+    return m_chooser2.get(i);
   }
 
 

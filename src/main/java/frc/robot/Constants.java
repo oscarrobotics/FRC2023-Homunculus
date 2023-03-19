@@ -12,13 +12,13 @@ public final class Constants {
   public static final int kTimoutms = 30;
 
   public static final double wheelRad = Units.inchesToMeters(3);
-  public static final double wheelBaseWidth = Units.inchesToMeters(28); // test robot
-  // public final double wheelbwidth = Units.inchesToMeters(26); // new robot
+  // public static final double wheelBaseWidth = Units.inchesToMeters(28); // test robot
+  public static final double wheelBaseWidth = Units.inchesToMeters(26); // new robot
   public static final double wheelBaseLength =30;
-  public static final double gearRatio = 10; // test robot
-  // public final double gearratio = 9.8; // new robot
+  // public static final double gearRatio = 10; // test robot
+  public static final double gearRatio = 9.8; // new robot
   public static final double maxSpeed = 4.267; //m/s
-  public static final double maxTurn = 10.0; //rad/s
+  public static final double maxTurn = 6.0; //rad/s
 
   public static final double dKf = 1023.0 / 18252;
   public static final double dKp = 0.05;
@@ -39,7 +39,7 @@ public final class Constants {
   public static class VisionConstants {
     public static final Transform3d robotToCam =
             new Transform3d(
-                    new Translation3d(Units.feetToMeters(-7.5), Units.feetToMeters(17), 0.5),
+                    new Translation3d(Units.inchesToMeters(-6), Units.inchesToMeters(7), 0.5),
                     new Rotation3d(
                             0, 0,
                             0)); // Cam mounted facing forward, half a meter forward of center, half a meter up

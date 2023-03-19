@@ -2,6 +2,7 @@ package frc.robot.subsystems.arm;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -46,8 +47,8 @@ private final double k_minLengthPos = 0;//postion at the max length we mesures i
 
 private final double k_maxLeanglePos = 116 ; //max length of the angle control in units
 private final double k_minLeanglePos = 0 ; //max length of the angle control in units
-private final double k_maxClawPos = 33.3; //43.3
-private final double k_minClawPos = -10;
+private final double k_maxClawPos = 43.3; //43.3
+private final double k_minClawPos = 0;
 
 // private final double k_rangeLengthPos = k_maxLengthPos - k_minLengthPos;
 // private final double k_rangeLeanglePos = k_maxLeanglePos- k_minLeanglePos;
@@ -59,7 +60,7 @@ private final double k_rangeClawPos = k_maxClawPos - k_minClawPos; //also should
 
 private final double k_maxHeight = Units.inchesToMeters((12*6.25)) ;// height in feet that the robot is alowed to be
 
-private final double k_pivotHeight = Units.inchesToMeters(22); // height in inches that the pivot point oi the arm is of the floor
+private final double k_pivotHeight = Units.inchesToMeters(21); // height in inches that the pivot point oi the arm is of the floor
 private double k_minArmHeight = Units.inchesToMeters(0); // height in inches that the arm is alowed to be at the bottom
 private final double d_minArmHeight = 5;
 
@@ -109,22 +110,36 @@ private final double k_ticksPerInchGrip= 1;
 
   //pid constants
   //extend
- public final double kPE = 1.0;//0.14
- public final double kIE = 0.00;//was 0.05
- public final double kDE = 0.0000;//was 0.01
- public final double kIzE = 2;
- public final double kFFE = 0.0;
+ public final double kPE_out = 0.06;//0.14
+ public final double kIE_out = 0.0008;//was 0.05
+ public final double kDE_out = 0.0000;//was 0.01
+ public final double kIzE_out = 4;
+ public final double kFFE_out = 0.0;
+
+ public final double kPE_in = 0.06;//0.14
+ public final double kIE_in = 0.0008;//was 0.05
+ public final double kDE_in = 0.0000;//was 0.01
+ public final double kIzE_in = 4;
+ public final double kFFE_in = 0.0;
+
  public final double kMaxOutputE = 0.4; //arm oout?
  public final double kMinOutputE = 0.3;//arm in?
  public final double maxRPME = 5;
  public final double maxAccelE = 2;
 
 //raise
-  public final double kPR = 0.6;//0.6
-  public final double kIR = 0.000;//was 0.0005
-  public final double kDR = 0.0000;//was 0.001
-  public final double kIzR = 2;
-  public final double kFFR = 0.0;
+  public final double kPR_up = 0.06;//0.6
+  public final double kIR_up = 0.0001;//was 0.0005
+  public final double kDR_up = 0.0000;//was 0.001
+  public final double kIzR_up = 2;
+  public final double kFFR_up = 0.0;
+
+  public final double kPR_down = 0.06;//0.6
+  public final double kIR_down = 0.0001;//was 0.0005
+  public final double kDR_down = 0.0000;//was 0.001
+  public final double kIzR_down = 2;
+  public final double kFFR_down = 0.0;
+
   public final double kMaxOutputR = 0.4;//arm up
   public final double kMinOutputR = 0.3;//arm down
   
@@ -161,8 +176,10 @@ private final double k_ticksPerInchGrip= 1;
 // private final AbsoluteEncoder m_Encoder;
 
 
-
-
+//Sets max velocity, acceleration, and state
+  private TrapezoidProfile armSmother = new TrapezoidProfile(new TrapezoidProfile.Constraints(0,0),
+                                                             new TrapezoidProfile.State(0, 0), 
+                                                             new TrapezoidProfile.State(0,0));
   public Arm(){
   m_extendMotor = new CANSparkMax(20, MotorType.kBrushless);
    m_raiseMotor = new CANSparkMax(21,MotorType.kBrushless);
@@ -222,41 +239,29 @@ private final double k_ticksPerInchGrip= 1;
 
 
 
-    // m_extendPID.setP(5.0);
-    // m_extendPID.setI(0.05);
-    // m_extendPID.setD(0.01);
-    // m_extendPID.setIZone(2);
-    // m_extendPID.setFF(0);
-    // m_extendPID.setOutputRange(-0.3, 0.8);
-    m_extendPID.setP(kPE,0);
-    m_extendPID.setI(kIE,0);
-    m_extendPID.setD(kDE,0);
-    m_extendPID.setIZone(kIzE,0);
-    m_extendPID.setFF(kFFE,0);
+    
+    m_extendPID.setP(kPE_out,0);
+    m_extendPID.setI(kIE_out,0);
+    m_extendPID.setD(kDE_out,0);
+    m_extendPID.setIZone(kIzE_out,0);
+    m_extendPID.setFF(kFFE_out,0);
+
+    m_extendPID.setP(kPE_in,1);
+    m_extendPID.setI(kIE_in,1);
+    m_extendPID.setD(kIE_in, 1);
+    m_extendPID.setIZone(kIzE_in,1);
+    m_extendPID.setFF(kFFE_in,1);
+
     m_extendPID.setOutputRange(-kMinOutputE, kMaxOutputE,0);
     
-
-
-
-    // m_raisePID.setP(0.05);
-    // m_raisePID.setI(0.0005);
-    // m_raisePID.setD(0.001);
-    // m_raisePID.setIZone(2);
-    // m_raisePID.setFF(0);
-    // m_raisePID.setOutputRange(-0.3, 0.8);
-    m_raisePID.setP(kPR,0);
-    m_raisePID.setI(kIR,0);
-    m_raisePID.setD(kDR,0);
-    m_raisePID.setIZone(kIzR,0);
-    m_raisePID.setFF(kFFR,0);
+    m_raisePID.setP(kPR_up,0);
+    m_raisePID.setI(kIR_up,0);
+    m_raisePID.setD(kDR_up,0);
+    m_raisePID.setIZone(kIzR_up,0);
+    m_raisePID.setFF(kFFR_up,0);
     m_raisePID.setOutputRange(-kMinOutputR, kMaxOutputR,0);
     
-    // m_gripPID.setP(1);
-    // m_gripPID.setI(0);
-    // m_gripPID.setD(0);
-    // m_gripPID.setIZone(0);
-    // m_gripPID.setFF(0);
-    // m_gripPID.setOutputRange(-0.4, 0.4);
+    
     m_gripPID.setP(kPG,0);
     m_gripPID.setI(kIG,0);
     m_gripPID.setD(kDG,0);
@@ -309,9 +314,24 @@ private final double k_ticksPerInchGrip= 1;
   //   return isStalled;
   // }
 
-  @Log.Graph(name = "Arm Motor Pulse")
-  public double getMotorPulse(){
+  @Log.Graph(name = "Extend Motor Curent")
+  public double getExtendCurrentP(){
     return m_extendMotor.getOutputCurrent();
+  }
+
+  @Log.Graph(name = "Raise Motor Curent")
+  public double getRaiseCurrent(){
+    return m_raiseMotor.getOutputCurrent();
+  }
+
+  @Log(name = "Extend Motor Temp")
+  public double getExtendTemp(){
+    return m_extendMotor.getMotorTemperature();
+  }
+
+  @Log(name = "Raise Motor Temp" )
+  public double getRaiseTemp(){
+    return m_raiseMotor.getMotorTemperature();
   }
 
 @Log.ToString(name = "Arm Pose")
@@ -486,10 +506,11 @@ public void setExtendPosition(double position){
   //inpoutrange -1 to 1
   // pos zero is fully retracted
   //1 is fully extended
+  // armSmother.calculate(5);
   position = position +1;
   position = position/2;
-  position = position * (k_rangeLengthPos-2);
-  position = position+2;
+  position = position * (k_rangeLengthPos-1);
+  position = position+1;
   vExtendPos=position;
   m_extendPID.setReference(position, CANSparkMax.ControlType.kPosition);
 }
@@ -499,8 +520,8 @@ public void setRaisePosition(double position){
   //negative pos is goint down 
   position = position +1;
   position = position/2;
-  position = position * (k_rangeLeanglePos-2) *-1;
-  position = position -2;
+  position = position * (k_rangeLeanglePos-0.5) *-1;
+  position = position -0.5;
   vRaisePos=position;
 
   m_raisePID.setReference(position, CANSparkMax.ControlType.kPosition);
@@ -531,6 +552,19 @@ public void setExtendMotion(double position){
   vExtendPos=position;
   m_extendPID.setReference(position, CANSparkMax.ControlType.kSmartMotion,0);
 }
+public void setExtendMotionOnboard(double position){
+  //inpoutrange -1 to 1
+  // pos zero is fully retracted
+  //1 is fully extended
+  position = position +1;
+  position = position/2;
+  position = position * (k_rangeLengthPos-2);
+  position = position+2;
+  vExtendPos=position;
+  
+  m_extendPID.setReference(position, CANSparkMax.ControlType.kSmartMotion,0);
+}
+
 public void setRaiseMotion(double position){
   //inpoutrange -1 to 1
   //pos 0 is fully raised
@@ -540,6 +574,8 @@ public void setRaiseMotion(double position){
   position = position * (k_rangeLeanglePos-2) *-1;
   position = position -2;
   vRaisePos=position;
+
+  
   m_raisePID.setReference(position, CANSparkMax.ControlType.kSmartMotion,0);
 }
 public void setClawMotion(double position){
@@ -673,12 +709,20 @@ public void setRaiseMotionSafe( double position){
   m_raisePID.setReference(position, CANSparkMax.ControlType.kSmartMotion);
 
 }
-public void toggleGrip(){
-  if(m_gripEncoder.getPosition()<30)
-    setClawPosition(.9);
+public void toggleGripCone(){
+  if(m_gripEncoder.getPosition()<38)
+    setClawPosition(.94);
+
   else 
     setClawPosition(-1);
 
+}
+public void toggleGripCube(){
+  if(m_gripEncoder.getPosition()<5 || m_gripEncoder.getPosition()>30)
+    setClawPosition(0.1);
+
+  else 
+    setClawPosition(-1);
 }
 
 public void resetPosition(){
@@ -698,23 +742,23 @@ public void resetPosition(){
 //   m_extendPID.setFF(f);
 
 // }
-@Config (name = "Extend P", tabName = "Arm PID", defaultValueNumeric = kPE)
+@Config (name = "Extend P", tabName = "Arm PID", defaultValueNumeric = kPE_out)
 void setExtendP(double p){
   m_extendPID.setP(p);
 }
-@Config (name = "Extend I", tabName = "Arm PID", defaultValueNumeric = kIE)
+@Config (name = "Extend I", tabName = "Arm PID", defaultValueNumeric = kIE_out)
 void setExtendI(double i){
   m_extendPID.setI(i);
 }
-@Config (name = "Extend D", tabName = "Arm PID", defaultValueNumeric = kDE)
+@Config (name = "Extend D", tabName = "Arm PID", defaultValueNumeric = kDE_out)
 void setExtendD(double d){
   m_extendPID.setD(d);
 }
-@Config (name = "Extend Iz", tabName = "Arm PID", defaultValueNumeric = kIzE)
+@Config (name = "Extend Iz", tabName = "Arm PID", defaultValueNumeric = kIzE_out)
 void setExtendIz(double iz){
   m_extendPID.setIZone(iz);
 }
-@Config (name = "Extend FF", tabName = "Arm PID", defaultValueNumeric = kFFE)
+@Config (name = "Extend FF", tabName = "Arm PID", defaultValueNumeric = kFFE_out)
 void setExtendFF(double f){
   m_extendPID.setFF(f);
 }
@@ -728,23 +772,23 @@ void setExtendFF(double f){
 //   m_raisePID.setIZone(iz);
 //   m_raisePID.setFF(f);
 // }
-@Config (name = "Raise P", tabName = "Arm PID", defaultValueNumeric = kPR)
+@Config (name = "Raise P", tabName = "Arm PID", defaultValueNumeric = kPR_up)
 void setRaiseP(double p){
   m_raisePID.setP(p);
 }
-@Config (name = "Raise I", tabName = "Arm PID", defaultValueNumeric = kIR)
+@Config (name = "Raise I", tabName = "Arm PID", defaultValueNumeric = kIR_up)
 void setRaiseI(double i){
   m_raisePID.setI(i);
 }
-@Config (name = "Raise D", tabName = "Arm PID", defaultValueNumeric = kDR)
+@Config (name = "Raise D", tabName = "Arm PID", defaultValueNumeric = kDR_up)
 void setRaiseD(double d){
   m_raisePID.setD(d);
 }
-@Config (name = "Raise Iz", tabName = "Arm PID", defaultValueNumeric = kIzR)
+@Config (name = "Raise Iz", tabName = "Arm PID", defaultValueNumeric = kIzR_up)
 void setRaiseIz(double iz){
   m_raisePID.setIZone(iz);
 }
-@Config (name = "Raise FF", tabName = "Arm PID", defaultValueNumeric = kFFR)
+@Config (name = "Raise FF", tabName = "Arm PID", defaultValueNumeric = kFFR_up)
 void setRaiseFF(double f){
   m_raisePID.setFF(f);
 }
