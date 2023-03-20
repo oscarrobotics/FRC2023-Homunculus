@@ -252,6 +252,8 @@ private final double k_ticksPerInchGrip= 1;
   public void periodic() {
     // This method will be called once per scheduler run
     // checkIfStalled();
+    s_extend.isSafeTemp();
+    s_raise.isSafeTemp();
   }
 
   // @Log(name = "Pivot Encoder Counts", tabName = "Arm")
@@ -449,7 +451,7 @@ public void setExtendPosition(double position){
   position = s_extend.mapInput(position);
 
   if (position > vExtendSetPos){
-  if (Math.abs(position-s_extend.getPosition() )< 5){
+  if (Math.abs(position-s_extend.getPosition() )< 3){
     position = s_extend.getPosition();
   }
 

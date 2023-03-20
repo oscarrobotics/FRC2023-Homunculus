@@ -110,6 +110,7 @@ public double  mapInput(double position){
 
 }
 
+
  public double setPosition(double position, int slot){
   
   
@@ -158,6 +159,16 @@ public double setEncPosition(double position){
   public double getTemp(){
     return m_extendMotor.getMotorTemperature();
   }
+
+  @Log.BooleanBox(name = "Is Motor Safe", tabName = "Extend", rowIndex =1 , columnIndex = 10)
+  public boolean isSafeTemp(){
+    if(m_extendMotor.getMotorTemperature() > 65.0){
+      m_extendMotor.setVoltage(0);
+      return false;
+    }
+    return true;
+  }
+  
   @Log.Graph (name = "Error", tabName = "Extend", rowIndex =2, columnIndex = 0)
   public double getError(){
     return m_Encoder.getPosition() - vSetPos;

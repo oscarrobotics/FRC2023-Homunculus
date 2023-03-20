@@ -141,6 +141,15 @@ SparkMaxPIDController m_PID;
         public double getTemp(){
           return m_raiseMotor.getMotorTemperature();
         }
+
+        @Log.BooleanBox(name = "Is Motor Safe", tabName = "Extend", rowIndex =1 , columnIndex = 10)
+        public boolean isSafeTemp(){
+          if(m_raiseMotor.getMotorTemperature() > 65.0){
+            m_raiseMotor.setVoltage(0);
+            return false;
+          }
+          return true;
+        }
         @Log.Graph (name = "Error", tabName = "Raise" ,rowIndex = 3, columnIndex = 0)
          public double getError(){
            return m_Encoder.getPosition() - vSetPos;
