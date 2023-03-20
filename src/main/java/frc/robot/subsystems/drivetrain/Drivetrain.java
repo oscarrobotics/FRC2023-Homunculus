@@ -158,7 +158,7 @@ public class Drivetrain extends SubsystemBase implements Loggable {
     m_leftMaster.configNominalOutputReverse(0);
     m_leftMaster.configPeakOutputForward(1);
     m_leftMaster.configPeakOutputReverse(-1);
-    m_leftMaster.configClosedloopRamp(0);
+    m_leftMaster.configClosedloopRamp(.2);
     
     m_leftMaster.config_kF(Constants.dkslot, Constants.dKf);
     m_leftMaster.config_kP(Constants.dkslot, Constants.dKp);
@@ -173,7 +173,7 @@ public class Drivetrain extends SubsystemBase implements Loggable {
     m_rightMaster.configNominalOutputReverse(0);
     m_rightMaster.configPeakOutputForward(1);
     m_rightMaster.configPeakOutputReverse(-1);
-    m_rightMaster.configClosedloopRamp(0);
+    m_rightMaster.configClosedloopRamp(0.2);
 
     m_rightMaster.config_kF(Constants.dkslot, Constants.dKf);
     m_rightMaster.config_kP(Constants.dkslot, Constants.dKp);

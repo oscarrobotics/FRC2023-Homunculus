@@ -118,11 +118,11 @@ public class AutonomousSelector implements Loggable{
 
 
   @Config.NumberSlider(name = "Auto Selectcor", min = -1, max = 6, blockIncrement = 1 ,defaultValue = -1, tabName = "Target Selector", columnIndex = 1, rowIndex = 4) 
-  double setauto1(double auto1){
-     return m_autoSelected = (int)auto1;
+  void setauto1(double auto1){
+      m_autoSelected = (int)auto1;
   }
 
-  @Log.ToString(name = "Selected Auto" , tabName = "Target Selector", columnIndex = 4, rowIndex = 4)
+  @Log.ToString(name = "Selected Auto" , tabName = "Target Selector", columnIndex = 4, rowIndex = 4 , width = 2, height = 1)
   String getSelectedAutoName(){
     if (m_autoSelected == -1) {
       return "Do Nothing";
