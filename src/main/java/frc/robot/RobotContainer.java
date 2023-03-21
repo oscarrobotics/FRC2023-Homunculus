@@ -23,6 +23,7 @@ import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandGenericHID;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import frc.robot.commands.placement.level.SetArmPosition;
 import frc.robot.subsystems.arm.Arm;
 import frc.robot.subsystems.drivetrain.Drivetrain;
 import io.github.oblarg.oblog.Logger;
@@ -255,7 +256,7 @@ public class RobotContainer {
 
   }
 
-
+  
 
   @Config.Command(name = "Reset Position", tabName = "Arm PID")
   InstantCommand resetPosition = new InstantCommand(() -> {
@@ -274,5 +275,23 @@ public class RobotContainer {
     extrastend = value;
   }
 
+  public Command scoreCone(int location){
+
+    if(location == 2){ //Mid
+      return new SequentialCommandGroup(
+        new InstantCommand(() -> m_arm.setAutoArmPos(0,0)),
+        new WaitCommand(1),
+        new InstantCommand(() -> m_arm.setAutoArmPos(0,0))
+      );
+    }
+
+    if(location == 3){ //High
+      return new SequentialCommandGroup(
+        new InstantCommand(() -> m_arm.setAutoArmPos(0,0)),
+        new WaitCommand(1),
+        new InstantCommand(() -> m_arm.setAutoArmPos(0,0))
+      );
+    }
+  }
 
 }

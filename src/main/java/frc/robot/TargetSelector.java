@@ -151,7 +151,7 @@ static void setFront(){
     update();
 }
 
-static int getTargetIdx(){
+public static int getTargetIdx(){
   //retunrs the index of the target in a flatend array
   //the index reprents targets from left to right the up to down
   //[col][row][grid]

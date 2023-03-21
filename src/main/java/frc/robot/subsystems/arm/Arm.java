@@ -2,6 +2,7 @@ package frc.robot.subsystems.arm;
 import frc.robot.subsystems.arm.Extend;
 
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
@@ -13,9 +14,12 @@ import edu.wpi.first.wpilibj2.command.WaitCommand;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
+import frc.robot.TargetMap;
+import frc.robot.TargetSelector;
 import io.github.oblarg.oblog.Loggable;
 import io.github.oblarg.oblog.annotations.Config;
 import io.github.oblarg.oblog.annotations.Log;
+import java.lang.annotation.Target;
 import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.CANSparkMax.ControlType;
@@ -461,7 +465,6 @@ public double getGripCurrent(){
    );
  }
 
-
 public void setExtendPosition(double position){
   //inpoutrange -1 to 
   position = s_extend.mapInput(position);
@@ -562,7 +565,6 @@ public void setRaisePositionSafe(double position){
   //negative pos is goint down 
   position = s_raise.mapInput(position);
 
-
   double lenght = getExtent();
  // min angle = Math.cos(angle)= k_pivotHeight/length
   double minAngle = -Math.acos((k_pivotHeight-k_minArmHeight)/lenght);
@@ -656,6 +658,13 @@ public void resetPosition(){
   m_gripEncoder.setPosition(0);
 }
 
+public void setAutoArmPos(double length, double height){
+  setArmPosition(TargetMap.getArmTarget(TargetSelector.getTargetIdx()));
+  Translation2d pose = cartToLengths(length, height);
+
+  s_extend.mapInput(pose.getX());
+  s_raise.mapInput(pose.getY());
+}
 
  
 // @Config(name = "Extend PID", tabName = "Arm PID")
