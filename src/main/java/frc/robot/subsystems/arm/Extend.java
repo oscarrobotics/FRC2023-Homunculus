@@ -63,6 +63,9 @@ public class Extend implements Loggable{
  public final double allowedErr = 0.5;
  public final double closedRR = 0.3;
 
+ public final double kFF_arbdef = 0;
+ public double kFF_arb = 0;
+
  int kSlotIdxOut  = 0;
  int kSlotIdxIn = 1;
  int kSlotIdxLow =2;
@@ -125,6 +128,7 @@ public double setPosition(double position, int slot, double feedforward){
   return position;
 }
 
+
 public double setMotion(double position , int slot){
   
   m_PID.setReference(position, CANSparkMax.ControlType.kSmartMotion, slot);
@@ -163,7 +167,7 @@ public double setEncPosition(double position){
   @Log.BooleanBox(name = "Is Motor Safe", tabName = "Extend", rowIndex =1 , columnIndex = 10)
   public boolean isSafeTemp(){
     if(m_extendMotor.getMotorTemperature() > 65.0){
-      m_extendMotor.setVoltage(0);
+      m_extendMotor.setSmartCurrentLimit(2,2,2);
       return false;
     }
     return true;
@@ -221,6 +225,12 @@ void setIz_in(double iz){
 void setFF_in(double f){
   m_PID.setFF(f, kSlotIdxIn);
 }
+
+@Config (name = "Extend FF_arb", tabName = "Extend", defaultValueNumeric = kFF_arbdef, rowIndex = 1, columnIndex = 4)
+void setFF_arb(double FF_arb){
+  kFF_arb = FF_arb;
+}
+
 // @Config (name = "Extend P_low", tabName = "Extend", defaultValueNumeric = kP_low)
 // void setP_low(double p){
 //   m_PID.setP(p, kSlotIdxLow);

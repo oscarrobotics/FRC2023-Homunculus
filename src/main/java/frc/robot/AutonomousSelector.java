@@ -117,7 +117,7 @@ public class AutonomousSelector implements Loggable{
   }
 
 
-  @Config.NumberSlider(name = "Auto Selectcor", min = -1, max = 6, blockIncrement = 1 ,defaultValue = -1, tabName = "Target Selector", columnIndex = 1, rowIndex = 4) 
+  @Config.NumberSlider(name = "Auto Selectcor", min = -1, max = 10, blockIncrement = 1 ,defaultValue = -1, tabName = "Target Selector", columnIndex = 1, rowIndex = 4) 
   void setauto1(double auto1){
       m_autoSelected = (int)auto1;
   }

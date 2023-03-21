@@ -73,12 +73,16 @@ SparkMaxPIDController m_PID;
 
       m_raiseMotor.setIdleMode(IdleMode.kBrake);
       m_raiseMotor.setSmartCurrentLimit(20, 50, 0);
-      m_raiseMotor.setClosedLoopRampRate(3);
+      m_raiseMotor.setClosedLoopRampRate(closedRR);
 
 
       initPID();
 
     }
+
+    // public double setArbituaryFF(double kFF_arb){
+      
+    // }
 
     public double  mapInput(double position){
       //inpoutrange -1 to 1
@@ -142,10 +146,10 @@ SparkMaxPIDController m_PID;
           return m_raiseMotor.getMotorTemperature();
         }
 
-        @Log.BooleanBox(name = "Is Motor Safe", tabName = "Extend", rowIndex =1 , columnIndex = 10)
+        @Log.BooleanBox(name = "Is Motor Safe", tabName = "Raise", rowIndex =1 , columnIndex = 10)
         public boolean isSafeTemp(){
           if(m_raiseMotor.getMotorTemperature() > 65.0){
-            m_raiseMotor.setVoltage(0);
+            m_raiseMotor.setSmartCurrentLimit(2,2,0);
             return false;
           }
           return true;

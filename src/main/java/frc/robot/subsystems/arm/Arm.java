@@ -162,25 +162,25 @@ private final double k_ticksPerInchGrip= 1;
 
 // private final AbsoluteEncoder m_Encoder;
 
-
+@Log(name = "Grip Motor Temp", tabName = "Extend", rowIndex =4 , columnIndex = 5)
+     public double gripMotorTemp(){
+      return m_gripMotor.getMotorTemperature();
+     }
 
 //Sets max velocity, acceleration, and state
   private TrapezoidProfile armSmother = new TrapezoidProfile(new TrapezoidProfile.Constraints(0,0),
                                                              new TrapezoidProfile.State(0, 0), 
                                                              new TrapezoidProfile.State(0,0));
+  
   public Arm(){
     s_extend = new Extend();
     s_raise = new Raise();
 
    m_gripMotor = new CANSparkMax(22,MotorType.kBrushless) ;
-   
+   m_gripMotor.setInverted(true);
    //cuewnt limit
    
    m_gripMotor.setSmartCurrentLimit(16,28,0);
-
-
-
-    
 
 
    // neutral mode
@@ -254,6 +254,7 @@ private final double k_ticksPerInchGrip= 1;
     // checkIfStalled();
     s_extend.isSafeTemp();
     s_raise.isSafeTemp();
+    gripMotorTemp();
   }
 
   // @Log(name = "Pivot Encoder Counts", tabName = "Arm")
@@ -419,6 +420,12 @@ public double getRaisedPosition(){
 public double getGripPosition(){
   return m_gripEncoder.getPosition();
 }
+
+@Log(name = "Grip Current")
+public double getGripCurrent(){
+  return m_gripMotor.getOutputCurrent();
+}
+
  public void setArmPosition(Translation2d position){
     //takes in a pose and sets the arm to that position
     Translation2d setpoints = cartToLengths(position.getX(), position.getY());
@@ -433,6 +440,15 @@ public double getGripPosition(){
     //   setRaiseMotionSafe(setpoints.getX());
 
  }
+
+ //Arbituary FF 
+ public void setExtendPositionArbFF(double position, int slot, double feedforward){
+ position = s_extend.mapInput(position);
+  feedforward = Math.sin(getArmAngle()) * s_extend.kFF_arb;
+  vExtendSetPos= s_extend.setPosition(position, slot, feedforward);
+    
+  }
+
  public Command dropCargo(Translation2d position){
    return new SequentialCommandGroup(
      new InstantCommand(()->setClawPosition(0)),
@@ -620,7 +636,7 @@ public void setRaiseMotionSafe( double position){
 }
 public void toggleGripCone(){
   if(m_gripEncoder.getPosition()<38)
-    setClawPosition(.94);
+    setClawPosition(1);
 
   else 
     setClawPosition(-1);
