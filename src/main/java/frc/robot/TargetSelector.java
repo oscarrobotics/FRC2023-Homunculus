@@ -160,7 +160,7 @@ public static int getTargetIdx(){
       for(int j = 0; j < 3; j++){
         for(int k = 0; k < 3; k++){
           if(target[i][j][k]) {
-            targetidx = i + j*9 + k*3;
+            return targetidx = i + j*9 + k*3;
           }
         }
       }

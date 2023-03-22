@@ -397,7 +397,7 @@ public Translation2d cartToLengths(double length, double height){
   //length is the distance from the front of the robot to the desired position
   height = height - k_pivotHeight;
   length = length + k_columtToFront;
-  double angle = Math.atan(height/length);
+  double angle = Math.toDegrees(Math.atan(height/length));
   double leangle = angleToLeangle(angle);
   length = length/Math.cos(angle);
  
@@ -446,10 +446,10 @@ public double getGripCurrent(){
  }
 
  //Arbituary FF 
- public void setExtendPositionArbFF(double position, int slot, double feedforward){
+ public void setExtendPositionArbFF(double position){
  position = s_extend.mapInput(position);
-  feedforward = Math.sin(getArmAngle()) * s_extend.kFF_arb;
-  vExtendSetPos= s_extend.setPosition(position, slot, feedforward);
+  double feedforward = Math.sin(Math.toRadians(getArmAngle())) * s_extend.kFF_arb;
+  vExtendSetPos= s_extend.setPosition(position, 0, feedforward);
     
   }
 

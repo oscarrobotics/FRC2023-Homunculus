@@ -106,55 +106,29 @@ public class RobotContainer {
 
 
 
-    m_operator.arcadeBlackLeft().onTrue(new InstantCommand(() -> {
-      safe = true;
-      motion = false;
+    // m_operator.arcadeBlackLeft().onTrue(new InstantCommand(() -> {
+    //   safe = true;
+    //   motion = false;
 
-    }));
-    m_operator.arcadeBlackLeft().onFalse(new InstantCommand(() -> {
-      safe = false;
-      motion = false;
-
-    }));
-    m_operator.arcadeBlackRight().onTrue(new InstantCommand(() -> {
-      safe = false;
-      motion = true;
-
-    }));
-    m_operator.arcadeBlackRight().onFalse(new InstantCommand(() -> {
-      safe = false;
-      motion = false;
-
-    }));
+    // }));
+    
 
 
-    if (!safe && !motion) {
+    
       m_arm.setDefaultCommand(Commands.run(() -> {
-        m_arm.setExtendPosition(m_operator.getLeftSlider());
+        m_arm.setExtendPositionArbFF(m_operator.getLeftSlider());
         m_arm.setRaisePosition(-m_operator.getRightSlider());
         // m_arm.setClawPosition(m_operator.arcadeWhiteLeft().getAsBoolean()?1:-1);
       }, m_arm));
-    }
+    
     m_operator.arcadeWhiteLeft().onTrue(new InstantCommand(() -> {
       m_arm.toggleGripCone();
     }));
     m_operator.arcadeWhiteRight().onTrue(new InstantCommand(() -> {
       m_arm.toggleGripCube();
     }));
-    if (safe && !motion) {
-      m_arm.setDefaultCommand(Commands.run(() -> {
-        m_arm.setExtendPositionSafe(m_operator.getLeftSlider());
-        m_arm.setRaisePositionSafe(-m_operator.getRightSlider());
-        m_arm.setClawPosition(m_operator.arcadeWhiteLeft().getAsBoolean() ? 1 : -1);
-      }, m_arm));
-    }
-    if (!safe && motion) {
-      m_arm.setDefaultCommand(Commands.run(() -> {
-        m_arm.setExtendMotion(m_operator.getLeftSlider());
-        m_arm.setRaiseMotion(-m_operator.getRightSlider());
-        m_arm.setClawMotion(m_operator.arcadeWhiteLeft().getAsBoolean() ? 1 : -1);
-      }, m_arm));
-    }
+    
+    
     // set driver buttons
     // m_driverController.x().whileTrue(m_drivetrain.goToPoseCommand(
     // TargetMap.getTargetPose( TargetSelector.getTargetIdx()),
@@ -165,10 +139,10 @@ public class RobotContainer {
 
 
     // //set the operator buttons for the arm
-    // //sets the arm to the currently selected target
-    // m_operator.arcadeBlackRight().whileTrue(new InstantCommand(()->{
-    // m_arm.setArmPosition(TargetMap.getArmTarget(TargetSelector.getTargetIdx()));
-    // }, m_arm));
+    //sets the arm to the currently selected target
+    m_operator.arcadeBlackRight().whileTrue(new InstantCommand(()->{
+    m_arm.setArmPosition(TargetMap.getArmTarget(TargetSelector.getTargetIdx()));
+    }, m_arm));
     // //sets the arm to the target dual station
     // m_operator.arcadeWhiteRight().whileTrue(new InstantCommand(()->{
     // m_arm.setArmPosition(TargetMap.stationArmTargets[0]);
@@ -275,23 +249,23 @@ public class RobotContainer {
     extrastend = value;
   }
 
-  public Command scoreCone(int location){
+  // public Command scoreCone(int location){
 
-    if(location == 2){ //Mid
-      return new SequentialCommandGroup(
-        new InstantCommand(() -> m_arm.setAutoArmPos(0,0)),
-        new WaitCommand(1),
-        new InstantCommand(() -> m_arm.setAutoArmPos(0,0))
-      );
-    }
+  //   if(location == 2){ //Mid
+  //     return new SequentialCommandGroup(
+  //       new InstantCommand(() -> m_arm.setAutoArmPos(0,0)),
+  //       new WaitCommand(1),
+  //       new InstantCommand(() -> m_arm.setAutoArmPos(0,0))
+  //     );
+  //   }
 
-    if(location == 3){ //High
-      return new SequentialCommandGroup(
-        new InstantCommand(() -> m_arm.setAutoArmPos(0,0)),
-        new WaitCommand(1),
-        new InstantCommand(() -> m_arm.setAutoArmPos(0,0))
-      );
-    }
-  }
+  //   if(location == 3){ //High
+  //     return new SequentialCommandGroup(
+  //       new InstantCommand(() -> m_arm.setAutoArmPos(0,0)),
+  //       new WaitCommand(1),
+  //       new InstantCommand(() -> m_arm.setAutoArmPos(0,0))
+  //     );
+  //   }
+  // }
 
 }
