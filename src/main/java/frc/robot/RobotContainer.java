@@ -53,8 +53,7 @@ public class RobotContainer {
   Boolean safe = false;
   Boolean motion = false;
 
-  @Config.ToggleSwitch(name= "Testing Aff", tabName = "Extend FF", rowIndex = 0, columnIndex = 4)
-      boolean testing = false; 
+  
 
   public RobotContainer() {
 
@@ -117,20 +116,14 @@ public class RobotContainer {
       
 
 
-      if(!testing){
+     
       m_arm.setDefaultCommand(Commands.run(() -> {
         m_arm.setExtendPositionArbFF(m_operator.getLeftSlider());
         m_arm.setRaisePosition(-m_operator.getRightSlider());
         // m_arm.setClawPosition(m_operator.arcadeWhiteLeft().getAsBoolean()?1:-1);
       }, m_arm));
-    }
-    else if(Math.abs(m_operator.getLeftSlider()) < 0.1){//arb ff tesing will only activate if the slider is at 0, middle position 
-        m_arm.setDefaultCommand(Commands.run(() -> { //allows you to set the voltage of the Extend and the angle of the arm
-        m_arm.s_extend.setVoltage((m_operator.getLeftSlider()));
-        m_arm.setRaisePosition(-m_operator.getRightSlider());
-        // m_arm.setClawPosition(m_operator.arcadeWhiteLeft().getAsBoolean()?1:-1);
-      }, m_arm));
-    }
+    
+    
 
     
     m_operator.arcadeWhiteLeft().onTrue(new InstantCommand(() -> {
@@ -196,6 +189,24 @@ public class RobotContainer {
 
   private void configureBindings() {
 
+  }
+
+  @Config.ToggleSwitch(name= "Testing Aff", tabName = "Extend FF",defaultValue = false, rowIndex = 0, columnIndex = 4)
+  public void setTesting(boolean testing){
+    if(!testing){
+      m_arm.setDefaultCommand(Commands.run(() -> {
+        m_arm.setExtendPositionArbFF(m_operator.getLeftSlider());
+        m_arm.setRaisePosition(-m_operator.getRightSlider());
+        // m_arm.setClawPosition(m_operator.arcadeWhiteLeft().getAsBoolean()?1:-1);
+      }, m_arm));
+    }
+    else if(Math.abs(m_operator.getLeftSlider()) < 0.1){//arb ff tesing will only activate if the slider is at 0, middle position 
+        m_arm.setDefaultCommand(Commands.run(() -> { //allows you to set the voltage of the Extend and the angle of the arm
+        m_arm.s_extend.setVoltage((m_operator.getLeftSlider()));
+        m_arm.setRaisePosition(-m_operator.getRightSlider());
+        // m_arm.setClawPosition(m_operator.arcadeWhiteLeft().getAsBoolean()?1:-1);
+      }, m_arm));
+    }
   }
 
   @Log(name = "Get button Configs", tabName = "Buttons")
