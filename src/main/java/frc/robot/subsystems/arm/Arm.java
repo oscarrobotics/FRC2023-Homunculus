@@ -348,7 +348,7 @@ public double getArmLength(){
 
 
 
-public double angleToLeangle(double angle){
+public double angleToLeanglePos(double angle){
   //TAKES DEGREES
   //angle is the angle of the arm above or below horizontal
  //use law of cosines because we have 2 sides and an included angle
@@ -378,12 +378,19 @@ double zerooffset = -5.27;
 
 }
 
+public double lengthToLengthPos(double length){
+  //length is the distance from the front of the robot to the desired position
+  length = length + k_columtToFront;
+  double leanglePos = (length-k_minLength)/(k_maxLength-k_minLength)*k_rangeLengthPos;
+  return leanglePos;
+}
+
 public Translation2d radialToLengths(double angle, double length){
  //calculate the lengths of the arm and angle motor to get to the desired position
  //angle is the angle of the arm above or below horizontal
  //length is the distance from the front of the robot to the desired position
 
- double leangle = angleToLeangle(angle);
+ double leangle = angleToLeanglePos(angle);
  length = length/Math.cos(angle) - k_columtToFront;
 
  
@@ -391,19 +398,25 @@ public Translation2d radialToLengths(double angle, double length){
   return new Translation2d(leangle,length);
 }
 
-public Translation2d cartToLengths(double length, double height){
+public Translation2d cartToPosRatio(double length, double height){
   //calculate the lengths of the arm and angle motor to get to the desired position
   //height is the hieght of the desired position
   //length is the distance from the front of the robot to the desired position
   height = height - k_pivotHeight;
   length = length + k_columtToFront;
   double angle = Math.toDegrees(Math.atan(height/length));
-  double leangle = angleToLeangle(angle);
-  length = length/Math.cos(angle);
+  double leanglePos = angleToLeanglePos(angle);
+  double leanglePosRatio = leanglePos/k_rangeLeanglePos*2-1;
+  
+ 
+  length = length/Math.cos(Math.toRadians(angle));
+  
+  double lengthPos = lengthToLengthPos(length);
+  double lengthPosRatio = lengthPos/k_rangeLengthPos*2-1;
  
   
  
-   return new Translation2d(leangle,length);
+   return new Translation2d(leanglePosRatio,lengthPosRatio);
  }
 
 @Log(name = "Extent Position")
@@ -432,10 +445,10 @@ public double getGripCurrent(){
 
  public void setArmPosition(Translation2d position){
     //takes in a pose and sets the arm to that position
-    Translation2d setpoints = cartToLengths(position.getX(), position.getY());
+    Translation2d setpoints = cartToPosRatio(position.getX(), position.getY());
 
-    s_extend.setPosition(setpoints.getY(), 0);
-    setRaisePosition(setpoints.getX());
+    setExtendPositionArbFF(setpoints.getY());
+    setRaisePosition(setpoints.getX()); 
 
     //  setExtendMotion(setpoints.getY());
     //  setRaiseMotion(setpoints.getX());  
@@ -515,6 +528,20 @@ public void setExtendPositionSafe(double position){
 
   vExtendSetPos =  s_extend.setPosition(position ,0);
 }
+// public double getMaxExtentPos(){
+//   double angle = Math.toRadians( getArmAngle());
+//   double maxExtension = k_rangeLengthPos;
+//   if (angle < 0){
+//      maxExtension =lengthToLengthPos( ( k_pivotHeight-k_minArmHeight )) / Math.sin(angle)*-1;
+//   }
+//   if(angle >0){
+//     maxExtension = lengthToLengthPos( ( k_maxHeight k_pivotHeight ) / Math.sin(angle);
+//   }
+
+//   maxExtension = (maxExtension-k_minLength)/(k_maxLength-k_minLength)*(k_rangeLengthPos);
+//   return vMaxExtention;
+// }
+
 public void setExtendMotionSafe(double position){
   //inpoutrange -1 to 1
   
@@ -568,7 +595,7 @@ public void setRaisePositionSafe(double position){
   double lenght = getExtent();
  // min angle = Math.cos(angle)= k_pivotHeight/length
   double minAngle = -Math.acos((k_pivotHeight-k_minArmHeight)/lenght);
-  minAngle = angleToLeangle(minAngle)*k_rangeLeanglePos;
+  minAngle = angleToLeanglePos(minAngle)*k_rangeLeanglePos;
 
 
   if (position < minAngle){
@@ -625,7 +652,7 @@ public void setRaiseMotionSafe( double position){
   double lenght = getExtent();
  // min angle = Math.cos(angle)= k_pivotHeight/length
   double minAngle =Math.toDegrees( -Math.acos((k_pivotHeight-k_minArmHeight)/lenght));
-  double minLeangle = angleToLeangle(minAngle)*k_rangeLeanglePos;
+  double minLeangle = angleToLeanglePos(minAngle)*k_rangeLeanglePos;
   
   if (position < minLeangle){
     position = minLeangle;
@@ -658,13 +685,13 @@ public void resetPosition(){
   m_gripEncoder.setPosition(0);
 }
 
-public void setAutoArmPos(double length, double height){
-  setArmPosition(TargetMap.getArmTarget(TargetSelector.getTargetIdx()));
-  Translation2d pose = cartToLengths(length, height);
+// public void setAutoArmPos(double length, double height){
+//   setArmPosition(TargetMap.getArmTarget(TargetSelector.getTargetIdx()));
+//   Translation2d pose = cartToLengths(length, height);
 
-  s_extend.mapInput(pose.getX());
-  s_raise.mapInput(pose.getY());
-}
+//   s_extend.mapInput(pose.getX());
+//   s_raise.mapInput(pose.getY());
+// }
 
  
 // @Config(name = "Extend PID", tabName = "Arm PID")
