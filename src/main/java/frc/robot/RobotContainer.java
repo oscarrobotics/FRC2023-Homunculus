@@ -26,12 +26,13 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.commands.placement.level.SetArmPosition;
 import frc.robot.subsystems.arm.Arm;
 import frc.robot.subsystems.drivetrain.Drivetrain;
+import io.github.oblarg.oblog.Loggable;
 import io.github.oblarg.oblog.Logger;
 import io.github.oblarg.oblog.annotations.Config;
 import io.github.oblarg.oblog.annotations.Log;
 
 
-public class RobotContainer {
+public class RobotContainer implements Loggable{
   private final CommandXboxController m_driverController = new CommandXboxController(0);
 
   private final ControllerButtons m_operator = new ControllerButtons(1);
