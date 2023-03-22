@@ -5,6 +5,9 @@ package frc.robot.subsystems.arm;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkMaxPIDController;
+import edu.wpi.first.hal.simulation.RoboRioDataJNI;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import io.github.oblarg.oblog.Loggable;
@@ -146,6 +149,48 @@ public double setMotionOB(double position , int slot){
 }
 
 
+//arbff helper functions
+public double maxVoltage=0;
+public double maxVoltagesStoped=0;
+public void setVoltage(double dutycylce){
+  double voltage = dutycylce * 6;
+
+  m_extendMotor.setVoltage(voltage);
+}
+@Log(name = "Voltage", tabName = "Extend FF", rowIndex = 0, columnIndex = 0)
+public double getVoltage(){
+  return m_extendMotor.getBusVoltage()*m_extendMotor.getAppliedOutput();
+
+} 
+@Log(name = "Max Voltage", tabName = "Extend FF", rowIndex = 0, columnIndex = 1)
+public double getMaxVoltage(){
+  if (Math.abs(m_extendMotor.getBusVoltage()*m_extendMotor.getAppliedOutput() )> Math.abs(maxVoltage)){
+    maxVoltage = m_extendMotor.getBusVoltage()*m_extendMotor.getAppliedOutput();
+  }
+  return maxVoltage;
+}
+@Log(name = "Max Voltage Stopped", tabName = "Extend FF", rowIndex = 0, columnIndex = 2)
+public double getMaxVoltageStopped(){
+  if (Math.abs(m_extendMotor.getBusVoltage()*m_extendMotor.getAppliedOutput() )> Math.abs(maxVoltagesStoped)
+  && (Math.abs(m_Encoder.getVelocity()) < Math.abs(0.3))){
+    maxVoltagesStoped = m_extendMotor.getBusVoltage()*m_extendMotor.getAppliedOutput();
+  }
+  return maxVoltagesStoped;
+}
+//rested max voltages from oblog
+@Config.Command(name = "Reset Max Voltage", tabName = "Extend FF" , rowIndex = 0, columnIndex = 3)
+public final Command resetMaxVoltage = new InstantCommand(this::resetMaxVoltage); 
+
+
+
+
+public void resetMaxVoltage(){
+  maxVoltage = 0;
+  maxVoltagesStoped = 0;
+}
+
+
+//oblog methods
 
 @Log(name = "Extend Position", tabName = "Extend")
 public double getPosition(){

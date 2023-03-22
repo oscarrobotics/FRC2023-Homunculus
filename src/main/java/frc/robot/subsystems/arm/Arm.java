@@ -543,6 +543,9 @@ public void setExtendPositionSafe(double position){
 //   return vMaxExtention;
 // }
 
+
+
+
 public void setExtendMotionSafe(double position){
   //inpoutrange -1 to 1
   
@@ -685,6 +688,29 @@ public void resetPosition(){
   s_raise.setEncPosition(0);
   m_gripEncoder.setPosition(0);
 }
+
+//more arbff tuning methods
+@Log(name = "Arm Angle", tabName = "Extend FF", rowIndex = 2, columnIndex = 0)
+public double getAngle(){
+  return getArmAngle();
+}
+@Log(name = "karbFF", tabName = "Extend FF", rowIndex = 1, columnIndex = 0)
+public double getKarbFF(){
+  return s_extend.getMaxVoltage()/Math.sin(Math.toRadians(getArmAngle()));
+}
+
+@Log(name = "Max_karbFF", tabName = "Extend FF", rowIndex = 1, columnIndex = 1)
+public double getMaxKarbFF(){
+  return s_extend.getMaxVoltage()/Math.sin(Math.toRadians(getArmAngle()));
+}
+
+@Log(name = "Max_karbFF_stoped", tabName = "Extend FF", rowIndex = 1, columnIndex = 2)
+public double getMaxKarbFFStoped(){
+  return s_extend.getMaxVoltageStopped()/Math.sin(Math.toRadians(getArmAngle()));
+}
+
+
+
 
 // public void setAutoArmPos(double length, double height){
 //   setArmPosition(TargetMap.getArmTarget(TargetSelector.getTargetIdx()));
