@@ -378,10 +378,10 @@ double zerooffset = -5.27;
 
 }
 
-public double lengthToLengthPos(double length){
-  //length is the distance from the front of the robot to the desired position
-  length = length + k_columtToFront;
-  double leanglePos = (length-k_minLength)/(k_maxLength-k_minLength)*k_rangeLengthPos;
+public double extentToExtentPos(double extent){
+  //extent is the length of the arm
+  extent = extent + k_columtToFront;
+  double leanglePos = (extent-k_minLength)/(k_maxLength-k_minLength)*k_rangeLengthPos;
   return leanglePos;
 }
 
@@ -390,28 +390,28 @@ public Translation2d radialToLengths(double angle, double length){
  //angle is the angle of the arm above or below horizontal
  //length is the distance from the front of the robot to the desired position
 
- double leangle = angleToLeanglePos(angle);
- length = length/Math.cos(angle) - k_columtToFront;
-
+ double leanglePos = angleToLeanglePos(angle);
+ double extent = (length + k_columtToFront) /Math.cos(angle);
+ double extentPos = extentToExtentPos(extent);
  
 
-  return new Translation2d(leangle,length);
+  return new Translation2d(leanglePos,extentPos);
 }
 
 public Translation2d cartToPosRatio(double length, double height){
   //calculate the lengths of the arm and angle motor to get to the desired position
   //height is the hieght of the desired position
   //length is the distance from the front of the robot to the desired position
-  height = height - k_pivotHeight;
-  length = length + k_columtToFront;
-  double angle = Math.toDegrees(Math.atan(height/length));
+  double Y= height - k_pivotHeight;
+  double X = length + k_columtToFront;
+  double angle = Math.toDegrees(Math.atan(Y/X));
   double leanglePos = angleToLeanglePos(angle);
   double leanglePosRatio = leanglePos/k_rangeLeanglePos*2-1;
   
  
-  length = length/Math.cos(Math.toRadians(angle));
+  double extent = X/Math.cos(Math.toRadians(angle));
   
-  double lengthPos = lengthToLengthPos(length);
+  double lengthPos = extentToExtentPos(extent);
   double lengthPosRatio = lengthPos/k_rangeLengthPos*2-1;
  
   
@@ -446,9 +446,10 @@ public double getGripCurrent(){
  public void setArmPosition(Translation2d position){
     //takes in a pose and sets the arm to that position
     Translation2d setpoints = cartToPosRatio(position.getX(), position.getY());
-
-    setExtendPositionArbFF(setpoints.getY());
+    
     setRaisePosition(setpoints.getX()); 
+    setExtendPositionArbFF(setpoints.getY());
+    
 
     //  setExtendMotion(setpoints.getY());
     //  setRaiseMotion(setpoints.getX());  

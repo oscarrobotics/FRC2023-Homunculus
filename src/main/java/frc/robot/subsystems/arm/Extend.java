@@ -103,7 +103,11 @@ public double  mapInput(double position){
 //inpoutrange -1 to 1
   // pos zero is fully retracted
   //1 is fully extended
-  // armSmother.calculate(5);
+  // armSmother.calculate(5)
+  //limit the domain to -1 to 1
+  position = Math.min(position, 1);
+  position = Math.max(position, -1);
+
   position = position +1;
   position = position/2;
   position = position * (Arm.k_rangeLengthPos-1);
