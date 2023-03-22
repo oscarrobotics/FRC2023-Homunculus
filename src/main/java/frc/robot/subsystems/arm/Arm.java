@@ -193,7 +193,84 @@ private final double k_ticksPerInchGrip= 1;
     setExtendPositionArbFF(setpoints.getY());
 
  }
+  boolean extentSupresed = false;
+  boolean raiseSupresed = false;
 
+  boolean extentActive = false;
+  boolean raiseActive = false;
+
+  double lastraisePos = 0;
+  double lastextendPos = 0;
+
+  public void setArmPositionSafe (double raiseR, double extendR){
+      //takes in Setpoints and sets the arm to that position 
+      // keeps track of the previous setpoint to see whick control input is being changed
+      // automatically sets the other control input to a safe value and will return to the  correct value when allowed by contriants
+      //if the non changing control input is changed while being retricted, it will then begin to restrict the other control input, base on the 
+      //difference between the current setpoint and the new setpoint but both control inputs will be restricted to the same value
+      double raisePos = s_raise.mapInput(raiseR);
+      double extendPos = s_extend.mapInput(extendR);
+
+
+      if (raisePos != lastraisePos){
+        lastraisePos = raisePos;
+        raiseActive = true;
+        extentActive = false;
+      }
+
+      if (extendPos != lastextendPos){
+        lastextendPos = extendPos;
+        extentActive = true;
+        raiseActive = false;
+      }
+
+      
+
+      
+      setRaisePosition(raisePos); 
+      setExtendPositionArbFF(extendPos);
+  
+  }
+  public double getMaxExtentPos(){
+  double angle = Math.toRadians( getArmAngle());
+  double maxExtension = k_rangeLengthPos;
+  if (angle < 0){
+     maxExtension = extentToExtentPos( ( k_pivotHeight-k_minArmHeight )) / Math.sin(angle)*-1;
+  }
+  if(angle >0){
+    maxExtension = extentToExtentPos ( k_maxHeight- k_pivotHeight ) / Math.sin(angle);
+  }
+
+  maxExtension = (maxExtension-k_minLength)/(k_maxLength-k_minLength)*(k_rangeLengthPos);
+  return vMaxExtention;
+}
+  public double getMaxAngle(){
+    double angle = Math.toRadians( getArmAngle());
+    double maxExtension = k_rangeLengthPos;
+    if (angle < 0){
+       maxExtension =extentToExtentPos ( k_pivotHeight-k_minArmHeight ) / Math.sin(angle)*-1;
+    }
+    if(angle >0){
+      maxExtension = extentToExtentPos ( k_maxHeight- k_pivotHeight ) / Math.sin(angle);
+    }
+
+    maxExtension = (maxExtension-k_minLength)/(k_maxLength-k_minLength)*(k_rangeLengthPos);
+    return vMaxExtention;
+  }
+
+  public double getMinAngle(){
+    double angle = Math.toRadians( getArmAngle());
+    double maxExtension = k_rangeLengthPos;
+    if (angle < 0){
+       maxExtension =extentToExtentPos( k_pivotHeight-k_minArmHeight )/ Math.sin(angle)*-1;
+    }
+    if(angle >0){
+      maxExtension = extentToExtentPos ( k_maxHeight - k_pivotHeight ) / Math.sin(angle);
+    }
+
+    maxExtension = (maxExtension-k_minLength)/(k_maxLength-k_minLength)*(k_rangeLengthPos);
+    return vMaxExtention;
+  }
 
  
 
@@ -259,19 +336,7 @@ public void setRaisePosition(double position){
 
 
 
-// public double getMaxExtentPos(){
-//   double angle = Math.toRadians( getArmAngle());
-//   double maxExtension = k_rangeLengthPos;
-//   if (angle < 0){
-//      maxExtension =lengthToLengthPos( ( k_pivotHeight-k_minArmHeight )) / Math.sin(angle)*-1;
-//   }
-//   if(angle >0){
-//     maxExtension = lengthToLengthPos( ( k_maxHeight k_pivotHeight ) / Math.sin(angle);
-//   }
 
-//   maxExtension = (maxExtension-k_minLength)/(k_maxLength-k_minLength)*(k_rangeLengthPos);
-//   return vMaxExtention;
-// }
 
 
 //Claw setters
