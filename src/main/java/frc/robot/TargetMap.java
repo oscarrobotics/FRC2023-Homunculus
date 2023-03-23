@@ -24,7 +24,7 @@ public  class TargetMap {
   public static Pose2d[] blueChargeingPose2bot = new Pose2d[2];
   public static Pose2d[] redChargeingPose2bot = new Pose2d[2];
 
-  TargetMap() {
+  public static void init() {
       //collum 1 is bottom of field
       blueTargetPoses[0] = new Pose2d(new Translation2d(2, 0.52), new Rotation2d(Math.toRadians(180)));
       blueTargetPoses[1] = new Pose2d(new Translation2d(2, 1.06), new Rotation2d(Math.toRadians(180)));

@@ -40,12 +40,9 @@ public class RobotContainer implements Loggable{
   private final Drivetrain m_drivetrain = new Drivetrain();
 
   public static final Arm m_arm = new Arm();
-  
-  public static final TargetMap m_targetMap = new TargetMap();
+
 
   public final AutonomousSelector m_autoSelector = new AutonomousSelector();
-
-  public final TargetSelector m_targetSelector = new TargetSelector();
 
   private final NetworkTableInstance ntinst = NetworkTableInstance.getDefault();
 
@@ -63,6 +60,7 @@ public class RobotContainer implements Loggable{
 
     configureBindings();
     ntinst.startServer();
+    TargetMap.init();
 
 
     // m_drivetrain.setDefaultCommand(new InstantCommand (() -> {
@@ -223,7 +221,7 @@ public class RobotContainer implements Loggable{
   }
 
 
-  AutonomousMap m_autonMap = new AutonomousMap(m_drivetrain, m_arm, m_targetMap);
+  AutonomousMap m_autonMap = new AutonomousMap(m_drivetrain, m_arm);
 
   public Command getAutonomousCommand() {
     RamseteAutoBuilder autoBuilder = new RamseteAutoBuilder(m_drivetrain::getPose,
