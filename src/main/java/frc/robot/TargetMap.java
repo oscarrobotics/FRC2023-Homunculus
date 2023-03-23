@@ -7,7 +7,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotState;
 
 
-public  class TargetMap {
+public class TargetMap {
 
   public static Pose2d[] blueTargetPoses = new Pose2d[9];
   public static Pose2d[] redTargetPoses = new Pose2d[9];
@@ -24,7 +24,7 @@ public  class TargetMap {
   public static Pose2d[] blueChargeingPose2bot = new Pose2d[2];
   public static Pose2d[] redChargeingPose2bot = new Pose2d[2];
 
-  public static void init() {
+    TargetMap() {
       //collum 1 is bottom of field
       blueTargetPoses[0] = new Pose2d(new Translation2d(2, 0.52), new Rotation2d(Math.toRadians(180)));
       blueTargetPoses[1] = new Pose2d(new Translation2d(2, 1.06), new Rotation2d(Math.toRadians(180)));
@@ -170,7 +170,7 @@ public static Pose2d getChargeingPose2bot(int idx){
     return blueChargeingPose2bot[idx];
   }
 }
-public static Translation2d getArmTarget(int idx){
+public Translation2d getArmTarget(int idx){
   //get alliance color
   int col = idx%9;
   int row = (int)Math.floor(idx/9.0);

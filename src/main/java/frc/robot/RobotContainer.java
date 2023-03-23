@@ -41,6 +41,8 @@ public class RobotContainer implements Loggable{
 
   public static final Arm m_arm = new Arm();
 
+  public static final TargetMap m_targetMap = new TargetMap();
+
 
   public final AutonomousSelector m_autoSelector = new AutonomousSelector();
 
@@ -60,7 +62,7 @@ public class RobotContainer implements Loggable{
 
     configureBindings();
     ntinst.startServer();
-    TargetMap.init();
+    
 
 
     // m_drivetrain.setDefaultCommand(new InstantCommand (() -> {
@@ -147,8 +149,9 @@ public class RobotContainer implements Loggable{
     // //set the operator buttons for the arm
     //sets the arm to the currently selected target
     m_operator.arcadeBlackRight().whileTrue(new InstantCommand(()->{
-    m_arm.setArmPosition(TargetMap.getArmTarget(TargetSelector.getTargetIdx()));
+    m_arm.setArmPosition(m_targetMap.getArmTarget(TargetSelector.getTargetIdx()));
     }, m_arm));
+    
     // //sets the arm to the target dual station
     // m_operator.arcadeWhiteRight().whileTrue(new InstantCommand(()->{
     // m_arm.setArmPosition(TargetMap.stationArmTargets[0]);
@@ -192,15 +195,15 @@ public class RobotContainer implements Loggable{
 
   }
 
-  @Config.ToggleSwitch(name= "Testing Aff", tabName = "Extend FF",defaultValue = false, rowIndex = 0, columnIndex = 4)
-  public void setTesting(boolean testing){
-    if(!testing){
-      m_arm.setDefaultCommand(Commands.run(() -> {
-        m_arm.setExtendPositionArbFF(m_operator.getLeftSlider());
-        m_arm.setRaisePosition(-m_operator.getRightSlider());
-        // m_arm.setClawPosition(m_operator.arcadeWhiteLeft().getAsBoolean()?1:-1);
-      }, m_arm));
-    }
+  // @Config.ToggleSwitch(name= "Testing Aff", tabName = "Extend FF",defaultValue = false, rowIndex = 0, columnIndex = 4)
+  // public void setTesting(boolean testing){
+  //   if(!testing){
+  //     m_arm.setDefaultCommand(Commands.run(() -> {
+  //       m_arm.setExtendPositionArbFF(m_operator.getLeftSlider());
+  //       m_arm.setRaisePosition(-m_operator.getRightSlider());
+  //       // m_arm.setClawPosition(m_operator.arcadeWhiteLeft().getAsBoolean()?1:-1);
+  //     }, m_arm));
+  //   }
     // else if(Math.abs(m_operator.getLeftSlider()) < 0.1){//arb ff tesing will only activate if the slider is at 0, middle position 
     //     m_arm.setDefaultCommand(Commands.run(() -> { //allows you to set the voltage of the Extend and the angle of the arm
     //     m_arm.s_extend.setVoltage((m_operator.getLeftSlider()));
@@ -208,7 +211,7 @@ public class RobotContainer implements Loggable{
     //     // m_arm.setClawPosition(m_operator.arcadeWhiteLeft().getAsBoolean()?1:-1);
     //   }, m_arm));
     // }
-  }
+  // }
 
   @Log(name = "Get button Configs", tabName = "Buttons")
   public double getSliderConfig() {
