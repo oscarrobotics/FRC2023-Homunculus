@@ -40,6 +40,8 @@ public class RobotContainer implements Loggable{
   private final Drivetrain m_drivetrain = new Drivetrain();
 
   public static final Arm m_arm = new Arm();
+  
+  public static final TargetMap m_targetMap = new TargetMap();
 
   public final AutonomousSelector m_autoSelector = new AutonomousSelector();
 
@@ -221,7 +223,7 @@ public class RobotContainer implements Loggable{
   }
 
 
-  AutonomousMap m_autonMap = new AutonomousMap(m_drivetrain, m_arm);
+  AutonomousMap m_autonMap = new AutonomousMap(m_drivetrain, m_arm, m_targetMap);
 
   public Command getAutonomousCommand() {
     RamseteAutoBuilder autoBuilder = new RamseteAutoBuilder(m_drivetrain::getPose,
