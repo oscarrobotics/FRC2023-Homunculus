@@ -79,7 +79,7 @@ public class Extend implements Loggable{
   m_extendMotor = new CANSparkMax(20, MotorType.kBrushless);
   m_extendMotor.setSmartCurrentLimit(15 , 40,0); 
  
-  m_extendMotor.setSoftLimit(SoftLimitDirection.kForward, (float)Arm.k_rangeLengthPos);
+  m_extendMotor.setSoftLimit(SoftLimitDirection.kForward, (float)Arm.k_rangeExtentPos);
   m_extendMotor.setSoftLimit(SoftLimitDirection.kReverse, (float)0);
 
   m_extendMotor.setIdleMode(IdleMode.kBrake);
@@ -113,7 +113,7 @@ public double  mapInput(double position){
 
   position = position +1;
   position = position/2;
-  position = position * (Arm.k_rangeLengthPos-1);
+  position = position * (Arm.k_rangeExtentPos-1);
   position = position+1;
   vSetPos = position;
   return position;
@@ -228,7 +228,7 @@ public double setEncPosition(double position){
   }
   @Log.Graph (name = "Percent Error", tabName = "Extend", rowIndex =2, columnIndex = 3)
   public double getPercentError(){
-    return (m_Encoder.getPosition() - vSetPos)/Arm.k_rangeLengthPos*100;
+    return (m_Encoder.getPosition() - vSetPos)/Arm.k_rangeExtentPos*100;
   }
 
 

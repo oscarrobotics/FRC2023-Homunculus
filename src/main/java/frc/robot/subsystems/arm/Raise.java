@@ -164,7 +164,7 @@ SparkMaxPIDController m_PID;
 
         @Log.Graph (name = "Percent Error", tabName = "Raise", rowIndex = 3, columnIndex = 3)
          public double getPercentError(){
-              return (m_Encoder.getPosition() - vSetPos)/Arm.k_rangeLengthPos*100;
+              return (m_Encoder.getPosition() - vSetPos)/Arm.k_rangeExtentPos*100;
          }
 
          @Config (name = "P_up_in", tabName = "Raise", defaultValueNumeric = kP_up_in, rowIndex = 0, columnIndex = 0)
