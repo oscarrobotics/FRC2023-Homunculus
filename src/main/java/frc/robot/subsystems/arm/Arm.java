@@ -260,7 +260,7 @@ private final double k_ticksPerInchGrip= 1;
  //Arbituary FF 
  public void setExtendPositionArbFF(double position){
  position = s_extend.mapInput(position);
-  double feedforward = Math.sin(Math.toRadians(getArmAngle())) * s_extend.kFF_arb;
+  double feedforward = s_extend.kFF_arb * Math.sin(Math.toRadians(getArmAngle())) + 0.25;
   vExtendSetPos= s_extend.setPosition(position, 0, feedforward);
     
   }

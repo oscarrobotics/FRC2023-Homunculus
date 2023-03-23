@@ -67,7 +67,7 @@ public class Extend implements Loggable{
  public final double closedRR = 0.3;
 
  public final double kFF_arbdef = 0;
- public double kFF_arb = 0;
+ public double kFF_arb = 0.784;
 
  int kSlotIdxOut  = 0;
  int kSlotIdxIn = 1;

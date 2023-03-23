@@ -201,13 +201,13 @@ public class RobotContainer implements Loggable{
         // m_arm.setClawPosition(m_operator.arcadeWhiteLeft().getAsBoolean()?1:-1);
       }, m_arm));
     }
-    else if(Math.abs(m_operator.getLeftSlider()) < 0.1){//arb ff tesing will only activate if the slider is at 0, middle position 
-        m_arm.setDefaultCommand(Commands.run(() -> { //allows you to set the voltage of the Extend and the angle of the arm
-        m_arm.s_extend.setVoltage((m_operator.getLeftSlider()));
-        m_arm.setRaisePosition(-m_operator.getRightSlider());
-        // m_arm.setClawPosition(m_operator.arcadeWhiteLeft().getAsBoolean()?1:-1);
-      }, m_arm));
-    }
+    // else if(Math.abs(m_operator.getLeftSlider()) < 0.1){//arb ff tesing will only activate if the slider is at 0, middle position 
+    //     m_arm.setDefaultCommand(Commands.run(() -> { //allows you to set the voltage of the Extend and the angle of the arm
+    //     m_arm.s_extend.setVoltage((m_operator.getLeftSlider()));
+    //     m_arm.setRaisePosition(-m_operator.getRightSlider());
+    //     // m_arm.setClawPosition(m_operator.arcadeWhiteLeft().getAsBoolean()?1:-1);
+    //   }, m_arm));
+    // }
   }
 
   @Log(name = "Get button Configs", tabName = "Buttons")
