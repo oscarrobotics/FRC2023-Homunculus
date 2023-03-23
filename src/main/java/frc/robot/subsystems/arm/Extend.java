@@ -33,20 +33,20 @@ public class Extend implements Loggable{
   SparkMaxPIDController m_PID;
 
   //extend
- public final double kPE_out = 0.04;//0.14
+ public final double kPE_out = 0.02;//0.14
  public final double kIE_out = 0.0002;//was 0.05
  public final double kDE_out = 0.01;//was 0.01
  public final double kIzE_out = 6;
  public final double kFFE_out = 0.0;
 
- public final double kP_in = 0.04;//0.14
+ public final double kP_in = 0.02;//0.14
  public final double kI_in = 0.000;//was 0.05
  public final double kD_in = 0.01;//was 0.01
  public final double kIz_in = 6;
  public final double kFF_in = 0.0;
 
 
- public final double kP_low = 0.06;//0.14
+ public final double kP_low = 0.04;//0.14
  public final double kI_low = 0.0008;//was 0.05
  public final double kD_low = 0.0000;//was 0.01
  public final double kIz_low = 4;
