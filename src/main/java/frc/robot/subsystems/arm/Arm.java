@@ -195,66 +195,82 @@ private final double k_ticksPerInchGrip= 1;
  }
  
 
-  public void setArmPositionSafe (double angleR, double extentR){
-      //takes in Setpoints and sets the arm to that position 
-      //;retracts the arm if the arm if the angle would makie it incorectly positioned
-      //extent =  extentPosToExtent(extentPos)
-      //angle = anglePosToAngle(anglePos)
-     //height = extent * sin(angle) + pivotHeight
-      //length = extent * cos(angle) -  columtToFront
-      //raisePos = angleToLeangle(angle)
-      //maxHeight = 1.87m
-      //minHeight = 0.15m
-      //maxLength = 1.1m
-      //pivotHeight = 0.33m
-      //columtToFront = 0.46m
-      //leangle is the angle of the arm
-      //raise is the angle of the arm
-      double leanglePos = s_raise.mapInput(angleR);
-      double extentPos = s_extend.mapInput(extentR);
-
-      double angle = angleToLeanglePos(leanglePos);
-      double extent = extentPosToExtent(extentPos);
-
-      double height = extent * Math.sin(Math.toRadians( angle)) + k_pivotHeight;
-      double length = extent * Math.cos(Math.toRadians( angle)) - k_columToFront;
-
-      if (height > k_maxHeight){
-        extentPos = extentToExtentPos ( k_maxHeight- k_pivotHeight ) / Math.sin(Math.toRadians( angle));
-        extent = extentPosToExtent(extentPos);
-        length = extent * Math.cos(Math.toRadians( angle)) - k_columToFront;
-        angle = Math.atan((k_maxHeight-k_pivotHeight)/length);
-        leanglePos = angleToLeanglePos(angle);
-      }
-      if(height < k_minArmHeight){
-        extentPos = extentToExtentPos( ( k_pivotHeight-k_minArmHeight )) / Math.sin(angle)*-1;
-        extent = extentPosToExtent(extentPos);
-        length = extent * Math.cos(Math.toRadians( angle)) - k_columToFront;
-        angle = Math.toDegrees(Math.atan((k_pivotHeight-k_minArmHeight)/length))*-1;
-        leanglePos = angleToLeanglePos(angle);
-      }
-      if(length > k_maxLength){
-        extentPos = (k_maxLength + k_columToFront)/Math.cos(Math.toRadians( angle));
-        extent = extentPosToExtent(extentPos);
-        height = extent * Math.sin(Math.toRadians( angle)) + k_pivotHeight;
-        angle = Math.toDegrees(Math.atan((height-k_pivotHeight)/k_maxLength));
-        leanglePos = angleToLeanglePos(angle);
-      }
-      double leanglePosRatio = leanglePos/k_rangeLeanglePos*2-1;
-      double extentPosRatio = extentPos/k_rangeExtentPos*2-1;
-
-      setRaisePosition(leanglePosRatio); 
-      setExtendPositionArbFF(extentPosRatio);
-
-      //raise is the angle of the arm
-
-
-
+  // public void setArmPositionSafe (double angleR, double extentR){
+  //     //takes in Setpoints and sets the arm to that position 
+  //     //;retracts the arm if the arm if the angle would makie it incorectly positioned
+  //     //extent =  extentPosToExtent(extentPos)
+  //     //angle = anglePosToAngle(anglePos)
+  //    //height = extent * sin(angle) + pivotHeight
+  //     //length = extent * cos(angle) -  columtToFront
+  //     //raisePos = angleToLeangle(angle)
+  //     //maxHeight = 1.87m
+  //     //minHeight = 0.15m
+  //     //maxLength = 1.1m
+  //     //pivotHeight = 0.33m
+  //     //columtToFront = 0.46m
+  //     //leangle is the angle of the arm
+  //     //raise is the angle of the arm
+  //     double leanglePos = s_raise.mapInput(angleR);
+  //     double extentPos = s_extend.mapInput(extentR);
       
-  
-  }
-  
+  //     double angle = leanglePosToAngle(leanglePos);
+  //     double extent = extentPosToExtent(extentPos);
 
+  //     System.out.println("angle"+angle);
+  //     double height = extent * Math.sin(Math.toRadians( angle)) + k_pivotHeight;
+  //     double length = extent * Math.cos(Math.toRadians( angle)) - k_columToFront;
+  //     System.out.println("height"+ height);
+  //     System.out.println("length"+length);
+
+  //     if (height > k_maxHeight){
+  //       extentPos = extentToExtentPos ( (k_maxHeight- k_pivotHeight ) / Math.sin(Math.toRadians( angle)));
+  //       extent = extentPosToExtent(extentPos);
+  //       length = extent * Math.cos(Math.toRadians( angle)) - k_columToFront;
+  //       // angle = Math.atan((k_maxHeight-k_pivotHeight)/length)
+  //       ;
+  //       // leanglePos = angleToLeanglePos(angle);
+  //     }
+  //     if(height < k_minArmHeight){
+  //       extentPos = extentToExtentPos((( k_pivotHeight-k_minArmHeight )) / Math.sin(angle)*-1);
+  //       extent = extentPosToExtent(extentPos);
+  //       length = extent * Math.cos(Math.toRadians( angle)) - k_columToFront;
+  //       // angle = Math.toDegrees(Math.atan((k_pivotHeight-k_minArmHeight)/length))*-1;
+  //       // leanglePos = angleToLeanglePos(angle);
+  //     }
+  //     if(length > k_maxLength){
+  //       extentPos = extentToExtentPos((k_maxLength + k_columToFront)/Math.cos(Math.toRadians( angle)));
+  //       extent = extentPosToExtent(extentPos);
+  //       height = extent * Math.sin(Math.toRadians( angle)) + k_pivotHeight;
+  //       // angle = Math.toDegrees(Math.atan((height-k_pivotHeight)/k_maxLength));
+  //       // leanglePos = angleToLeanglePos(angle);
+  //     }
+  //     System.out.println("height f"+ height);
+  //     System.out.println("length f"+length);
+  //     double leanglePosRatio = leanglePos/k_rangeLeanglePos*2-1;
+  //     double extentPosRatio = extentPos/k_rangeExtentPos*2-1;
+
+  //     setRaisePosition(angleR); 
+  //     setExtendPositionArbFF(extentPosRatio);
+
+  //     //raise is the angle of the arm
+  
+  // }
+  
+  public  void setArmPositionSafe(double angleR, double extentR){
+
+    double expos = s_extend.mapInput(extentR);
+    //pos max at horizontal =40
+    // pos max at vert
+    double maxExtent = (Units.inchesToMeters(41)+k_columToFront)/Math.abs(Math.cos(Math.toRadians(getArmAngle())));
+    double maxPos = extentToExtentPos(maxExtent);
+    expos = Math.min(expos, maxPos);
+    expos = expos/k_rangeExtentPos*2-1;
+
+
+
+    setRaisePosition(angleR);
+    setExtendPositionArbFF(expos);
+  }
  
 
  //Arbituary FF 
@@ -284,29 +300,29 @@ public void setExtendPosition(double position){
 }
 
 
-public void setExtendPositionSafe(double position){
-  position = s_extend.mapInput(position);
-  // calculate max extension based on arm angle so it doesnt hit the floor
-  //max extion == k_pivotHeight/Math.cos(angle)
+// public void setExtendPositionSafe(double position){
+//   position = s_extend.mapInput(position);
+//   // calculate max extension based on arm angle so it doesnt hit the floor
+//   //max extion == k_pivotHeight/Math.cos(angle)
   
-  // final double k_horizontalPos = -50;//????? this is a guess, fill in with actual value
-  // final double k_minAngle = -30;//  ????? this is a guess, fill in with actual value by mesuring the angle of the arm
-  double angle = Math.toRadians( getArmAngle());
-  double maxExtension = position;
-  if (angle < 0){
-     maxExtension = ( k_pivotHeight-k_minArmHeight ) / Math.cos(angle);
-  }
-  maxExtension = (maxExtension-k_minLength)/(k_maxLength-k_minLength)*(k_rangeExtentPos);
+//   // final double k_horizontalPos = -50;//????? this is a guess, fill in with actual value
+//   // final double k_minAngle = -30;//  ????? this is a guess, fill in with actual value by mesuring the angle of the arm
+//   double angle = Math.toRadians( getArmAngle());
+//   double maxExtension = position;
+//   if (angle < 0){
+//      maxExtension = ( k_pivotHeight-k_minArmHeight ) / Math.cos(angle);
+//   }
+//   maxExtension = (maxExtension-k_minLength)/(k_maxLength-k_minLength)*(k_rangeExtentPos);
 
-  if (position > maxExtension){
-    position = maxExtension;
-  }
-  vExtendSetPos=position;
-  vMaxExtention = maxExtension;
+//   if (position > maxExtension){
+//     position = maxExtension;
+//   }
+//   vExtendSetPos=position;
+//   vMaxExtention = maxExtension;
 
 
-  vExtendSetPos =  s_extend.setPosition(position ,0);
-}
+//   vExtendSetPos =  s_extend.setPosition(position ,0);
+// }
 
 public void setRaisePosition(double position){
   //inpoutrange -1 to 1
@@ -475,15 +491,16 @@ double zerooffset = -5.27;
   double a = k_pivotLenght;
   double b = k_pivotOffset;
   double c = Math.sqrt(Math.pow(a, 2)+Math.pow(b, 2)-2*a*b*Math.cos(C));
-  double leangle = (c-k_minLeangle)/(k_maxLeangle-k_minLeangle)*k_maxLeanglePos;
+  double leangle = (c-k_minLeangle)/(k_maxLeangle-k_minLeangle)*k_maxLeanglePos*-1;
   return leangle;
 
 
 }
 
+
 public double extentToExtentPos(double extent){
   //extent is the length of the arm
-  extent = extent + k_columToFront;
+  extent = extent ;
   double extentPos = (extent-k_minLength)/(k_maxLength-k_minLength)*k_rangeExtentPos;
   return extentPos;
 }
@@ -492,6 +509,37 @@ public double extentPosToExtent(double extentPos){
   double extent = (extentPos/k_rangeExtentPos)*(k_maxLength-k_minLength)+k_minLength;
 
   return extent;
+}
+public double leanglePosToAngle(double anglePos){
+  double angle = 0;
+  //use law of cosines because we have three sides
+  //c^2 = a^2+b^2-2ab*cos(C)%
+  //a^2+b^2 - c^2 = 2ab*cos(C)
+  //C = acos((a^2+b^2 - c^2) /2ab)
+  double a = k_pivotLenght;
+  double b = k_pivotOffset;
+  double c = k_maxLeangle+( -anglePos/k_rangeLeanglePos *(k_maxLeangle-k_minLeangle));//negative positoning lead to subtracting from max angle
+  // System.out.println("c: "+c);
+  // System.out.println("a: "+a);
+
+  // System.out.println("b: "+b);
+  double temp = (Math.pow(a, 2)+Math.pow(b, 2)-Math.pow(c, 2))/(2*a*b);
+  // System.out.println("temp: "+temp);
+  angle = Math.toDegrees( Math.acos(temp)); // angle of obtuse triangle formed by arm
+  angle = angle -90;// i of arm  above or below horizontal
+  
+ //calibrated fudging
+  double measuredmin = -23.8;
+  double measuredmax = 62;
+  double calcmin =-26.9;
+  double calcmax = 52.4;
+  double zerooffset = -5.27;
+
+
+  angle =   (angle-calcmin)/(calcmax-calcmin)*(measuredmax-measuredmin)+measuredmin; 
+
+
+  return angle;
 }
 
 public Translation2d radialToLengths(double angle, double length){

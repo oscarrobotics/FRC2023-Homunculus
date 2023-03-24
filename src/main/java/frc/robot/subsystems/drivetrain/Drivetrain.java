@@ -433,7 +433,7 @@ public Command goToPoseCommand(Pose2d tpose, double speed, double accel) {
     Rotation2d rotation = m_gyro.getRotation2d();
     rotation = rotation.times(-1);
     m_poseEstimator.update(
-      rotation, nativeUnitsToDistanceMeters( m_rightMaster.getSelectedSensorPosition()),nativeUnitsToDistanceMeters( m_leftMaster.getSelectedSensorPosition()));
+      rotation, -nativeUnitsToDistanceMeters( m_rightMaster.getSelectedSensorPosition()),-nativeUnitsToDistanceMeters( m_leftMaster.getSelectedSensorPosition()));
     Optional<EstimatedRobotPose> result =
             pcw.getEstimatedGlobalPose(m_poseEstimator.getEstimatedPosition());
     

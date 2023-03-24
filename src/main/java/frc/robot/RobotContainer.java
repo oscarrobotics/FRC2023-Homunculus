@@ -120,13 +120,18 @@ public class RobotContainer implements Loggable{
 
 
      
+      // m_arm.setDefaultCommand(Commands.run(() -> {
+      //   m_arm.setExtendPositionArbFF(m_operator.getLeftSlider());
+      //   m_arm.setRaisePosition(-m_operator.getRightSlider());
+      //   // m_arm.setClawPosition(m_operator.arcadeWhiteLeft().getAsBoolean()?1:-1);
+      // }, m_arm));
+    
+      
       m_arm.setDefaultCommand(Commands.run(() -> {
-        m_arm.setExtendPositionArbFF(m_operator.getLeftSlider());
-        m_arm.setRaisePosition(-m_operator.getRightSlider());
+        m_arm.setArmPositionSafe(-m_operator.getRightSlider(), m_operator.getLeftSlider()) ;
+        
         // m_arm.setClawPosition(m_operator.arcadeWhiteLeft().getAsBoolean()?1:-1);
       }, m_arm));
-    
-    
 
     
     m_operator.arcadeWhiteLeft().onTrue(new InstantCommand(() -> {
@@ -239,7 +244,10 @@ public class RobotContainer implements Loggable{
     // else{
     // fullAuto = new WaitCommand(2);
     // }
-    fullAuto = autoBuilder.fullAuto(m_autoSelector.getAutoPath(m_autoSelector.getSelectedAuto()));
+    int auto= m_autoSelector.getSelectedAuto();
+    System.out.println(auto);
+    List<PathPlannerTrajectory> path = m_autoSelector.getAutoPath(auto);
+    fullAuto = autoBuilder.fullAuto(path);
     return fullAuto;
 
   }
