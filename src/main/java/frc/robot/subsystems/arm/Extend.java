@@ -33,15 +33,15 @@ public class Extend implements Loggable{
   SparkMaxPIDController m_PID;
 
   //extend
- public final double kPE_out = 0.02;//0.14
- public final double kIE_out = 0.0002;//was 0.05
- public final double kDE_out = 0.01;//was 0.01
+ public final double kPE_out = 0.04;//0.14
+ public final double kIE_out = 0.00002;//was 0.05
+ public final double kDE_out = 0.02;//was 0.01
  public final double kIzE_out = 6;
  public final double kFFE_out = 0.0;
 
- public final double kP_in = 0.02;//0.14
+ public final double kP_in = 0.04;//0.14
  public final double kI_in = 0.000;//was 0.05
- public final double kD_in = 0.01;//was 0.01
+ public final double kD_in = 0.02;//was 0.01
  public final double kIz_in = 6;
  public final double kFF_in = 0.0;
 
@@ -64,7 +64,7 @@ public class Extend implements Loggable{
  public final double maxRPM = 5;
  public final double maxAccel = 2;
  public final double allowedErr = 0.5;
- public final double closedRR = 0.3;
+ public final double closedRR = 0.18;
 
  public final double kFF_arbdef = 0;
  public double kFF_arb = 0.784;
@@ -203,7 +203,7 @@ public double setEncPosition(double position){
   return position;
 }
 
- @Log.Graph(name = "Motor Curent" ,tabName = "Extend", rowIndex =0, columnIndex = 6 )
+//  @Log.Graph(name = "Motor Curent" ,tabName = "Extend", rowIndex =0, columnIndex = 6 )
  public double getCurrent(){
    return m_extendMotor.getOutputCurrent();
  }
@@ -222,11 +222,11 @@ public double setEncPosition(double position){
     return true;
   }
   
-  @Log.Graph (name = "Error", tabName = "Extend", rowIndex =2, columnIndex = 0)
+  // @Log.Graph (name = "Error", tabName = "Extend", rowIndex =2, columnIndex = 0)
   public double getError(){
     return m_Encoder.getPosition() - vSetPos;
   }
-  @Log.Graph (name = "Percent Error", tabName = "Extend", rowIndex =2, columnIndex = 3)
+  // @Log.Graph (name = "Percent Error", tabName = "Extend", rowIndex =2, columnIndex = 3)
   public double getPercentError(){
     return (m_Encoder.getPosition() - vSetPos)/Arm.k_rangeExtentPos*100;
   }

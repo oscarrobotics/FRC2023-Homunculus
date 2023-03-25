@@ -13,6 +13,7 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.DifferentialDriveKinematics;
 import edu.wpi.first.math.controller.RamseteController;
 import edu.wpi.first.math.estimator.DifferentialDrivePoseEstimator;
+import edu.wpi.first.math.filter.LinearFilter;
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.kinematics.DifferentialDriveWheelSpeeds;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
@@ -431,7 +432,7 @@ public Command goToPoseCommand(Pose2d tpose, double speed, double accel) {
 
   public void updateOdometry() {
     Rotation2d rotation = m_gyro.getRotation2d();
-    rotation = rotation.times(-1);
+    rotation = rotation.times(1);
     m_poseEstimator.update(
       rotation, -nativeUnitsToDistanceMeters( m_rightMaster.getSelectedSensorPosition()),-nativeUnitsToDistanceMeters( m_leftMaster.getSelectedSensorPosition()));
     Optional<EstimatedRobotPose> result =
@@ -477,7 +478,7 @@ public double getRightPositionMeters(){
 
 
 
-@Log.ToString(name = "Pose")
+@Log.ToString(name = "Pose", tabName = "Target Selector", rowIndex = 4, columnIndex = 8)
 public Pose2d getPose() {
     return m_poseEstimator.getEstimatedPosition();
 }
@@ -498,6 +499,11 @@ public double getGyroPos(){
 @Log(name = "Gyro Roll")
 public double getGyroRoll(){
   return m_gyro.getRoll();
+}
+
+@Log(name = "Gyro Pitch")
+public double getGyroPitch(){
+  return m_gyro.getPitch();
 }
 
 // @Log.Graph(name = "lefterror")

@@ -5,6 +5,8 @@
 package frc.robot;
 
 import java.util.List;
+
+import com.fasterxml.jackson.databind.deser.DataFormatReaders.Match;
 import com.pathplanner.lib.PathConstraints;
 import com.pathplanner.lib.PathPlanner;
 import com.pathplanner.lib.PathPlannerTrajectory;
@@ -13,17 +15,19 @@ import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.wpilibj.interfaces.Gyro;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandGenericHID;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import frc.robot.commands.placement.level.SetArmPosition;
+// import frc.robot.commands.movement.AutoBalance;
 import frc.robot.subsystems.arm.Arm;
 import frc.robot.subsystems.drivetrain.Drivetrain;
 import io.github.oblarg.oblog.Loggable;
@@ -43,8 +47,10 @@ public class RobotContainer implements Loggable{
 
   public static final TargetMap m_targetMap = new TargetMap();
 
+  public static final TargetSelector m_targetSelector = new TargetSelector();
 
-  public final AutonomousSelector m_autoSelector = new AutonomousSelector();
+
+  public final PathOptions m_autoSelector = new PathOptions();
 
   private final NetworkTableInstance ntinst = NetworkTableInstance.getDefault();
 
@@ -116,6 +122,7 @@ public class RobotContainer implements Loggable{
     //   motion = false;
 
     // }));
+      m_operator.arcadeBlackLeft().onTrue(m_arm.dropCargo2());
       
 
 
@@ -153,8 +160,12 @@ public class RobotContainer implements Loggable{
 
     // //set the operator buttons for the arm
     //sets the arm to the currently selected target
-    m_operator.arcadeBlackRight().whileTrue(new InstantCommand(()->{
-    m_arm.setArmPosition(m_targetMap.getArmTarget(TargetSelector.getTargetIdx()));
+    // m_operator.arcadeBlackRight().whileTrue(new InstantCommand(()->{
+    // m_arm.setArmPosition(m_targetMap.getArmTarget(TargetSelector.getTargetIdx()));
+    // }, m_arm));
+    
+    m_operator.arcadeBlackRight().whileTrue(new RunCommand(()->{
+    m_arm.setArmPosition((m_targetMap.getArmTarget(TargetSelector.getTargetIdx())));
     }, m_arm));
     
     // //sets the arm to the target dual station
@@ -173,11 +184,12 @@ public class RobotContainer implements Loggable{
       TargetSelector.setC();
     }));
 
+
     m_operator.sc4().onTrue(new InstantCommand(() -> {
       TargetSelector.setLeft();
     }));
     m_operator.sc5().onTrue(new InstantCommand(() -> {
-      TargetSelector.setMid();
+      TargetSelector.setCenter();
     }));
     m_operator.sc6().onTrue(new InstantCommand(() -> {
       TargetSelector.setRight();
@@ -255,15 +267,57 @@ public class RobotContainer implements Loggable{
   public Command getAutonomousCommand2() {
     // cammad drive backwards 3 meters wait 2 seconds then drive forward 1.2 meters then back .2
     // meters using just velocity control
-    return new SequentialCommandGroup(
-        new InstantCommand(() -> m_drivetrain.setSpeedsCONT(-1, -1)).withTimeout(2),
-        new WaitCommand(2),
-        new InstantCommand(() -> m_drivetrain.setSpeedsCONT(1, 1)).withTimeout(1.2),
-        new WaitCommand(0.5),
-        new InstantCommand(() -> m_drivetrain.setSpeedsCONT(-1, -1)).withTimeout(.2),
-        new InstantCommand(() -> m_drivetrain.setSpeedsCONT(0, 0)).withTimeout(5));
+    System.out.println("auto");
+    // return new SequentialCommandGroup(
+    //     new  Command(() -> m_drivetrain.setSpeedsCONT(-1, -1)).withTimeout(2),
+    //     new WaitCommand(2),
+    //     new InstantCommand(() -> m_drivetrain.setSpeedsCONT(1, 1)).withTimeout(1.2),
+    //     new WaitCommand(0.5),
+    //     new InstantCommand(() -> m_drivetrain.setSpeedsCONT(-1, -1)).withTimeout(.2),
+    //     new InstantCommand(() -> m_drivetrain.setSpeedsCONT(0, 0)).withTimeout(5));
+    double drivetune = 0.94;
+    double start = 1.887;
+    double chargestation = 3.9;
+    
+    //  return new InstantCommand(()->m_drivetrain.smoothDrive(-0.7*drivetune,0), m_drivetrain)
+    //  .andThen(new WaitCommand(5.7))
+    //  .andThen(()->m_drivetrain.smoothDrive(0.0*drivetune,0), m_drivetrain)
+    //  .andThen(new WaitCommand(1))
+    //  .andThen(()->m_drivetrain.smoothDrive(0.7*drivetune,0), m_drivetrain)
+    //  .andThen(new WaitCommand(2.85))
+    // //  .andThen(()->m_drivetrain.smoothDrive(0.3,0)).withTimeout(5).until(() -> m_drivetrain.getGyroRoll() < 0.5 && m_drivetrain.getGyroRoll() > -0.5) //Simple auto balance
+    // // .andThen(()->m_drivetrain.smoothDrive(0.3,0)).withTimeout(5)
+    // .finallyDo((i)->m_drivetrain.smoothDrive(0,0));
 
-  }
+
+     return m_arm.dropCargo2()
+    .andThen(()->m_drivetrain.smoothDrive(-0.7*drivetune,0), m_drivetrain)
+    .andThen(new WaitCommand(5.7))
+    .andThen(()->m_drivetrain.smoothDrive(0.0*drivetune,0), m_drivetrain)
+    .andThen(new WaitCommand(1))
+    .andThen(()->m_drivetrain.smoothDrive(0.7*drivetune,0), m_drivetrain)
+    .andThen(new WaitCommand(2.85));
+    // .andThen(()->setDefaultarm())
+   //  .andThen(()->m_drivetrain.smoothDrive(0.3,0)).withTimeout(5).until(() -> m_drivetrain.getGyroRoll() < 0.5 && m_drivetrain.getGyroRoll() > -0.5) //Simple auto balance
+   // .andThen(()->m_drivetrain.smoothDrive(0.3,0)).withTimeout(5)
+  //  .finallyDo((i)->m_drivetrain.smoothDrive(0,0));
+
+    //  Command test =  new RunCommand(()->m_drivetrain.smoothDrive(-2,0), m_drivetrain).withTimeout(2.5)
+    //  .andThen(()->m_drivetrain.smoothDrive(0.3,0)).withTimeout(5);
+    // return SequentialCommandGroup(
+    //    ).addCommad(
+    //    new RunCommand(()->m_drivetrain.smoothDrive(0,0), m_drivetrain).withTimeout(0.4)).addCommad(
+    //    new RunCommand(()->m_drivetrain.smoothDrive(1,0), m_drivetrain).withTimeout(1.2));
+
+  
+    // .finallyDo(()->m_drivetrain.smoothDrive(-1,0));
+    // .andthen(()->m_drivetrain.smoothDrive(-1,0));
+
+
+      
+      
+    
+    }
 
   
 
@@ -283,7 +337,14 @@ public class RobotContainer implements Loggable{
   private void setExtraStend(double value) {
     extrastend = value;
   }
+public void setDefaultarm(){
+  m_arm.setDefaultCommand(Commands.run(() -> {
+    m_arm.setArmPositionSafe(-m_operator.getRightSlider(), m_operator.getLeftSlider()) ;
+    
+    // m_arm.setClawPosition(m_operator.arcadeWhiteLeft().getAsBoolean()?1:-1);
+  }, m_arm));
 
+}
   // public Command scoreCone(int location){
 
   //   if(location == 2){ //Mid

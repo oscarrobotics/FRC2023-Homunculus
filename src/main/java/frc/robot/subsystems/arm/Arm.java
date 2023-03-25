@@ -10,6 +10,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
+import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -188,6 +189,8 @@ private final double k_ticksPerInchGrip= 1;
  public void setArmPosition(Translation2d position){
     //takes in a pose and sets the arm to that position
     Translation2d setpoints = cartToPosRatio(position.getX(), position.getY());
+    System.out.println("position"+position);
+    System.out.println("setpoints"+ setpoints);
     
     setRaisePosition(setpoints.getX()); 
     setExtendPositionArbFF(setpoints.getY());
@@ -261,13 +264,21 @@ private final double k_ticksPerInchGrip= 1;
     double expos = s_extend.mapInput(extentR);
     //pos max at horizontal =40
     // pos max at vert
-    double maxExtent = (Units.inchesToMeters(41)+k_columToFront)/Math.abs(Math.cos(Math.toRadians(getArmAngle())));
+    double downfudge = s_extend.m_Encoder.getVelocity()<0?5:0;
+
+    // double fudge = getArmAngle()>0? getArmAngle()-10: getArmAngle()+5;
+    double fudge = Math.min(Math.abs(leanglePosToAngle(s_raise.mapInput(angleR))) ,Math.abs( getAngle()));
+    double maxExtent = (Units.inchesToMeters(39)+k_columToFront)/Math.abs(Math.cos(Math.toRadians(fudge)));
+    double maxExtension =  (Units.inchesToMeters(70)+k_pivotHeight)/Math.abs(Math.sin(Math.toRadians(fudge)));
+    double max = Math.min(maxExtension,maxExtent);
+    
     double maxPos = extentToExtentPos(maxExtent);
+
     expos = Math.min(expos, maxPos);
     expos = expos/k_rangeExtentPos*2-1;
 
 
-
+    expos = Math.min(expos,k_rangeExtentPos);
     setRaisePosition(angleR);
     setExtendPositionArbFF(expos);
   }
@@ -402,7 +413,7 @@ public void resetPosition(){
 
 
 //Kinematic helper methods
-@Log.ToString(name = "Arm Pose")
+@Log.ToString(name = "Arm Pose", tabName = "Target Selector", rowIndex = 4, columnIndex = 6)
 public Translation2d getArmPose(){
 
 double armangle = getArmAngle();
@@ -447,6 +458,37 @@ public double getArmAngle(){
   angle =   (angle-calcmin)/(calcmax-calcmin)*(measuredmax-measuredmin)+measuredmin; 
 
 
+  return angle;
+}
+public double leanglePosToAngle(double anglePos){
+  double angle = 0;
+  //use law of cosines because we have three sides
+  //c^2 = a^2+b^2-2ab*cos(C)%
+  //a^2+b^2 - c^2 = 2ab*cos(C)
+  //C = acos((a^2+b^2 - c^2) /2ab)
+  double a = k_pivotLenght;
+  double b = k_pivotOffset;
+  double c = k_maxLeangle+( anglePos/k_rangeLeanglePos *(k_maxLeangle-k_minLeangle));//negative positoning lead to subtracting from max angle
+  // System.out.println("c: "+c);
+  // System.out.println("a: "+a);
+
+  // System.out.println("b: "+b);
+  double temp = (Math.pow(a, 2)+Math.pow(b, 2)-Math.pow(c, 2))/(2*a*b);
+  // System.out.println("temp: "+temp);
+  angle = Math.toDegrees( Math.acos(temp)); // angle of obtuse triangle formed by arm
+  angle = angle -90;// i of arm  above or below horizontal
+  
+ //calibrated fudging
+  double measuredmin = -23.8;
+  double measuredmax = 62;
+  double calcmin =-26.9;
+  double calcmax = 52.4;
+  double zerooffset = -5.27;
+
+
+  angle =   (angle-calcmin)/(calcmax-calcmin)*(measuredmax-measuredmin)+measuredmin; 
+
+  // System.out.println("angle "+angle);
   return angle;
 }
 
@@ -510,37 +552,7 @@ public double extentPosToExtent(double extentPos){
 
   return extent;
 }
-public double leanglePosToAngle(double anglePos){
-  double angle = 0;
-  //use law of cosines because we have three sides
-  //c^2 = a^2+b^2-2ab*cos(C)%
-  //a^2+b^2 - c^2 = 2ab*cos(C)
-  //C = acos((a^2+b^2 - c^2) /2ab)
-  double a = k_pivotLenght;
-  double b = k_pivotOffset;
-  double c = k_maxLeangle+( -anglePos/k_rangeLeanglePos *(k_maxLeangle-k_minLeangle));//negative positoning lead to subtracting from max angle
-  // System.out.println("c: "+c);
-  // System.out.println("a: "+a);
 
-  // System.out.println("b: "+b);
-  double temp = (Math.pow(a, 2)+Math.pow(b, 2)-Math.pow(c, 2))/(2*a*b);
-  // System.out.println("temp: "+temp);
-  angle = Math.toDegrees( Math.acos(temp)); // angle of obtuse triangle formed by arm
-  angle = angle -90;// i of arm  above or below horizontal
-  
- //calibrated fudging
-  double measuredmin = -23.8;
-  double measuredmax = 62;
-  double calcmin =-26.9;
-  double calcmax = 52.4;
-  double zerooffset = -5.27;
-
-
-  angle =   (angle-calcmin)/(calcmax-calcmin)*(measuredmax-measuredmin)+measuredmin; 
-
-
-  return angle;
-}
 
 public Translation2d radialToLengths(double angle, double length){
  //calculate the lengths of the arm and angle motor to get to the desired position
@@ -577,16 +589,51 @@ public Translation2d cartToPosRatio(double length, double height){
  }
 
 //simple commads
-public Command dropCargo(Translation2d position){
+public Command dropCargo(Translation2d pose){
   return new SequentialCommandGroup(
-    new InstantCommand(()->setClawPosition(0)),
-    new InstantCommand(()->setArmPosition(position)),
-    new WaitCommand(0.5),
+   
+    new InstantCommand(()->setArmPositionSafe(0.45, 0.65)),//slider values
+    new WaitCommand(1),
     new InstantCommand(()->setClawPosition(1)),
-    new WaitCommand(0.5),
+    new WaitCommand(1),
     new InstantCommand(()->setClawPosition(0)),
-    new InstantCommand(()->setArmPosition(new Translation2d(0,0)))
+    new InstantCommand(()->setArmPositionSafe(1,-1))
+    //slider values
   );
+}
+public Command dropCargo(){
+  return new SequentialCommandGroup(
+   
+    new InstantCommand(()->setArmPositionSafe(-0.45, 0.75)),//slider values
+    new WaitCommand(1),
+    new InstantCommand(()->setClawPosition(0)),
+    new WaitCommand(2),
+    // new InstantCommand(()->setClawPosition(1)),
+    new InstantCommand( () -> setArmPositionSafe(-1,0.75)),
+    new WaitCommand(2),
+    new InstantCommand(()->setArmPositionSafe(-1,-1)),
+    new WaitCommand(2)
+    );
+    //slider values
+  
+}
+public Command dropCargo2(){
+  return new SequentialCommandGroup(
+   
+    new InstantCommand(()->setArmPositionSafe(-0.45, 0.75),this),//slider values
+    new WaitCommand(1),
+    new InstantCommand(()->setClawPosition(-1)),
+    new WaitCommand(1),
+    // new InstantCommand(()->setClawPosition(1)),
+    new InstantCommand( () -> setArmPositionSafe(-1,0.2),this),
+    new WaitCommand(1),
+    new InstantCommand(()->setArmPositionSafe(-1,-1),this),
+    new WaitCommand(1)
+    );
+    //slider values
+
+
+  
 }
 
 

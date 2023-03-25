@@ -5,7 +5,7 @@ import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
-import frc.robot.commands.movement.AutoBalance;
+// import frc.robot.commands.movement.AutoBalance;
 import frc.robot.subsystems.arm.Arm;
 import frc.robot.subsystems.drivetrain.Drivetrain;
 
@@ -20,7 +20,7 @@ public class AutonomousMap {
     this.arm = arm;
     eventMap.put("Marker 1", new WaitCommand(3));
     eventMap.put("Reset Position", new InstantCommand(() -> arm.resetPosition()));
-    eventMap.put("Auto Balance", new AutoBalance(drivetrain));
+    // eventMap.put("Auto Balance", new AutoBalance(drivetrain));
     eventMap.put("firstCone3", arm.dropCargo(TargetMap.coneArmTargets[2]));
     eventMap.put("firstCube3",  arm.dropCargo(TargetMap.cubeArmTargets[2] ));
     

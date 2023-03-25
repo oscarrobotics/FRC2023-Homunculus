@@ -13,15 +13,14 @@ import java.util.List;
 import com.pathplanner.lib.PathConstraints;
 import com.pathplanner.lib.PathPlanner;
 import com.pathplanner.lib.PathPlannerTrajectory;
-public class AutonomousSelector implements Loggable{
+public class PathOptions implements Loggable{
 
   // SendableChooser<List <PathPlannerTrajectory>> m_chooser;
-
   int m_autoSelected;
   SendableChooser<List<PathPlannerTrajectory>> m_chooser = new SendableChooser<>();
   ArrayList<List<PathPlannerTrajectory>> m_chooser2 = new ArrayList<>();
   ArrayList<String> autoNames = new ArrayList<String>();
-  public AutonomousSelector(){
+  public PathOptions(){
   
     List<PathPlannerTrajectory> oneCargoAuto1 = 
         PathPlanner.loadPathGroup(

@@ -16,7 +16,7 @@ public class Raise implements Loggable {
 RelativeEncoder m_Encoder ;
 SparkMaxPIDController m_PID;
 
-    public final double kP_up_in = 0.025;
+    public final double kP_up_in = 0.013;
     public final double kI_up_in = 0.000;
     public final double kD_up_in = 0.0000;
     public final double kIz_up_in = 4;
@@ -43,8 +43,8 @@ SparkMaxPIDController m_PID;
 
   
 
-    public final double kMaxOutput_in = 0.4; //arm up
-    public final double kMinOutput_in = 0.3;//arm down
+    public final double kMaxOutput_in = 0.3; //arm up
+    public final double kMinOutput_in = 0.2;//arm down
 
     public final double kMaxOutput_out = 0.4; //arm up
     public final double kMinOutput_out = 0.3;//arm down
@@ -53,7 +53,7 @@ SparkMaxPIDController m_PID;
     public final double maxRPM = 5;
     public final double maxAccel = 1.0;
     public final double allowedErr = 0.5;
-    public final double closedRR  = 1.4;
+    public final double closedRR  = 2;
 
     public int kSlotIdx_up_in = 0;
     public int kSlotIdx_down_in = 1;
@@ -140,7 +140,7 @@ SparkMaxPIDController m_PID;
         return position;
       }
       
-       @Log.Graph(name = "Motor Curent" ,tabName = "Raise" ,rowIndex = 0 , columnIndex = 6)
+      //  @Log.Graph(name = "Motor Curent" ,tabName = "Raise" ,rowIndex = 0 , columnIndex = 6)
        public double getCurrent(){
          return m_raiseMotor.getOutputCurrent();
        }
@@ -157,12 +157,12 @@ SparkMaxPIDController m_PID;
           }
           return true;
         }
-        @Log.Graph (name = "Error", tabName = "Raise" ,rowIndex = 3, columnIndex = 0)
+        // @Log.Graph (name = "Error", tabName = "Raise" ,rowIndex = 3, columnIndex = 0)
          public double getError(){
            return m_Encoder.getPosition() - vSetPos;
          }
 
-        @Log.Graph (name = "Percent Error", tabName = "Raise", rowIndex = 3, columnIndex = 3)
+        // @Log.Graph (name = "Percent Error", tabName = "Raise", rowIndex = 3, columnIndex = 3)
          public double getPercentError(){
               return (m_Encoder.getPosition() - vSetPos)/Arm.k_rangeExtentPos*100;
          }

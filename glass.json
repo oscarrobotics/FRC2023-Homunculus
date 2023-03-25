@@ -1,0 +1,24 @@
+{
+  "NetworkTables": {
+    "transitory": {
+      "Shuffleboard": {
+        "..metadata": {
+          "open": true
+        },
+        "SmartDashboard": {
+          "Auton Chooser": {
+            "open": true
+          },
+          "open": true
+        }
+      },
+      "types": {
+        "/FMSInfo": "FMSInfo",
+        "/2023-chargedup.json": "2023-chargedup.json",
+        "/drivetrain/Drivetrain": "Subsystem",
+        "/SmartDashboard/AutonomousSelector": "Auton Chooser",
+        "/Shuffleboard/TargetMap": "TargetMap"
+      }
+    }
+  }
+}
