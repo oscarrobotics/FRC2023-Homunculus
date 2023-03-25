@@ -465,12 +465,12 @@ public Command goToPoseCommand(Pose2d tpose, double speed, double accel) {
     // m_fieldSim.setRobotPose(m_poseEstimator.getEstimatedPosition());
 }
 
-@Log(name = "left enc")
+// @Log(name = "left enc")
 public double getLeftPositionMeters(){
   return nativeUnitsToDistanceMeters(m_leftMaster.getSelectedSensorPosition());
 
 }
-@Log(name = "right enc")
+// @Log(name = "right enc")
 public double getRightPositionMeters(){
   return nativeUnitsToDistanceMeters(m_rightMaster.getSelectedSensorPosition());
   
@@ -482,26 +482,26 @@ public double getRightPositionMeters(){
 public Pose2d getPose() {
     return m_poseEstimator.getEstimatedPosition();
 }
-@Log.ToString(name = "Translation")
+// @Log.ToString(name = "Translation")
 public Translation2d getTranslation() {
     return m_poseEstimator.getEstimatedPosition().getTranslation();
 }
-@Log.ToString(name = "Rotation")
+// @Log.ToString(name = "Rotation")
 public Rotation2d getRot() {
     return m_poseEstimator.getEstimatedPosition().getRotation();
 }
 
-@Log(name = "Gyro Yaw")
+// @Log(name = "Gyro Yaw")
 public double getGyroPos(){
   return m_gyro.getYaw();
 }
 
-@Log(name = "Gyro Roll")
+// @Log(name = "Gyro Roll")
 public double getGyroRoll(){
   return m_gyro.getRoll();
 }
 
-@Log(name = "Gyro Pitch")
+// @Log(name = "Gyro Pitch")
 public double getGyroPitch(){
   return m_gyro.getPitch();
 }

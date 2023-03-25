@@ -157,19 +157,19 @@ public void setVoltage(double dutycylce){
 
   m_extendMotor.setVoltage(voltage);
 }
-@Log(name = "Voltage", tabName = "Extend FF", rowIndex = 0, columnIndex = 0)
+// @Log(name = "Voltage", tabName = "Extend FF", rowIndex = 0, columnIndex = 0)
 public double getVoltage(){
   return m_extendMotor.getBusVoltage()*m_extendMotor.getAppliedOutput();
 
 } 
-@Log(name = "Max Voltage", tabName = "Extend FF", rowIndex = 0, columnIndex = 1)
+// @Log(name = "Max Voltage", tabName = "Extend FF", rowIndex = 0, columnIndex = 1)
 public double getMaxVoltage(){
   if (Math.abs(m_extendMotor.getBusVoltage()*m_extendMotor.getAppliedOutput() )> Math.abs(maxVoltage)){
     maxVoltage = m_extendMotor.getBusVoltage()*m_extendMotor.getAppliedOutput();
   }
   return maxVoltage;
 }
-@Log(name = "Max Voltage Stopped", tabName = "Extend FF", rowIndex = 0, columnIndex = 2)
+// @Log(name = "Max Voltage Stopped", tabName = "Extend FF", rowIndex = 0, columnIndex = 2)
 public double getMaxVoltageStopped(){
   if (Math.abs(m_extendMotor.getBusVoltage()*m_extendMotor.getAppliedOutput() )> Math.abs(maxVoltagesStoped)
   && (Math.abs(m_Encoder.getVelocity()) < Math.abs(0.3))){
@@ -178,7 +178,7 @@ public double getMaxVoltageStopped(){
   return maxVoltagesStoped;
 }
 //rested max voltages from oblog
-@Config.Command(name = "Reset Max Voltage", tabName = "Extend FF" , rowIndex = 0, columnIndex = 3)
+// @Config.Command(name = "Reset Max Voltage", tabName = "Extend FF" , rowIndex = 0, columnIndex = 3)
 public final Command resetMaxVoltage = new InstantCommand(this::resetMaxVoltage); 
 
 
@@ -192,7 +192,7 @@ public void resetMaxVoltage(){
 
 //oblog methods
 
-@Log(name = "Extend Position", tabName = "Extend")
+// @Log(name = "Extend Position", tabName = "Extend")
 public double getPosition(){
   return m_Encoder.getPosition();
 

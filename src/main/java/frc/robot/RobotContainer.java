@@ -11,6 +11,8 @@ import com.pathplanner.lib.PathConstraints;
 import com.pathplanner.lib.PathPlanner;
 import com.pathplanner.lib.PathPlannerTrajectory;
 import com.pathplanner.lib.auto.RamseteAutoBuilder;
+
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.NetworkTable;
@@ -61,7 +63,7 @@ public class RobotContainer implements Loggable{
   Boolean safe = false;
   Boolean motion = false;
 
-  
+  double move = 0;
 
   public RobotContainer() {
 
@@ -121,8 +123,8 @@ public class RobotContainer implements Loggable{
     //   safe = true;
     //   motion = false;
 
-    // }));
-      m_operator.arcadeBlackLeft().onTrue(m_arm.dropCargo2());
+    // // }));
+    //   m_operator.arcadeBlackLeft().onTrue(m_arm.dropCargo2());
       
 
 
@@ -163,10 +165,27 @@ public class RobotContainer implements Loggable{
     // m_operator.arcadeBlackRight().whileTrue(new InstantCommand(()->{
     // m_arm.setArmPosition(m_targetMap.getArmTarget(TargetSelector.getTargetIdx()));
     // }, m_arm));
+
     
-    m_operator.arcadeBlackRight().whileTrue(new RunCommand(()->{
-    m_arm.setArmPosition((m_targetMap.getArmTarget(TargetSelector.getTargetIdx())));
-    }, m_arm));
+    m_operator.scPlus().onTrue(new InstantCommand(()->{move = move+0.10;}));
+    m_operator.scMinus().onTrue(new InstantCommand(()->{move = move-0.10;}));
+    
+    m_operator.arcadeBlackRight().toggleOnTrue(
+      new RunCommand(()->{
+       m_arm.setArmPosition((new Translation2d(m_targetMap.getArmTarget(TargetSelector.getTargetIdx()).getX(),m_targetMap.getArmTarget(TargetSelector.getTargetIdx()).getY()+move)
+       ));}, m_arm).until(m_operator.arcadeBlackLeft())
+      .andThen(new WaitCommand(.5))
+    
+    );
+    m_operator.arcadeBlackLeft().onTrue(
+
+    new InstantCommand(()->m_arm.setClawPosition(-.95))
+    .andThen(new WaitCommand(2))
+    .andThen( new InstantCommand(()->{ m_arm.setArmPositionSafe(-0.5,0.5);}))
+    .andThen(new WaitCommand(0.2))
+
+    );
+    
     
     // //sets the arm to the target dual station
     // m_operator.arcadeWhiteRight().whileTrue(new InstantCommand(()->{
@@ -230,12 +249,12 @@ public class RobotContainer implements Loggable{
     // }
   // }
 
-  @Log(name = "Get button Configs", tabName = "Buttons")
+  // @Log(name = "Get button Configs", tabName = "Buttons")
   public double getSliderConfig() {
     return m_operator.getLeftSlider();
   }
 
-  @Config.NumberSlider(name = "Set left slider")
+  // @Config.NumberSlider(name = "Set left slider")
   public void setLeftSliderConfig() {
     m_operator.getLeftSlider();
   }
@@ -295,8 +314,11 @@ public class RobotContainer implements Loggable{
     .andThen(new WaitCommand(5.7))
     .andThen(()->m_drivetrain.smoothDrive(0.0*drivetune,0), m_drivetrain)
     .andThen(new WaitCommand(1))
-    .andThen(()->m_drivetrain.smoothDrive(0.7*drivetune,0), m_drivetrain)
-    .andThen(new WaitCommand(2.85));
+    // .andThen(()->m_drivetrain.smoothDrive(0.7*drivetune,0), m_drivetrain)
+    // .andThen(new WaitCommand(3.25))
+    // .andThen(()->m_drivetrain.smoothDrive(-0.7*drivetune,0), m_drivetrain)
+    // .andThen(new WaitCommand(0.12))
+    ;
     // .andThen(()->setDefaultarm())
    //  .andThen(()->m_drivetrain.smoothDrive(0.3,0)).withTimeout(5).until(() -> m_drivetrain.getGyroRoll() < 0.5 && m_drivetrain.getGyroRoll() > -0.5) //Simple auto balance
    // .andThen(()->m_drivetrain.smoothDrive(0.3,0)).withTimeout(5)
@@ -321,19 +343,19 @@ public class RobotContainer implements Loggable{
 
   
 
-  @Config.Command(name = "Reset Position", tabName = "Arm PID")
+  // @Config.Command(name = "Reset Position", tabName = "Arm PID")
   InstantCommand resetPosition = new InstantCommand(() -> {
     m_arm.resetPosition();
   }, m_arm);
 
 
-  @Log(name = "Extra Stend get", tabName = "Arm PID")
+  // @Log(name = "Extra Stend get", tabName = "Arm PID")
   private double getExtraStend() {
     return extrastend;
   }
 
-  @Config.NumberSlider(name = "Extra Stend set", tabName = "Arm PID", min = 0, max = .2,
-      defaultValue = k_extrastend)
+  // @Config.NumberSlider(name = "Extra Stend set", tabName = "Arm PID", min = 0, max = .2,
+      // defaultValue = k_extrastend)
   private void setExtraStend(double value) {
     extrastend = value;
   }

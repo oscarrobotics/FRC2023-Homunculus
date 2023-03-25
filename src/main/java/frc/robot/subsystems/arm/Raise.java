@@ -126,7 +126,7 @@ SparkMaxPIDController m_PID;
         return position;
       }
 
-      @Log(name = "Set Position", tabName = "Raise" ,rowIndex = 1 , columnIndex = 5)
+      // @Log(name = "Set Position", tabName = "Raise" ,rowIndex = 1 , columnIndex = 5)
       public double getSetPosition(){
         return vSetPos;
       }
