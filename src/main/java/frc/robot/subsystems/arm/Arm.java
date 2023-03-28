@@ -645,14 +645,18 @@ public double getExtendedPosition(){
 }
 
 // @Log(name = "Extent")
+// @Log(name = "Extent")
 public double getExtent(){
   return s_extend.getPosition()/k_rangeExtentPos*(k_maxLength-k_minLength)+k_minLength;
 }
 
 // @Log(name = "Raise Position")
+// @Log(name = "Raise Position")
 public double getRaisedPosition(){
   return s_raise.getPosition();
 }
+// 
+// @Log(name = "Grip Position")
 // 
 // @Log(name = "Grip Position")
 public double getGripPosition(){
@@ -683,6 +687,7 @@ public double getMaxKarbFF(){
 }
 
 // @Log(name = "Max_karbFF_stoped", tabName = "Extend FF", rowIndex = 1, columnIndex = 2)
+// @Log(name = "Max_karbFF_stoped", tabName = "Extend FF", rowIndex = 1, columnIndex = 2)
 public double getMaxKarbFFStoped(){
   return s_extend.getMaxVoltageStopped()/Math.sin(Math.toRadians(getArmAngle()));
 }
@@ -701,6 +706,7 @@ void setGripMaxOutput(@Config(defaultValueNumeric = kMaxOutputG) double gripPowe
 
  
 
+// @Config.NumberSlider (name = "min height", tabName = "Arm", min = 0, max = 8, defaultValue = d_minArmHeight)
 // @Config.NumberSlider (name = "min height", tabName = "Arm", min = 0, max = 8, defaultValue = d_minArmHeight)
 void setMinArmHeight( double minHeight){
   k_minArmHeight = minHeight;
