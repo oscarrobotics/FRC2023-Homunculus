@@ -56,6 +56,7 @@ import com.ctre.phoenix.sensors.BasePigeonSimCollection;
 
 import frc.robot.Constants;
 import frc.robot.PhotonCameraWrapper;
+import frc.robot.commands.movement.AutoBalance;
 import io.github.oblarg.oblog.Loggable;
 import io.github.oblarg.oblog.annotations.Config;
 import io.github.oblarg.oblog.annotations.Log;
@@ -595,6 +596,9 @@ public CommandBase movingCommand(){
   };
 }
 
+public CommandBase autoBalance(){
+  return new AutoBalance(this);
+}
 // @Config(name = "set Drive pid" )
 // public void setDrivePID(@Config(defaultValueNumeric = Constants.dKp) double p, @Config(defaultValueNumeric = Constants.dKi) double i, @Config(defaultValueNumeric = Constants.dKd) double d, @Config(defaultValueNumeric = Constants.dKf) double f){
 //   m_leftMaster.config_kP(0, p);
