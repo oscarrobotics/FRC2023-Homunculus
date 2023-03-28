@@ -72,6 +72,18 @@ public class Drivetrain extends SubsystemBase implements Loggable {
   //gyro
   private final WPI_Pigeon2 m_gyro = new WPI_Pigeon2(0);
 
+  protected double getGyroPitchRate() {
+    double[] xyzDPS = new double[3];
+    m_gyro.getRawGyro(xyzDPS);
+    return xyzDPS[0];
+  }
+  
+  private final LinearFilter pitchRateFilter = LinearFilter.movingAverage(16);
+  
+  public double getFilteredGyroPitchRate() {
+    return pitchRateFilter.calculate(getGyroPitchRate());
+  }
+
   //motor groups
   // @Log.MotorController(name = "Left Motors", tabName = "Drivetrain")
   // public
@@ -232,6 +244,11 @@ public class Drivetrain extends SubsystemBase implements Loggable {
 
   public void resetOdometry(Pose2d initialPose) {
     m_poseEstimator.resetPosition(m_gyro.getRotation2d(), nativeUnitsToDistanceMeters( m_leftMaster.getSelectedSensorPosition()), nativeUnitsToDistanceMeters( m_rightMaster.getSelectedSensorPosition()), initialPose);
+  }
+
+  public void hardStop() {
+    m_leftMaster.set(ControlMode.PercentOutput, 0);
+    m_rightMaster.set(ControlMode.PercentOutput, 0);
   }
 
   @Override
@@ -465,12 +482,12 @@ public Command goToPoseCommand(Pose2d tpose, double speed, double accel) {
     // m_fieldSim.setRobotPose(m_poseEstimator.getEstimatedPosition());
 }
 
-@Log(name = "left enc")
+// @Log(name = "left enc")
 public double getLeftPositionMeters(){
   return nativeUnitsToDistanceMeters(m_leftMaster.getSelectedSensorPosition());
 
 }
-@Log(name = "right enc")
+// @Log(name = "right enc")
 public double getRightPositionMeters(){
   return nativeUnitsToDistanceMeters(m_rightMaster.getSelectedSensorPosition());
   
@@ -482,29 +499,31 @@ public double getRightPositionMeters(){
 public Pose2d getPose() {
     return m_poseEstimator.getEstimatedPosition();
 }
-@Log.ToString(name = "Translation")
+// @Log.ToString(name = "Translation")
 public Translation2d getTranslation() {
     return m_poseEstimator.getEstimatedPosition().getTranslation();
 }
-@Log.ToString(name = "Rotation")
+// @Log.ToString(name = "Rotation")
 public Rotation2d getRot() {
     return m_poseEstimator.getEstimatedPosition().getRotation();
 }
 
-@Log(name = "Gyro Yaw")
+// @Log(name = "Gyro Yaw")
 public double getGyroPos(){
   return m_gyro.getYaw();
 }
 
-@Log(name = "Gyro Roll")
+// @Log(name = "Gyro Roll")
 public double getGyroRoll(){
   return m_gyro.getRoll();
 }
 
-@Log(name = "Gyro Pitch")
+// @Log(name = "Gyro Pitch")
 public double getGyroPitch(){
   return m_gyro.getPitch();
 }
+
+
 
 // @Log.Graph(name = "lefterror")
 // public double lerror(){

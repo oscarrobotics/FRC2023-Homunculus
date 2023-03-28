@@ -1,101 +1,56 @@
 package frc.robot.commands.movement;
 
-import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import frc.robot.RobotContainer;
+import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.subsystems.drivetrain.Drivetrain;
 import io.github.oblarg.oblog.Loggable;
-import io.github.oblarg.oblog.annotations.Log;
 
-public class AutoBalance extends CommandBase implements Loggable{
+public class AutoBalance extends SequentialCommandGroup implements Loggable {
 
-  private boolean m_reverse = false;
-  private boolean isBalancing = false;
-  private boolean done = false;
-  private double targetYaw;
-  private double rampDeg = 14;
-  private double reverseFactor = 1;
-  private double forwardPower= 0.0; //TODO: figure out this value
+  private final double m_rateThreshold = 5;
+  private final double m_climbRateTimeout = 1.5;
 
-  Drivetrain m_drivetrain;
-  Timer endTimer = new Timer();
+  private double m_climbingSign = 0.0;
+  private final Timer m_timer = new Timer();
 
-  public AutoBalance(Drivetrain drive, boolean reverse) {
-    // Use addRequirements() here to declare subsystem dependencies.
-    m_drivetrain = drive;
-    addRequirements(drive);
-    m_reverse = reverse;
-  }
+  private final double m_angleThreshold = 10; //change to 14 degs during practice
 
-  // Called when the command is initially scheduled.
-  @Override
-  public void initialize() {
-    isBalancing = false;
-    done = false;
-    targetYaw = 180;
-    if(m_reverse){
-      reverseFactor = -1;
+  public AutoBalance(Drivetrain m_drivetrain){
+
+    CommandBase getOnDriveStation = Commands.run(
+      ()-> m_drivetrain.smoothDrive(2.3,0), m_drivetrain)
+      .until(()-> Math.abs(m_drivetrain.getGyroPitch()) > m_angleThreshold)
+      .finallyDo((intr)->{
+        m_climbingSign = Math.signum(m_drivetrain.getGyroPitch());
+      });
+
+      CommandBase adjustPos = Commands.run(() -> {
+          m_drivetrain.smoothDrive(0.5, 0.0);}, m_drivetrain)
+          .until(() -> {
+            var curPitchRate = m_drivetrain.getFilteredGyroPitchRate();
+        
+            if(m_climbingSign == -1){
+              if(curPitchRate > m_rateThreshold){
+                return m_timer.hasElapsed(m_climbRateTimeout);
+              }
+            }
+            else {
+              if(curPitchRate < -m_rateThreshold){
+                return m_timer.hasElapsed(m_climbRateTimeout);
+              }
+            }
+            return false;
+        
+          });
+      addCommands(
+          getOnDriveStation,
+          Commands.runOnce(() -> {
+            m_timer.restart();
+          }),
+          adjustPos,
+          Commands.runOnce(m_drivetrain::hardStop)
+      );
     }
-    m_drivetrain.smoothDrive(3 * reverseFactor, 0);
-  }
-
-  // Called every time the scheduler runs while the command is scheduled.
-  @Override
-  public void execute() {
-      double pitch = m_drivetrain.getGyroPitch();
-
-      if(pitch > rampDeg && !isBalancing){
-        m_drivetrain.smoothDrive(0, 0);
-        isBalancing = false;
-        done = true;
-      }
-      if(isBalancing){
-        if(m_reverse && Math.abs(pitch) < 4.5){
-          m_drivetrain.smoothDrive(0, 0);
-          isBalancing = false;
-          done = true;
-        }
-        if(!m_reverse && Math.abs(pitch) < 4.5 ){
-          m_drivetrain.smoothDrive(0.6, 0);
-          m_drivetrain.smoothDrive(0, 0);
-          isBalancing = false;
-          done = true;
-        }
-        else {
-          double powerSign = pitch > 0 ? 1 : -1;
-          double maxPitch = 30;
-
-          double percentage = MathUtil.clamp(Math.abs(pitch) / maxPitch, 0.0, 0.65) * forwardPower;
-      }
-    }
-
-    // endTimer.start();
-    // Double currentAngle = m_drivetrain.getGyroRoll();
-    // Double angleDifference = currentAngle - lastAngle;
-    // if (angleDifference > 2){
-    //   m_drivetrain.arcadeDriveV(0.5,0);
-    // } else if (angleDifference < 2){
-    //   m_drivetrain.arcadeDriveV(-0.5, 0);
-    // } else {
-    //   m_drivetrain.arcadeDriveV(0, 0);
-    // }
-    
-    // lastAngle = m_drivetrain.getGyroRoll();
-  }
-
-  // Called once the command ends or is interrupted.
-  @Override
-  public void end(boolean interrupted) {
-    // m_drivetrain.m_leftMotors.stopMotor();
-    // m_drivetrain.m_rightMotors.stopMotor();
-  }
-
-
-  // Returns true when the command should end.
-  @Override
-  public boolean isFinished() {
-    boolean finished = (m_drivetrain.getGyroRoll() < 2 && m_drivetrain.getGyroRoll() > -2 && endTimer.get() > 1? true: false);
-    return finished;
-  }
 }

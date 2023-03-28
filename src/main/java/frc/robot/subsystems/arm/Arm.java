@@ -116,9 +116,9 @@ private final double k_ticksPerInchGrip= 1;
   public double vRaisePos = 0;
   public double vGripPos = 0;
 
-  @Log.Graph(name = "minArmHeight")
+  // @Log.Graph(name = "minArmHeight")
   public double vMaxExtention = 0;
-  @Log.Graph(name = "minAgnle")
+  // @Log.Graph(name = "minAgnle")
   public double vMinAngle = 0;
   public double k_targetRaisePosHigh;
   public double k_targetExtPosHigh;
@@ -644,16 +644,17 @@ public double getExtendedPosition(){
   return s_extend.getPosition();
 }
 
-@Log(name = "Extent")
+// @Log(name = "Extent")
 public double getExtent(){
   return s_extend.getPosition()/k_rangeExtentPos*(k_maxLength-k_minLength)+k_minLength;
 }
 
-@Log(name = "Raise Position")
+// @Log(name = "Raise Position")
 public double getRaisedPosition(){
   return s_raise.getPosition();
 }
-@Log(name = "Grip Position")
+// 
+// @Log(name = "Grip Position")
 public double getGripPosition(){
   return m_gripEncoder.getPosition();
 }
@@ -664,25 +665,29 @@ public double getGripCurrent(){
 }
 
 //more arbff tuning methods
-@Log(name = "Arm Angle", tabName = "Extend FF", rowIndex = 2, columnIndex = 0)
+@Log(name = "Arm Angle", tabName = "Raise FF", rowIndex = 0, columnIndex = 1)
 public double getAngle(){
   return getArmAngle();
 }
-@Log(name = "karbFF", tabName = "Extend FF", rowIndex = 1, columnIndex = 0)
+// @Log(name = "Arm Angle Pos", tabName = "Raise FF", rowIndex = 0, columnIndex = 2)
+// public double getArmAnglePos()
+
+// @Log(name = "karbFF", tabName = "Extend FF", rowIndex = 1, columnIndex = 0)
 public double getKarbFF(){
   return s_extend.getMaxVoltage()/Math.sin(Math.toRadians(getArmAngle()));
 }
 
-@Log(name = "Max_karbFF", tabName = "Extend FF", rowIndex = 1, columnIndex = 1)
+// @Log(name = "Max_karbFF", tabName = "Extend FF", rowIndex = 1, columnIndex = 1)
 public double getMaxKarbFF(){
   return s_extend.getMaxVoltage()/Math.sin(Math.toRadians(getArmAngle()));
 }
 
-@Log(name = "Max_karbFF_stoped", tabName = "Extend FF", rowIndex = 1, columnIndex = 2)
+// @Log(name = "Max_karbFF_stoped", tabName = "Extend FF", rowIndex = 1, columnIndex = 2)
 public double getMaxKarbFFStoped(){
   return s_extend.getMaxVoltageStopped()/Math.sin(Math.toRadians(getArmAngle()));
 }
 
+@Log(name = "karbFF", tabName = "Raise FF", rowIndex = 2, columnIndex = 0)
 
 
 
@@ -696,7 +701,7 @@ void setGripMaxOutput(@Config(defaultValueNumeric = kMaxOutputG) double gripPowe
 
  
 
-@Config.NumberSlider (name = "min height", tabName = "Arm", min = 0, max = 8, defaultValue = d_minArmHeight)
+// @Config.NumberSlider (name = "min height", tabName = "Arm", min = 0, max = 8, defaultValue = d_minArmHeight)
 void setMinArmHeight( double minHeight){
   k_minArmHeight = minHeight;
 

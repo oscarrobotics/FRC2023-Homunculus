@@ -126,7 +126,7 @@ SparkMaxPIDController m_PID;
         return position;
       }
 
-      @Log(name = "Set Position", tabName = "Raise" ,rowIndex = 1 , columnIndex = 5)
+      // @Log(name = "Set Position", tabName = "Raise" ,rowIndex = 1 , columnIndex = 5)
       public double getSetPosition(){
         return vSetPos;
       }
@@ -272,7 +272,12 @@ SparkMaxPIDController m_PID;
           m_raiseMotor.setClosedLoopRampRate(rr);
         }
     
+        @Config (name = "Raise Voltage", tabName = "Raise FF" , rowIndex = 0, columnIndex = 0)
+        public double getVoltage(){
+          return m_raiseMotor.getBusVoltage()*m_raiseMotor.getAppliedOutput();
         
+        }
+        //No need to worry aout max inpt (motor will always be fighting gravity)
 
 
 
