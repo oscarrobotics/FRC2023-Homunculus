@@ -81,6 +81,7 @@ public class Drivetrain extends SubsystemBase implements Loggable {
   
   private final LinearFilter pitchRateFilter = LinearFilter.movingAverage(16);
   
+  @Log(name = "Filtered Gyro Pitch Rate", tabName = "Auto Balance")
   public double getFilteredGyroPitchRate() {
     return pitchRateFilter.calculate(getGyroPitchRate());
   }
@@ -247,14 +248,10 @@ public class Drivetrain extends SubsystemBase implements Loggable {
     m_poseEstimator.resetPosition(m_gyro.getRotation2d(), nativeUnitsToDistanceMeters( m_leftMaster.getSelectedSensorPosition()), nativeUnitsToDistanceMeters( m_rightMaster.getSelectedSensorPosition()), initialPose);
   }
 
-  public void hardStop() {
-    m_leftMaster.set(ControlMode.PercentOutput, 0);
-    m_rightMaster.set(ControlMode.PercentOutput, 0);
-  }
 
   @Override
   public void periodic() {
-    // This method will be called once per scheduler runs
+    // This method will be called once per scheduler runst
     updateOdometry();
     // System.out.println(String.format("Roll: %f, Pitch: %f, Yaw: %f", m_gyro.getRoll(), m_gyro.getPitch(), m_gyro.getYaw()));
   }

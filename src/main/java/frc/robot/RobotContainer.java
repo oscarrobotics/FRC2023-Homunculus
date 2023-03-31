@@ -29,6 +29,7 @@ import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandGenericHID;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import frc.robot.commands.movement.AutoBalance;
 // import frc.robot.commands.movement.AutoBalance;
 import frc.robot.subsystems.arm.Arm;
 import frc.robot.subsystems.drivetrain.Drivetrain;
@@ -144,11 +145,16 @@ public class RobotContainer implements Loggable{
 
     
     m_operator.arcadeWhiteLeft().onTrue(new InstantCommand(() -> {
-      m_arm.toggleGripCone();
-    }));
-    m_operator.arcadeWhiteRight().onTrue(new InstantCommand(() -> {
-      m_arm.toggleGripCube();
-    }));
+      m_arm.setGripSpeed(5000);})
+      .andThen(new WaitCommand(0.8))
+      .andThen(() -> {m_arm.setGripSpeed(0);})
+    );
+    m_operator.arcadeWhiteRight().
+    onTrue(new InstantCommand(() -> {
+      m_arm.setGripSpeed(-5000);})
+      .andThen(new WaitCommand(0.25))
+      .andThen(() -> {m_arm.setGripSpeed(0);})
+    );
     
     
     // set driver buttons
@@ -166,7 +172,9 @@ public class RobotContainer implements Loggable{
     // m_arm.setArmPosition(m_targetMap.getArmTarget(TargetSelector.getTargetIdx()));
     // }, m_arm));
 
-    
+    //X button = auto balance cmd testing
+    m_driverController.x().whileTrue(new AutoBalance(m_drivetrain));
+
     m_operator.scPlus().onTrue(new InstantCommand(()->{move = move+0.10;}));
     m_operator.scMinus().onTrue(new InstantCommand(()->{move = move-0.10;}));
     
@@ -313,7 +321,7 @@ public class RobotContainer implements Loggable{
     .andThen(()->m_drivetrain.smoothDrive(-0.7*drivetune,0), m_drivetrain)
     .andThen(new WaitCommand(5.7))
     .andThen(()->m_drivetrain.smoothDrive(0.0*drivetune,0), m_drivetrain)
-    .andThen(new WaitCommand(1))
+    .andThen(new WaitCommand(1).andThen(m_drivetrain.autoBalance()))
     // .andThen(()->m_drivetrain.smoothDrive(0.7*drivetune,0), m_drivetrain)
     // .andThen(new WaitCommand(3.25))
     // .andThen(()->m_drivetrain.smoothDrive(-0.7*drivetune,0), m_drivetrain)

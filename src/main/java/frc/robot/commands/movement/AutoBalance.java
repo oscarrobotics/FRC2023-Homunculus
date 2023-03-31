@@ -10,17 +10,17 @@ import io.github.oblarg.oblog.Loggable;
 public class AutoBalance extends SequentialCommandGroup implements Loggable {
 
   private final double m_rateThreshold = 5;
-  private final double m_climbRateTimeout = 1.5;
+  private final double m_climbRateTimeout = 1.25;
 
   private double m_climbingSign = 0.0;
   private final Timer m_timer = new Timer();
 
-  private final double m_angleThreshold = 10; //change to 14 degs during practice
+  private final double m_angleThreshold = 5; //change to 14 degs during practice
 
   public AutoBalance(Drivetrain m_drivetrain){
 
     CommandBase getOnDriveStation = Commands.run(
-      ()-> m_drivetrain.smoothDrive(2.3,0), m_drivetrain)
+      ()-> m_drivetrain.smoothDrive(1.2,0), m_drivetrain)
       .until(()-> Math.abs(m_drivetrain.getGyroPitch()) > m_angleThreshold)
       .finallyDo((intr)->{
         m_climbingSign = Math.signum(m_drivetrain.getGyroPitch());
@@ -30,14 +30,15 @@ public class AutoBalance extends SequentialCommandGroup implements Loggable {
           m_drivetrain.smoothDrive(0.5, 0.0);}, m_drivetrain)
           .until(() -> {
             var curPitchRate = m_drivetrain.getFilteredGyroPitchRate();
-        
+            System.out.println(m_climbingSign);
+            System.out.println(curPitchRate);
             if(m_climbingSign == -1){
               if(curPitchRate > m_rateThreshold){
                 return m_timer.hasElapsed(m_climbRateTimeout);
               }
             }
             else {
-              if(curPitchRate < -m_rateThreshold){
+              if(curPitchRate < m_rateThreshold * -1){
                 return m_timer.hasElapsed(m_climbRateTimeout);
               }
             }
@@ -49,8 +50,6 @@ public class AutoBalance extends SequentialCommandGroup implements Loggable {
           Commands.runOnce(() -> {
             m_timer.restart();
           }),
-          adjustPos,
-          Commands.runOnce(m_drivetrain::hardStop)
-      );
+          adjustPos);
     }
 }

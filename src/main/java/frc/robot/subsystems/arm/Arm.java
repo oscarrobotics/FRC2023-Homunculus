@@ -21,6 +21,8 @@ import io.github.oblarg.oblog.Loggable;
 import io.github.oblarg.oblog.annotations.Config;
 import io.github.oblarg.oblog.annotations.Log;
 import java.lang.annotation.Target;
+
+import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.CANSparkMax.ControlType;
@@ -36,13 +38,11 @@ public class Arm extends SubsystemBase implements Loggable{
 public final Extend s_extend;
 public final Raise s_raise;
 
-public final CANSparkMax m_gripMotor;
-
+public final CANSparkMax m_masterGripMotor;
+public final CANSparkMax m_droneGripMotor;
 
 
 RelativeEncoder m_gripEncoder;
-
-
 
 
 SparkMaxPIDController m_gripPID;
@@ -100,13 +100,13 @@ private final double k_ticksPerInchGrip= 1;
   //pid constants
 
 //grip
-  public final double kPG = 1;
+  public final double kPG = 0.0001;
   public final double kIG = 0;
-  public final double kDG = 0;
+  public final double kDG = 0.0001;
   public final double kIzG = 0;
-  public final double kFFG = 0; 
-  public final double kMaxOutputG = 0.3;//grip open?
-  public final double kMinOutputG = 0.3;//grip close?
+  public final double kFFG = 0.001; 
+  public final double kMaxOutputG = 0.4;//grip open?
+  public final double kMinOutputG = 0.4;//grip close?
   public final double maxRPMG = 5;
   public final double maxAccelG = 2;
 
@@ -129,7 +129,7 @@ private final double k_ticksPerInchGrip= 1;
 
 @Log(name = "Grip Motor Temp", tabName = "Extend", rowIndex =4 , columnIndex = 5)
      public double gripMotorTemp(){
-      return m_gripMotor.getMotorTemperature();
+      return m_masterGripMotor.getMotorTemperature();
      }
 
 //Sets max velocity, acceleration, and state
@@ -138,23 +138,26 @@ private final double k_ticksPerInchGrip= 1;
     s_extend = new Extend();
     s_raise = new Raise();
 
-   m_gripMotor = new CANSparkMax(22,MotorType.kBrushless) ;
-   m_gripMotor.setInverted(true);
+   m_masterGripMotor = new CANSparkMax(22,MotorType.kBrushless);
+   m_droneGripMotor = new CANSparkMax(23, MotorType.kBrushless);
+
+  //  m_droneGripMotor.setInverted(true);
+   m_droneGripMotor.follow(m_masterGripMotor, true);
    //cuewnt limit
    
-   m_gripMotor.setSmartCurrentLimit(10,28,0);
+   m_masterGripMotor.setSmartCurrentLimit(10,28,0);
 
    // neutral mode
       
-   m_gripMotor.setIdleMode(IdleMode.kBrake);
+   m_masterGripMotor.setIdleMode(IdleMode.kBrake);
 
   //encoder
     
-    m_gripEncoder = m_gripMotor.getEncoder();
+    m_gripEncoder = m_masterGripMotor.getEncoder();
 
     // pid controllers
    
-    m_gripPID = m_gripMotor.getPIDController();
+    m_gripPID = m_masterGripMotor.getPIDController();
     
     m_gripPID.setP(kPG,0);
     m_gripPID.setI(kIG,0);
@@ -189,8 +192,8 @@ private final double k_ticksPerInchGrip= 1;
  public void setArmPosition(Translation2d position){
     //takes in a pose and sets the arm to that position
     Translation2d setpoints = cartToPosRatio(position.getX(), position.getY());
-    System.out.println("position"+position);
-    System.out.println("setpoints"+ setpoints);
+    // System.out.println("position"+position);
+    // System.out.println("setpoints"+ setpoints);
     
     setRaisePosition(setpoints.getX()); 
     setExtendPositionArbFF(setpoints.getY());
@@ -665,7 +668,7 @@ public double getGripPosition(){
 
 @Log(name = "Grip Current")
 public double getGripCurrent(){
-  return m_gripMotor.getOutputCurrent();
+  return m_masterGripMotor.getOutputCurrent();
 }
 
 //more arbff tuning methods
@@ -704,8 +707,10 @@ void setGripMaxOutput(@Config(defaultValueNumeric = kMaxOutputG) double gripPowe
   m_gripPID.setOutputRange(-gripPower, releasePower);
 }
 
- 
 
+public void setGripSpeed(double speed){
+  m_gripPID.setReference(speed, CANSparkMax.ControlType.kVelocity);
+}
 // @Config.NumberSlider (name = "min height", tabName = "Arm", min = 0, max = 8, defaultValue = d_minArmHeight)
 // @Config.NumberSlider (name = "min height", tabName = "Arm", min = 0, max = 8, defaultValue = d_minArmHeight)
 void setMinArmHeight( double minHeight){
@@ -725,7 +730,7 @@ void setMinArmHeight( double minHeight){
 // @Log.Graph(name = "Grip Setpoint")
 // double vGripPos(){
 //   return vGripPos;
-// }
+//}
 
 
   // @Log.Graph (name = "Raise Error", tabName = "Arm PID")
