@@ -129,7 +129,7 @@ private final double k_ticksPerInchGrip= 1;
 
 // private final AbsoluteEncoder m_Encoder;
 
-@Log(name = "Grip Motor Temp", tabName = "Extend", rowIndex =4 , columnIndex = 5)
+// @Log(name = "Grip Motor Temp", tabName = "Extend", rowIndex =4 , columnIndex = 5)
      public double gripMotorTemp(){
       return m_masterGripMotor.getMotorTemperature();
      }
@@ -204,7 +204,7 @@ private final double k_ticksPerInchGrip= 1;
     setExtendPositionArbFF(setpoints.getY());
 
  }
- @Log(name = "grip speed", tabName = "Arm", rowIndex = 3, columnIndex = 6)
+//  @Log(name = "grip speed", tabName = "Arm", rowIndex = 3, columnIndex = 6)
  double getGripSpeed(){
   return m_gripEncoder.getVelocity();
  }
@@ -325,7 +325,7 @@ private final double k_ticksPerInchGrip= 1;
           }
      public void retract(){
       eRetractPos=-5;
-      rRetractPos = 30;
+      rRetractPos = 5;
     
     }
     public void unRetract(){
@@ -679,7 +679,7 @@ public Command dropCargo2(){
 
 
 // Data Helper Methods
-@Log(name = "Extent Position")
+// @Log(name = "Extent Position")
 public double getExtendedPosition(){
   return s_extend.getPosition();
 }
@@ -703,13 +703,13 @@ public double getGripPosition(){
   return m_gripEncoder.getPosition();
 }
 
-@Log(name = "Grip Current")
+// @Log(name = "Grip Current")
 public double getGripCurrent(){
   return m_masterGripMotor.getOutputCurrent();
 }
 
 //more arbff tuning methods
-@Log(name = "Arm Angle", tabName = "Raise FF", rowIndex = 1, columnIndex = 1)
+// @Log(name = "Arm Angle", tabName = "Raise FF", rowIndex = 1, columnIndex = 1)
 public double getAngle(){
   return getArmAngle();
 }
@@ -732,13 +732,13 @@ public double getMaxKarbFFStoped(){
   return s_extend.getMaxVoltageStopped()/Math.sin(Math.toRadians(getArmAngle()));
 }
 
-@Log(name = "karbFF", tabName = "Raise FF", rowIndex = 2, columnIndex = 0)
+// @Log(name = "karbFF", tabName = "Raise FF", rowIndex = 2, columnIndex = 0)
 
 
 
 
 //oblog config methods
-@Config (name = "Grip Max Output", tabName = "Arm")
+// @Config (name = "Grip Max Output", tabName = "Arm")
 void setGripMaxOutput(@Config(defaultValueNumeric = kMaxOutputG) double gripPower, @Config(defaultValueNumeric = kMinOutputG) double releasePower){
   
   m_gripPID.setOutputRange(-gripPower, releasePower);

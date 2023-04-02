@@ -104,17 +104,18 @@ public class RobotContainer implements Loggable{
     // }, m_drivetrain));
     m_drivetrain.setDefaultCommand(Commands.run(() -> {
       double Smodifier = m_driverController.getRightTriggerAxis() * 0.5 + 0.5
-          - m_driverController.getLeftTriggerAxis() * 0.42;
+          - m_driverController.getLeftTriggerAxis() * 0.30;
       // double Tmodifer =1-(( m_driverController.leftBumper().getAsBoolean()?0:1 )*
       // (m_driverController.getRightTriggerAxis()>0.5 &&
       // m_driverController.getLeftTriggerAxis()<0.5?1:0)*0.4); //
       double Tmodifier =
-          (Math.abs(m_driverController.getLeftY()) < 0.25 ? Smodifier : Math.min(0.5, Smodifier));
+          (Math.abs(m_driverController.getLeftY()) < 0.18
+           ? Smodifier *1.4: Math.min(0.5, Smodifier));
 
       m_drivetrain.smoothDrive(
-          -1 * m_driverController.getLeftY() * Math.abs(m_driverController.getLeftY()) * Smodifier
+          -1 * m_driverController.getLeftY() * Math.abs(m_driverController.getLeftY()) * Math.abs(m_driverController.getLeftY())* Smodifier
               * Constants.maxSpeed,
-          m_driverController.getRightX() * -1 * Math.abs(m_driverController.getRightX()) * Tmodifier
+          m_driverController.getRightX() * -1 * Math.abs(m_driverController.getRightX())* Tmodifier
               * Constants.maxTurn);
     }, m_drivetrain));
 
@@ -132,7 +133,7 @@ public class RobotContainer implements Loggable{
      
       m_arm.setDefaultCommand(Commands.run(() -> {
         m_arm.setExtendPositionArbFF(m_operator.getLeftSlider());
-        m_arm.setRaisePositionArbFF(-m_operator.getRightSlider());
+        // m_arm.setRaisePositionArbFF(-m_operator.getRightSlider());
         // m_arm.setClawPosition(m_operator.arcadeWhiteLeft().getAsBoolean()?1:-1);
       }, m_arm));
     
@@ -192,11 +193,11 @@ public class RobotContainer implements Loggable{
     //X button = auto balance cmd testing
     m_driverController.x().whileTrue(new AutoBalance(m_drivetrain));
     m_driverController.y().whileTrue(new RunCommand(()->m_drivetrain.fullStop(), m_drivetrain));
-    m_driverController.b().whileTrue(new RunCommand(()->m_drivetrain.moveDistance(0.1), m_drivetrain)
+    // m_driverController.b().whileTrue(new RunCommand(()->m_drivetrain.moveDistance(0.1), m_drivetrain)
     
 
   
-    ).onFalse(new InstantCommand(()->{m_drivetrain.accDistance(0.1);}));
+    // ).onFalse(new InstantCommand(()->{m_drivetrain.accDistance(0.1);}));
 
   
 
@@ -343,16 +344,22 @@ public class RobotContainer implements Loggable{
     // .finallyDo((i)->m_drivetrain.smoothDrive(0,0));
 
 
-     return m_arm.dropCargo2()
-    .andThen(()->m_drivetrain.smoothDrive(-0.7*drivetune,0), m_drivetrain)
+    //  return m_arm.dropCargo2()
+    // .andThen(()->m_drivetrain.smoothDrive(-0.7*drivetune,0), m_drivetrain)
+    // .andThen(new WaitCommand(5.7))
+    // .andThen(()->m_drivetrain.smoothDrive(0.0*drivetune,0), m_drivetrain)
+    // .andThen(new WaitCommand(1).andThen(m_drivetrain.autoBalance()));
+
+    return new InstantCommand(()->m_drivetrain.smoothDrive(-0.7*drivetune,0), m_drivetrain)
     .andThen(new WaitCommand(5.7))
     .andThen(()->m_drivetrain.smoothDrive(0.0*drivetune,0), m_drivetrain)
-    .andThen(new WaitCommand(1).andThen(m_drivetrain.autoBalance()))
+    .andThen(new WaitCommand(1))
+    .andThen(new AutoBalance(m_drivetrain));
     // .andThen(()->m_drivetrain.smoothDrive(0.7*drivetune,0), m_drivetrain)
     // .andThen(new WaitCommand(3.25))
     // .andThen(()->m_drivetrain.smoothDrive(-0.7*drivetune,0), m_drivetrain)
     // .andThen(new WaitCommand(0.12))
-    ;
+    
     // .andThen(()->setDefaultarm())
    //  .andThen(()->m_drivetrain.smoothDrive(0.3,0)).withTimeout(5).until(() -> m_drivetrain.getGyroRoll() < 0.5 && m_drivetrain.getGyroRoll() > -0.5) //Simple auto balance
    // .andThen(()->m_drivetrain.smoothDrive(0.3,0)).withTimeout(5)

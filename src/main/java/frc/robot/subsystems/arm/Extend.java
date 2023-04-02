@@ -34,11 +34,11 @@ public class Extend implements Loggable{
   SparkMaxPIDController m_PID;
 
   //extend
- public final double kPE_pos = 0.04;//0.14
- public final double kIE_pos = 0.00002;//was 0.05
- public final double kDE_pos = 0.02;//was 0.01
- public final double kIzE_pos = 6;
- public final double kFFE_pos = 0.0;
+//  public final double kPE_pos = 0.04;//0.14
+//  public final double kIE_pos = 0.00002;//was 0.05
+//  public final double kDE_pos = 0.02;//was 0.01
+//  public final double kIzE_pos = 6;
+//  public final double kFFE_pos = 0.0;
 
  public final double kP_vel = 0.004;//0.14
  public final double kI_vel = 0.000;//was 0.05
@@ -46,7 +46,17 @@ public class Extend implements Loggable{
  public final double kIz_vel = 6;
  public final double kFF_vel = 0.0;
 
+//  public final double kFF_arbdef = 1.084;
+ //  public double kFF_arb = 0.784;
+  public double kFF_arb = 1.084;
+  // public double kFF_arb = 0;
+   public double kFF_arbC = 0.184;
 
+ public final double kPE_pos = 0.06;//0.14
+ public final double kIE_pos = 0.00000;//was 0.05
+ public final double kDE_pos = 0.00;//was 0.01
+ public final double kIzE_pos = 6;
+ public final double kFFE_pos = 0.0;
 
 
  public final double kMaxOutputE_out = 0.3; //arm out?
@@ -63,10 +73,7 @@ public class Extend implements Loggable{
  public final double allowedErr = 0.5;
  public final double closedRR = 0.18;
 
- public final double kFF_arbdef = 0;
-//  public double kFF_arb = 0.784;
- public double kFF_arb = 1.084;
-  public double kFF_arbC = 0.284;
+
 
  int kSlotIdxPos  = 0;
  int kSlotIdxVel = 1;
@@ -136,13 +143,13 @@ public double  mapInput(double position){
   return position;
 }
 public double setPosition(double position, int slot, double feedforward){
-  if (Math.abs(position-vSetPos)<3 && settlTimer.hasElapsed(2)){
-    position = m_Encoder.getPosition();
+  // if (Math.abs(position-vSetPos)<3 && settlTimer.hasElapsed(2)){
+  //   position = m_Encoder.getPosition();
       
-  }
-  if( Math.abs(position-vSetPos)>=3 ){
-    settlTimer.restart();
-  }
+  // }
+  // if( Math.abs(position-vSetPos)>=3 ){
+  //   settlTimer.restart();
+  // }
 
 
 
@@ -182,19 +189,19 @@ public void setVoltage(double dutycylce){
 
   m_extendMotor.setVoltage(voltage);
 }
-@Log(name = "Voltage", tabName = "Extend FF", rowIndex = 0, columnIndex = 0)
+// @Log(name = "Voltage", tabName = "Extend FF", rowIndex = 0, columnIndex = 0)
 public double getVoltage(){
   return m_extendMotor.getBusVoltage()*m_extendMotor.getAppliedOutput();
 
 } 
-@Log(name = "Max Voltage", tabName = "Extend FF", rowIndex = 0, columnIndex = 1)
+// @Log(name = "Max Voltage", tabName = "Extend FF", rowIndex = 0, columnIndex = 1)
 public double getMaxVoltage(){
   if (Math.abs(m_extendMotor.getBusVoltage()*m_extendMotor.getAppliedOutput() )> Math.abs(maxVoltage)){
     maxVoltage = m_extendMotor.getBusVoltage()*m_extendMotor.getAppliedOutput();
   }
   return maxVoltage;
 }
-@Log(name = "Max Voltage Stopped", tabName = "Extend FF", rowIndex = 0, columnIndex = 2)
+// @Log(name = "Max Voltage Stopped", tabName = "Extend FF", rowIndex = 0, columnIndex = 2)
 public double getMaxVoltageStopped(){
   if (Math.abs(m_extendMotor.getBusVoltage()*m_extendMotor.getAppliedOutput() )> Math.abs(maxVoltagesStoped)
   && (Math.abs(m_Encoder.getVelocity()) < Math.abs(0.3))){
@@ -203,7 +210,7 @@ public double getMaxVoltageStopped(){
   return maxVoltagesStoped;
 }
 //rested max voltages from oblog
-@Config.Command(name = "Reset Max Voltage", tabName = "Extend FF" , rowIndex = 0, columnIndex = 3)
+// @Config.Command(name = "Reset Max Voltage", tabName = "Extend FF" , rowIndex = 0, columnIndex = 3)
 public final Command resetMaxVoltage = new InstantCommand(this::resetMaxVoltage); 
 
 
@@ -217,7 +224,7 @@ public void resetMaxVoltage(){
 
 //oblog methods
 
-@Log(name = "Extend Position", tabName = "Raise FF")
+// @Log(name = "Extend Position", tabName = "Raise FF")
 public double getPosition(){
   return m_Encoder.getPosition();
 
@@ -259,51 +266,51 @@ public double setEncPosition(double position){
 
 
 //PID setters
-@Config (name = "Extend P_out", tabName = "Extend", defaultValueNumeric = kPE_pos, rowIndex = 0, columnIndex = 0)
+// @Config (name = "Extend P_out", tabName = "Extend", defaultValueNumeric = kPE_pos, rowIndex = 0, columnIndex = 0)
 void setP_out(double p){
   m_PID.setP(p, kSlotIdxPos );
 }
-@Config (name = "Extend I_out", tabName = "Extend", defaultValueNumeric = kIE_pos, rowIndex = 0, columnIndex = 1)
+// @Config (name = "Extend I_out", tabName = "Extend", defaultValueNumeric = kIE_pos, rowIndex = 0, columnIndex = 1)
 void setI_out(double i){
   m_PID.setI(i, kSlotIdxPos );
 }
-@Config (name = "Extend D_out", tabName = "Extend", defaultValueNumeric = kDE_pos, rowIndex = 0, columnIndex = 2)
+// @Config (name = "Extend D_out", tabName = "Extend", defaultValueNumeric = kDE_pos, rowIndex = 0, columnIndex = 2)
 void setD_out(double d){
   m_PID.setD(d, kSlotIdxPos );
 }
-@Config (name = "Extend Iz_out", tabName = "Extend", defaultValueNumeric = kIzE_pos, rowIndex = 0, columnIndex = 3)
+// @Config (name = "Extend Iz_out", tabName = "Extend", defaultValueNumeric = kIzE_pos, rowIndex = 0, columnIndex = 3)
 void setIz_out(double iz){
   m_PID.setIZone(iz, kSlotIdxPos );
 }
-@Config (name = "Extend FF_out", tabName = "Extend", defaultValueNumeric = kFFE_pos, rowIndex = 0, columnIndex = 4)
+// @Config (name = "Extend FF_out", tabName = "Extend", defaultValueNumeric = kFFE_pos, rowIndex = 0, columnIndex = 4)
 void setFF_out(double f){
   m_PID.setFF(f, kSlotIdxPos );
 }
-@Config (name = "Extend P_in", tabName = "Extend", defaultValueNumeric = kP_vel, rowIndex = 1,columnIndex = 0)
+// @Config (name = "Extend P_in", tabName = "Extend", defaultValueNumeric = kP_vel, rowIndex = 1,columnIndex = 0)
 void setP_in(double p){
   m_PID.setP(p, kSlotIdxVel);
 }
-@Config (name = "Extend I_in", tabName = "Extend", defaultValueNumeric = kI_vel ,  rowIndex = 1, columnIndex = 1)
+// @Config (name = "Extend I_in", tabName = "Extend", defaultValueNumeric = kI_vel ,  rowIndex = 1, columnIndex = 1)
 void setI_in(double i){
   m_PID.setI(i, kSlotIdxVel);
 }
-@Config (name = "Extend D_in", tabName = "Extend", defaultValueNumeric = kD_vel, rowIndex =1, columnIndex = 2 )
+// @Config (name = "Extend D_in", tabName = "Extend", defaultValueNumeric = kD_vel, rowIndex =1, columnIndex = 2 )
 void setD_in(double d){
   m_PID.setD(d, kSlotIdxVel);
 }
-@Config (name = "Extend Iz_in", tabName = "Extend", defaultValueNumeric = kIz_vel, rowIndex = 1, columnIndex = 3)
+// @Config (name = "Extend Iz_in", tabName = "Extend", defaultValueNumeric = kIz_vel, rowIndex = 1, columnIndex = 3)
 void setIz_in(double iz){
   m_PID.setIZone(iz, kSlotIdxVel);
 }
-@Config (name = "Extend FF_in", tabName = "Extend", defaultValueNumeric = kFF_vel, rowIndex = 1, columnIndex = 4)
+// @Config (name = "Extend FF_in", tabName = "Extend", defaultValueNumeric = kFF_vel, rowIndex = 1, columnIndex = 4)
 void setFF_in(double f){
   m_PID.setFF(f, kSlotIdxVel);
 }
 
-@Config (name = "Extend FF_arb", tabName = "Extend", defaultValueNumeric = kFF_arbdef, rowIndex = 1, columnIndex = 4)
-void setFF_arb(double FF_arb){
-  kFF_arb = FF_arb;
-}
+// @Config (name = "Extend FF_arb", tabName = "Extend", defaultValueNumeric = kFF_arbdef, rowIndex = 1, columnIndex = 4)
+// void setFF_arb(double FF_arb){
+//   kFF_arb = FF_arb;
+// }
 
 // @Config (name = "Extend P_low", tabName = "Extend", defaultValueNumeric = kP_low)
 // void setP_low(double p){
@@ -325,7 +332,7 @@ void setFF_arb(double FF_arb){
 // void setFF_low(double f){
 //   m_PID.setFF(f, kSlotIdxLow);
 // }
-@Config (name = "Max Output out", tabName = "Extend", rowIndex = 1, columnIndex = 0)
+// @Config (name = "Max Output out", tabName = "Extend", rowIndex = 1, columnIndex = 0)
 void setMaxOutputOut(@Config(defaultValueNumeric = kMaxOutputE_out) double outPower, @Config(defaultValueNumeric = kMinOutputE_out) double inPower){
   
   m_PID.setOutputRange(-inPower, outPower, kSlotIdxPos);
@@ -344,7 +351,7 @@ void setMaxOutputOut(@Config(defaultValueNumeric = kMaxOutputE_out) double outPo
   
 //   m_PID.setOutputRange(-inPower, outPower, kSlotIdxLow);
 // }
-@Config(name = "Cl RR", tabName = "Extend", rowIndex = 1, columnIndex = 5, defaultValueNumeric = closedRR)
+// @Config(name = "Cl RR", tabName = "Extend", rowIndex = 1, columnIndex = 5, defaultValueNumeric = closedRR)
 void setClosedLoopRampRate(double rampRate){
   m_extendMotor.setClosedLoopRampRate(rampRate);
 }

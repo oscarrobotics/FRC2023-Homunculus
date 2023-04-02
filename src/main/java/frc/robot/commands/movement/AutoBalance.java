@@ -3,6 +3,7 @@ package frc.robot.commands.movement;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.subsystems.drivetrain.Drivetrain;
@@ -28,7 +29,7 @@ public class AutoBalance extends SequentialCommandGroup implements Loggable {
       });
 
       CommandBase adjustPos = Commands.run(() -> {
-          m_drivetrain.smoothDrive(0.5, 0.0);}, m_drivetrain)
+          m_drivetrain.smoothDrive(1, 0.0);}, m_drivetrain)
           .until(() -> {
             var curPitchRate = m_drivetrain.getFilteredGyroPitchRate();
             System.out.println(m_climbingSign);
@@ -46,9 +47,12 @@ public class AutoBalance extends SequentialCommandGroup implements Loggable {
             return false;
         
           });
-          CommandBase adjustPosF = Commands.runOnce(() -> {
-            m_drivetrain.smoothDrive(-0.1, 0.0);}, m_drivetrain)
-            .andThen(new WaitCommand(0.25))
+          CommandBase adjustPosF = Commands.runOnce(
+             ()->{m_timer.restart();}     )
+            .andThen(new RunCommand(() -> {
+            m_drivetrain.smoothDrive(-0.7, 0.0);
+            }, m_drivetrain)).until(()->{return m_timer.hasElapsed(0.75);})
+      
             .andThen(() -> {
               m_drivetrain.smoothDrive(0, 0.0);}, m_drivetrain);
            
@@ -59,7 +63,8 @@ public class AutoBalance extends SequentialCommandGroup implements Loggable {
           Commands.runOnce(() -> {
             m_timer.restart();
           }),
-          adjustPos,
-          adjustPosF);
+          adjustPos
+          , adjustPosF
+          );
     }
 }

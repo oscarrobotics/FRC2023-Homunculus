@@ -16,15 +16,15 @@ public class Raise implements Loggable {
 RelativeEncoder m_Encoder ;
 SparkMaxPIDController m_PID;
 
-    public final double kP_Pos = 0.00083;
+    public final double kP_Pos = 0.043;
     public final double kI_Pos = 0.000;
     public final double kD_Pos = 0.0000;
     public final double kIz_Pos = 4;
     public final double kFF_Pos = -0.1;
   //position based feed forward
     public final double karb_ffa = -0.01; //angle based
-    public final double karb_ffe = 0.016; //extent based
-    public final double karb_ffc = 0.63; //contstant 
+    public final double karb_ffe = 0.012; //extent based
+    public final double karb_ffc = 0.40; //contstant 
 
     public final double kP_Vel = 0.06;
     public final double kI_Vel = 0.0008;
@@ -37,17 +37,23 @@ SparkMaxPIDController m_PID;
 
   
 
-    public final double kMaxOutput_in = 0.4; //arm up
-    public final double kMinOutput_in = 0.4;//arm down
+    // public final double kMaxOutput_in = 0.4; //arm up
+    // public final double kMinOutput_in = 0.4;//arm down
 
-    public final double kMaxOutput_out = 0.4; //arm up
-    public final double kMinOutput_out = 0.3;//arm down
+    // public final double kMaxOutput_out = 0.4; //arm up
+    // public final double kMinOutput_out = 0.3;//arm down
 
+    public final double kMaxOutput_in = 0.0; //arm up
+    public final double kMinOutput_in = 0.0;//arm down
+
+    public final double kMaxOutput_out = 0.0; //arm up
+    public final double kMinOutput_out = 0.0;//arm down
+    
 
     public final double maxRPM = 5;
     public final double maxAccel = 1.0;
     public final double allowedErr = 0.5;
-    public final double closedRR  = 1.7;
+    public final double closedRR  = 0.7;
 
     public int kSlotIdx_Pos = 0;
     public int kSlotIdx_Vel = 1;
@@ -156,54 +162,54 @@ SparkMaxPIDController m_PID;
           }
           return true;
         }
-        @Log.Graph (name = "Error", tabName = "Raise" ,rowIndex = 3, columnIndex = 0)
+        // @Log.Graph (name = "Error", tabName = "Raise" ,rowIndex = 3, columnIndex = 0)
          public double getError(){
            return m_Encoder.getPosition() - vSetPos;
          }
 
-        @Log.Graph (name = "Percent Error", tabName = "Raise", rowIndex = 3, columnIndex = 3)
+        // @Log.Graph (name = "Percent Error", tabName = "Raise", rowIndex = 3, columnIndex = 3)
          public double getPercentError(){
               return (m_Encoder.getPosition() - vSetPos)/Arm.k_rangeExtentPos*100;
          }
 
-         @Config (name = "P_up_in", tabName = "Raise", defaultValueNumeric = kP_Pos, rowIndex = 0, columnIndex = 0)
+        //  @Config (name = "P_up_in", tabName = "Raise", defaultValueNumeric = kP_Pos, rowIndex = 0, columnIndex = 0)
         void setP_up_in(double p){
           m_PID.setP(p , kSlotIdx_Pos);
         }
-        @Config (name = "I_up_in", tabName = "Raise", defaultValueNumeric = kI_Pos , rowIndex = 0, columnIndex = 1)
+        // @Config (name = "I_up_in", tabName = "Raise", defaultValueNumeric = kI_Pos , rowIndex = 0, columnIndex = 1)
         void setI_up_in(double i){
           m_PID.setI(i, kSlotIdx_Pos);
         }
-        @Config (name = "D_up_in", tabName = "Raise", defaultValueNumeric = kD_Pos, rowIndex = 0, columnIndex = 2)
+        // @Config (name = "D_up_in", tabName = "Raise", defaultValueNumeric = kD_Pos, rowIndex = 0, columnIndex = 2)
         void setD_up_in(double d){
           m_PID.setD(d, kSlotIdx_Pos);
         }
-        @Config (name = "Iz_up_in", tabName = "Raise", defaultValueNumeric = kIz_Pos, rowIndex = 0, columnIndex = 3)
+        // @Config (name = "Iz_up_in", tabName = "Raise", defaultValueNumeric = kIz_Pos, rowIndex = 0, columnIndex = 3)
         void setIz_up_in(double iz){
           m_PID.setIZone(iz, kSlotIdx_Pos);
         }
-        @Config (name = "F_up_in", tabName = "Raise", defaultValueNumeric = kFF_Pos, rowIndex = 0, columnIndex = 4)
+        // @Config (name = "F_up_in", tabName = "Raise", defaultValueNumeric = kFF_Pos, rowIndex = 0, columnIndex = 4)
         void setF_up_in(double f){
           m_PID.setFF(f, kSlotIdx_Pos);
         }
-        @Config (name = "P_down_in", tabName = "Raise", defaultValueNumeric = kP_Vel, rowIndex = 1, columnIndex = 0)  
+        // @Config (name = "P_down_in", tabName = "Raise", defaultValueNumeric = kP_Vel, rowIndex = 1, columnIndex = 0)  
         void setP_down_in(double p){
           m_PID.setP(p , kSlotIdx_Vel);
         }
-        @Config (name = "I_down_in", tabName = "Raise", defaultValueNumeric = kI_Vel, rowIndex = 1, columnIndex = 1)   
+        // @Config (name = "I_down_in", tabName = "Raise", defaultValueNumeric = kI_Vel, rowIndex = 1, columnIndex = 1)   
 
         void setI_down_in(double i){
           m_PID.setI(i, kSlotIdx_Vel);
         }
-        @Config (name = "D_down_in", tabName = "Raise", defaultValueNumeric = kD_Vel, rowIndex = 1, columnIndex = 2)
+        // @Config (name = "D_down_in", tabName = "Raise", defaultValueNumeric = kD_Vel, rowIndex = 1, columnIndex = 2)
         void setD_down_in(double d){
           m_PID.setD(d, kSlotIdx_Vel);
         }
-        @Config (name = "Iz_down_in", tabName = "Raise", defaultValueNumeric = kIz_Vel, rowIndex = 1, columnIndex = 3)
+        // @Config (name = "Iz_down_in", tabName = "Raise", defaultValueNumeric = kIz_Vel, rowIndex = 1, columnIndex = 3)
         void setIz_down_in(double iz){
           m_PID.setIZone(iz, kSlotIdx_Vel);
         }
-        @Config (name = "F_down_in", tabName = "Raise", defaultValueNumeric = kFF_Vel, rowIndex = 1, columnIndex = 4)
+        // @Config (name = "F_down_in", tabName = "Raise", defaultValueNumeric = kFF_Vel, rowIndex = 1, columnIndex = 4)
         void setF_down_in(double f){
           m_PID.setFF(f, kSlotIdx_Vel);
         }
@@ -252,7 +258,7 @@ SparkMaxPIDController m_PID;
 
 
 
-        @Config (name = "MaxOutput_in", tabName = "Raise"  ,rowIndex = 2, columnIndex = 0, defaultValueNumeric = kMaxOutput_in)
+        // @Config (name = "MaxOutput_in", tabName = "Raise"  ,rowIndex = 2, columnIndex = 0, defaultValueNumeric = kMaxOutput_in)
         void setMaxOutput_in(@Config(defaultValueNumeric = kMaxOutput_in) double upPower ,@Config(defaultValueNumeric = kMinOutput_in)  double downPower){
           m_PID.setOutputRange(-downPower, upPower, kSlotIdx_Pos);
           m_PID.setOutputRange(-downPower, upPower, kSlotIdx_Vel);
@@ -261,12 +267,12 @@ SparkMaxPIDController m_PID;
         }
         
 
-        @Config (name = "ClosedRR", tabName = "Raise", defaultValueNumeric = closedRR , rowIndex = 1, columnIndex = 5)
+        // @Config (name = "ClosedRR", tabName = "Raise", defaultValueNumeric = closedRR , rowIndex = 1, columnIndex = 5)
         void setClosedRR(double rr){
           m_raiseMotor.setClosedLoopRampRate(rr);
         }
     
-        @Log (name = "Raise Voltage", tabName = "Raise FF" , rowIndex = 0, columnIndex = 0)
+        // @Log (name = "Raise Voltage", tabName = "Raise FF" , rowIndex = 0, columnIndex = 0)
         public double getVoltage(){
           return m_raiseMotor.getBusVoltage()*m_raiseMotor.getAppliedOutput();
         
