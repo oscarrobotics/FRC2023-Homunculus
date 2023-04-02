@@ -79,11 +79,20 @@ public class Drivetrain extends SubsystemBase implements Loggable {
     return xyzDPS[0];
   }
   
-  private final LinearFilter pitchRateFilter = LinearFilter.movingAverage(16);
+  private final LinearFilter pitchRateFilter = LinearFilter.movingAverage(10);
   
   @Log(name = "Filtered Gyro Pitch Rate", tabName = "Auto Balance")
   public double getFilteredGyroPitchRate() {
     return pitchRateFilter.calculate(getGyroPitchRate());
+  }
+  @Log(name = "Gyro Pitch", tabName = "Auto Balance")
+  public double getGyroPitch() {
+    return  m_gyro.getPitch();
+  }
+  @Log(name = "Climbing sign", tabName = "Auto Balance")
+  public double getClimbingSign() {
+  
+    return Math.signum(m_gyro.getPitch());
   }
 
   //motor groups
@@ -102,7 +111,7 @@ public class Drivetrain extends SubsystemBase implements Loggable {
   
   //kinematics
   public final DifferentialDriveKinematics m_kinematics =
-      new DifferentialDriveKinematics(Constants.wheelBaseWidth);
+      new DifferentialDriveKinematics(Constants.wheelBaseWidth );
 
   // a varible used to keep track of the current commanded speed from the joystick
   // used in smooth drive as part of a low pass filter
@@ -173,7 +182,8 @@ public class Drivetrain extends SubsystemBase implements Loggable {
     m_leftMaster.configNominalOutputReverse(0);
     m_leftMaster.configPeakOutputForward(1);
     m_leftMaster.configPeakOutputReverse(-1);
-    m_leftMaster.configClosedloopRamp(.2);
+    m_leftMaster.configClosedloopRamp(0.65
+    );
     
     m_leftMaster.config_kF(Constants.dkslot, Constants.dKf);
     m_leftMaster.config_kP(Constants.dkslot, Constants.dKp);
@@ -188,13 +198,20 @@ public class Drivetrain extends SubsystemBase implements Loggable {
     m_rightMaster.configNominalOutputReverse(0);
     m_rightMaster.configPeakOutputForward(1);
     m_rightMaster.configPeakOutputReverse(-1);
-    m_rightMaster.configClosedloopRamp(0.2);
+    m_rightMaster.configClosedloopRamp(0.65);
 
     m_rightMaster.config_kF(Constants.dkslot, Constants.dKf);
     m_rightMaster.config_kP(Constants.dkslot, Constants.dKp);
     m_rightMaster.config_kI(Constants.dkslot, Constants.dKi);
     m_rightMaster.config_kD(Constants.dkslot, Constants.dKd);
     m_rightMaster.config_IntegralZone(Constants.dkslot, Constants.dIz);
+
+    m_rightMaster.config_kP(1,0.1);
+    m_rightMaster.config_kD(1,0.01);
+
+    m_leftMaster.config_kP(1,0.1);
+    m_leftMaster.config_kD(1,0.01);
+
 
 
     //Odometry
@@ -253,6 +270,7 @@ public class Drivetrain extends SubsystemBase implements Loggable {
   public void periodic() {
     // This method will be called once per scheduler runst
     updateOdometry();
+    autoBreak();
     // System.out.println(String.format("Roll: %f, Pitch: %f, Yaw: %f", m_gyro.getRoll(), m_gyro.getPitch(), m_gyro.getYaw()));
   }
  
@@ -343,8 +361,8 @@ public class Drivetrain extends SubsystemBase implements Loggable {
     // System.out.println(wheelSpeeds.rightMetersPerSecond);
    
 
-    double leftspeedtalon = velocityToNativeUnits( wheelSpeeds.leftMetersPerSecond );
-    double rightspeedtalon = velocityToNativeUnits( wheelSpeeds.rightMetersPerSecond );
+    double leftspeedtalon = velocityMToNativeUnits( wheelSpeeds.leftMetersPerSecond );
+    double rightspeedtalon = velocityMToNativeUnits( wheelSpeeds.rightMetersPerSecond );
     // System.out.print(leftspeedtalon);
     // System.out.print("  ");
     // System.out.println(rightspeedtalon);
@@ -358,6 +376,8 @@ public class Drivetrain extends SubsystemBase implements Loggable {
 
   }
   double kFiltercoeff = 0;
+  private double accumulated;
+  private boolean breakmode;
    
   // @Config.NumberSlider(name = " Smothing Filter coeff" , min = 0, max = 0.5,defaultValue = 0 )
   // private void setSmothing(double filtervalue){
@@ -380,11 +400,13 @@ public class Drivetrain extends SubsystemBase implements Loggable {
     // System.out.print("*");
     // System.out.println(wheelSpeeds.rightMetersPerSecond);
    
-    double leftspeedtalon = velocityToNativeUnits( wheelSpeeds.leftMetersPerSecond );
-    double rightspeedtalon = velocityToNativeUnits( wheelSpeeds.rightMetersPerSecond );
+    double leftspeedtalon = velocityMToNativeUnits( wheelSpeeds.leftMetersPerSecond );
+    double rightspeedtalon = velocityMToNativeUnits( wheelSpeeds.rightMetersPerSecond );
     // System.out.print(leftspeedtalon);
     // System.out.print("  ");
     // System.out.println(rightspeedtalon);
+    m_leftMaster.selectProfileSlot(0,0);
+    m_rightMaster.selectProfileSlot(0,0);
 
     m_leftMaster.set(ControlMode.Velocity, leftspeedtalon);
     m_rightMaster.set(ControlMode.Velocity, rightspeedtalon);
@@ -394,6 +416,32 @@ public class Drivetrain extends SubsystemBase implements Loggable {
 
 
   }
+  public void fullStop(){
+    m_leftMaster.selectProfileSlot(1, 0);
+    m_rightMaster.selectProfileSlot(1, 0);
+
+
+
+    m_leftMaster.set(ControlMode.Position, m_leftMaster.getSelectedSensorPosition());
+    m_rightMaster.set(ControlMode.Position, m_rightMaster.getSelectedSensorPosition());
+
+  }
+
+  public void moveDistance(double distance){
+    distance += accumulated;
+    m_leftMaster.selectProfileSlot(1, 0);
+    m_rightMaster.selectProfileSlot(1, 0);
+    m_leftMaster.set(ControlMode.Position, distanceMToNativeUnits(distance));
+    m_rightMaster.set(ControlMode.Position, distanceMToNativeUnits(distance));
+  }
+  public void accDistance(double distance){
+    accumulated += distance;
+  
+  }
+  public boolean isDoneMoving(){
+    return Math.abs(m_leftMaster.getClosedLoopError())< 10 && Math.abs(m_rightMaster.getClosedLoopError())< 10;
+  }
+  
   // public void arcadeDrive(double speed, double rotation) {
   //   m_differentialDrive.arcadeDrive(speed, rotation);
   // }
@@ -449,7 +497,7 @@ public Command goToPoseCommand(Pose2d tpose, double speed, double accel) {
     Rotation2d rotation = m_gyro.getRotation2d();
     rotation = rotation.times(1);
     m_poseEstimator.update(
-      rotation, -nativeUnitsToDistanceMeters( m_rightMaster.getSelectedSensorPosition()),-nativeUnitsToDistanceMeters( m_leftMaster.getSelectedSensorPosition()));
+      rotation,nativeUnitsToDistanceMeters( m_leftMaster.getSelectedSensorPosition()), nativeUnitsToDistanceMeters( m_rightMaster.getSelectedSensorPosition()));
     Optional<EstimatedRobotPose> result =
             pcw.getEstimatedGlobalPose(m_poseEstimator.getEstimatedPosition());
     
@@ -478,6 +526,37 @@ public Command goToPoseCommand(Pose2d tpose, double speed, double accel) {
 
     // m_fieldSim.getObject("Actual Pos").setPose(m_driveSim.getPose());
     // m_fieldSim.setRobotPose(m_poseEstimator.getEstimatedPosition());
+}
+public void setBrake(){
+  
+  m_leftMaster.setNeutralMode(NeutralMode.Brake);
+  m_rightMaster.setNeutralMode(NeutralMode.Brake);
+  m_leftDrone.setNeutralMode(NeutralMode.Brake);
+  m_rightDrone.setNeutralMode(NeutralMode.Brake);
+}
+public void setCoast(){
+    
+    m_leftMaster.setNeutralMode(NeutralMode.Coast);
+    m_rightMaster.setNeutralMode(NeutralMode.Coast);
+    m_leftDrone.setNeutralMode(NeutralMode.Coast);
+    m_rightDrone.setNeutralMode(NeutralMode.Coast);
+
+}
+
+public void autoBreak(){
+  // check if the robot is stopped and if it is, set the brake mode if it not already in brake mode
+  if(Math.abs(m_leftMaster.getSelectedSensorVelocity())< 10 && Math.abs(m_rightMaster.getSelectedSensorVelocity())< 10){
+    if(!breakmode){
+      setBrake();
+      breakmode = true;
+    }
+  }else{
+    if(breakmode){
+      setCoast();
+      breakmode = false;
+    }
+  }
+
 }
 
 // @Log(name = "left enc")
@@ -517,9 +596,9 @@ public double getGyroRoll(){
 }
 
 // @Log(name = "Gyro Pitch")
-public double getGyroPitch(){
-  return m_gyro.getPitch();
-}
+// public double getGyroPitch(){
+//   return m_gyro.getPitch();
+// }
 
 
 
@@ -539,14 +618,14 @@ public double getGyroPitch(){
 
 
 
-private int distanceToNativeUnits(double positionMeters){
+private int distanceMToNativeUnits(double positionMeters){
   double wheelRotations = positionMeters/(2 * Math.PI * Units.inchesToMeters(kWheelRadiusInches));
   double motorRotations = wheelRotations * kSensorGearRatio;
   int sensorCounts = (int)(motorRotations * kCountsPerRev);
   return sensorCounts;
 }
 
-private int velocityToNativeUnits(double velocityMetersPerSecond){
+private int velocityMToNativeUnits(double velocityMetersPerSecond){
   double wheelRotationsPerSecond = velocityMetersPerSecond/(2 * Math.PI * Units.inchesToMeters(kWheelRadiusInches));
   double motorRotationsPerSecond = wheelRotationsPerSecond * kSensorGearRatio;
   double motorRotationsPer100ms = motorRotationsPerSecond / k100msPerSecond;
@@ -570,7 +649,7 @@ public void setSpeeds(Double left, Double right){
 
 private int moveTenFeet(){  //move 10 feet in native units
   double tenFeet = Units.feetToMeters(10);
-  int tenFeetNativeUnits = distanceToNativeUnits(tenFeet);
+  int tenFeetNativeUnits = distanceMToNativeUnits(tenFeet);
   return tenFeetNativeUnits;
 }                                
 

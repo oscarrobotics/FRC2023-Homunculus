@@ -6,6 +6,7 @@ import com.revrobotics.CANSparkMax;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkMaxPIDController;
 import edu.wpi.first.hal.simulation.RoboRioDataJNI;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -33,24 +34,20 @@ public class Extend implements Loggable{
   SparkMaxPIDController m_PID;
 
   //extend
- public final double kPE_out = 0.04;//0.14
- public final double kIE_out = 0.00002;//was 0.05
- public final double kDE_out = 0.02;//was 0.01
- public final double kIzE_out = 6;
- public final double kFFE_out = 0.0;
+ public final double kPE_pos = 0.04;//0.14
+ public final double kIE_pos = 0.00002;//was 0.05
+ public final double kDE_pos = 0.02;//was 0.01
+ public final double kIzE_pos = 6;
+ public final double kFFE_pos = 0.0;
 
- public final double kP_in = 0.04;//0.14
- public final double kI_in = 0.000;//was 0.05
- public final double kD_in = 0.02;//was 0.01
- public final double kIz_in = 6;
- public final double kFF_in = 0.0;
+ public final double kP_vel = 0.004;//0.14
+ public final double kI_vel = 0.000;//was 0.05
+ public final double kD_vel = 0.02;//was 0.01
+ public final double kIz_vel = 6;
+ public final double kFF_vel = 0.0;
 
 
- public final double kP_low = 0.04;//0.14
- public final double kI_low = 0.0008;//was 0.05
- public final double kD_low = 0.0000;//was 0.01
- public final double kIz_low = 4;
- public final double kFF_low = 0.0;
+
 
  public final double kMaxOutputE_out = 0.3; //arm out?
  public final double kMinOutputE_out = 0.3;//arm in?
@@ -67,13 +64,18 @@ public class Extend implements Loggable{
  public final double closedRR = 0.18;
 
  public final double kFF_arbdef = 0;
- public double kFF_arb = 0.784;
+//  public double kFF_arb = 0.784;
+ public double kFF_arb = 1.084;
+  public double kFF_arbC = 0.284;
 
- int kSlotIdxOut  = 0;
- int kSlotIdxIn = 1;
- int kSlotIdxLow =2;
+ int kSlotIdxPos  = 0;
+ int kSlotIdxVel = 1;
+
 
  private double vSetPos = 0;
+
+ private double retractPos = 0;
+ private Timer settlTimer = new Timer() ;
 
  public Extend(){
   m_extendMotor = new CANSparkMax(20, MotorType.kBrushless);
@@ -89,8 +91,8 @@ public class Extend implements Loggable{
   m_Encoder = m_extendMotor.getEncoder();
   m_Encoder.setPositionConversionFactor(Arm.k_ticksPerInchExtend);
   m_PID = m_extendMotor.getPIDController();
-  m_PID.setSmartMotionAllowedClosedLoopError(10, kSlotIdxIn);
-  m_PID.setSmartMotionAllowedClosedLoopError(10, kSlotIdxOut);
+  m_PID.setSmartMotionAllowedClosedLoopError(10, kSlotIdxVel);
+  m_PID.setSmartMotionAllowedClosedLoopError(10, kSlotIdxPos);
 
   initPID();
  }
@@ -115,25 +117,47 @@ public double  mapInput(double position){
   position = position/2;
   position = position * (Arm.k_rangeExtentPos-1);
   position = position+1;
-  vSetPos = position;
+  
   return position;
 
 }
 
 
  public double setPosition(double position, int slot){
-  
+
+
+
+
+
+  vSetPos = position;
   
   m_PID.setReference(position, CANSparkMax.ControlType.kPosition, slot);
   // m_PID.setReference(position-2, CANSparkMax.ControlType.kPosition, slot);
   return position;
 }
 public double setPosition(double position, int slot, double feedforward){
- 
+  if (Math.abs(position-vSetPos)<3 && settlTimer.hasElapsed(2)){
+    position = m_Encoder.getPosition();
+      
+  }
+  if( Math.abs(position-vSetPos)>=3 ){
+    settlTimer.restart();
+  }
+
+
+
+  vSetPos = position;
 
   m_PID.setReference(position, CANSparkMax.ControlType.kPosition, slot, feedforward);
   return position;
 }
+
+public double setVelocity(double velocityRatio,double arbFF){
+  double velocity = velocityRatio * 400;
+  m_PID.setReference(velocity, CANSparkMax.ControlType.kVelocity, 1,arbFF);
+  return velocity;
+}
+
 
 
 public double setMotion(double position , int slot){
@@ -141,6 +165,7 @@ public double setMotion(double position , int slot){
   m_PID.setReference(position, CANSparkMax.ControlType.kSmartMotion, slot);
   return position;
 }
+
 
 public double setMotionOB(double position , int slot){
   
@@ -153,23 +178,23 @@ public double setMotionOB(double position , int slot){
 public double maxVoltage=0;
 public double maxVoltagesStoped=0;
 public void setVoltage(double dutycylce){
-  double voltage = dutycylce * 6;
+  double voltage = dutycylce * 3;
 
   m_extendMotor.setVoltage(voltage);
 }
-// @Log(name = "Voltage", tabName = "Extend FF", rowIndex = 0, columnIndex = 0)
+@Log(name = "Voltage", tabName = "Extend FF", rowIndex = 0, columnIndex = 0)
 public double getVoltage(){
   return m_extendMotor.getBusVoltage()*m_extendMotor.getAppliedOutput();
 
 } 
-// @Log(name = "Max Voltage", tabName = "Extend FF", rowIndex = 0, columnIndex = 1)
+@Log(name = "Max Voltage", tabName = "Extend FF", rowIndex = 0, columnIndex = 1)
 public double getMaxVoltage(){
   if (Math.abs(m_extendMotor.getBusVoltage()*m_extendMotor.getAppliedOutput() )> Math.abs(maxVoltage)){
     maxVoltage = m_extendMotor.getBusVoltage()*m_extendMotor.getAppliedOutput();
   }
   return maxVoltage;
 }
-// @Log(name = "Max Voltage Stopped", tabName = "Extend FF", rowIndex = 0, columnIndex = 2)
+@Log(name = "Max Voltage Stopped", tabName = "Extend FF", rowIndex = 0, columnIndex = 2)
 public double getMaxVoltageStopped(){
   if (Math.abs(m_extendMotor.getBusVoltage()*m_extendMotor.getAppliedOutput() )> Math.abs(maxVoltagesStoped)
   && (Math.abs(m_Encoder.getVelocity()) < Math.abs(0.3))){
@@ -178,7 +203,7 @@ public double getMaxVoltageStopped(){
   return maxVoltagesStoped;
 }
 //rested max voltages from oblog
-// @Config.Command(name = "Reset Max Voltage", tabName = "Extend FF" , rowIndex = 0, columnIndex = 3)
+@Config.Command(name = "Reset Max Voltage", tabName = "Extend FF" , rowIndex = 0, columnIndex = 3)
 public final Command resetMaxVoltage = new InstantCommand(this::resetMaxVoltage); 
 
 
@@ -192,7 +217,7 @@ public void resetMaxVoltage(){
 
 //oblog methods
 
-// @Log(name = "Extend Position", tabName = "Extend")
+@Log(name = "Extend Position", tabName = "Raise FF")
 public double getPosition(){
   return m_Encoder.getPosition();
 
@@ -234,45 +259,45 @@ public double setEncPosition(double position){
 
 
 //PID setters
-@Config (name = "Extend P_out", tabName = "Extend", defaultValueNumeric = kPE_out, rowIndex = 0, columnIndex = 0)
+@Config (name = "Extend P_out", tabName = "Extend", defaultValueNumeric = kPE_pos, rowIndex = 0, columnIndex = 0)
 void setP_out(double p){
-  m_PID.setP(p, kSlotIdxOut );
+  m_PID.setP(p, kSlotIdxPos );
 }
-@Config (name = "Extend I_out", tabName = "Extend", defaultValueNumeric = kIE_out, rowIndex = 0, columnIndex = 1)
+@Config (name = "Extend I_out", tabName = "Extend", defaultValueNumeric = kIE_pos, rowIndex = 0, columnIndex = 1)
 void setI_out(double i){
-  m_PID.setI(i, kSlotIdxOut );
+  m_PID.setI(i, kSlotIdxPos );
 }
-@Config (name = "Extend D_out", tabName = "Extend", defaultValueNumeric = kDE_out, rowIndex = 0, columnIndex = 2)
+@Config (name = "Extend D_out", tabName = "Extend", defaultValueNumeric = kDE_pos, rowIndex = 0, columnIndex = 2)
 void setD_out(double d){
-  m_PID.setD(d, kSlotIdxOut );
+  m_PID.setD(d, kSlotIdxPos );
 }
-@Config (name = "Extend Iz_out", tabName = "Extend", defaultValueNumeric = kIzE_out, rowIndex = 0, columnIndex = 3)
+@Config (name = "Extend Iz_out", tabName = "Extend", defaultValueNumeric = kIzE_pos, rowIndex = 0, columnIndex = 3)
 void setIz_out(double iz){
-  m_PID.setIZone(iz, kSlotIdxOut );
+  m_PID.setIZone(iz, kSlotIdxPos );
 }
-@Config (name = "Extend FF_out", tabName = "Extend", defaultValueNumeric = kFFE_out, rowIndex = 0, columnIndex = 4)
+@Config (name = "Extend FF_out", tabName = "Extend", defaultValueNumeric = kFFE_pos, rowIndex = 0, columnIndex = 4)
 void setFF_out(double f){
-  m_PID.setFF(f, kSlotIdxOut );
+  m_PID.setFF(f, kSlotIdxPos );
 }
-@Config (name = "Extend P_in", tabName = "Extend", defaultValueNumeric = kP_in, rowIndex = 1,columnIndex = 0)
+@Config (name = "Extend P_in", tabName = "Extend", defaultValueNumeric = kP_vel, rowIndex = 1,columnIndex = 0)
 void setP_in(double p){
-  m_PID.setP(p, kSlotIdxIn);
+  m_PID.setP(p, kSlotIdxVel);
 }
-@Config (name = "Extend I_in", tabName = "Extend", defaultValueNumeric = kI_in ,  rowIndex = 1, columnIndex = 1)
+@Config (name = "Extend I_in", tabName = "Extend", defaultValueNumeric = kI_vel ,  rowIndex = 1, columnIndex = 1)
 void setI_in(double i){
-  m_PID.setI(i, kSlotIdxIn);
+  m_PID.setI(i, kSlotIdxVel);
 }
-@Config (name = "Extend D_in", tabName = "Extend", defaultValueNumeric = kD_in, rowIndex =1, columnIndex = 2 )
+@Config (name = "Extend D_in", tabName = "Extend", defaultValueNumeric = kD_vel, rowIndex =1, columnIndex = 2 )
 void setD_in(double d){
-  m_PID.setD(d, kSlotIdxIn);
+  m_PID.setD(d, kSlotIdxVel);
 }
-@Config (name = "Extend Iz_in", tabName = "Extend", defaultValueNumeric = kIz_in, rowIndex = 1, columnIndex = 3)
+@Config (name = "Extend Iz_in", tabName = "Extend", defaultValueNumeric = kIz_vel, rowIndex = 1, columnIndex = 3)
 void setIz_in(double iz){
-  m_PID.setIZone(iz, kSlotIdxIn);
+  m_PID.setIZone(iz, kSlotIdxVel);
 }
-@Config (name = "Extend FF_in", tabName = "Extend", defaultValueNumeric = kFF_in, rowIndex = 1, columnIndex = 4)
+@Config (name = "Extend FF_in", tabName = "Extend", defaultValueNumeric = kFF_vel, rowIndex = 1, columnIndex = 4)
 void setFF_in(double f){
-  m_PID.setFF(f, kSlotIdxIn);
+  m_PID.setFF(f, kSlotIdxVel);
 }
 
 @Config (name = "Extend FF_arb", tabName = "Extend", defaultValueNumeric = kFF_arbdef, rowIndex = 1, columnIndex = 4)
@@ -303,7 +328,7 @@ void setFF_arb(double FF_arb){
 @Config (name = "Max Output out", tabName = "Extend", rowIndex = 1, columnIndex = 0)
 void setMaxOutputOut(@Config(defaultValueNumeric = kMaxOutputE_out) double outPower, @Config(defaultValueNumeric = kMinOutputE_out) double inPower){
   
-  m_PID.setOutputRange(-inPower, outPower, kSlotIdxOut);
+  m_PID.setOutputRange(-inPower, outPower, kSlotIdxPos);
 
 }
 // @Config (name = "Max Output in", tabName = "Extend")
@@ -328,46 +353,37 @@ void setClosedLoopRampRate(double rampRate){
  private void initPID(){
 
 
-  m_PID.setP(kPE_out,kSlotIdxOut);
-  m_PID.setI(kIE_out,kSlotIdxOut);
-  m_PID.setD(kDE_out,kSlotIdxOut);
-  m_PID.setIZone(kIzE_out,kSlotIdxOut);
-  m_PID.setFF(kFFE_out,kSlotIdxOut);
+  m_PID.setP(kPE_pos,kSlotIdxPos);
+  m_PID.setI(kIE_pos,kSlotIdxPos);
+  m_PID.setD(kDE_pos,kSlotIdxPos);
+  m_PID.setIZone(kIzE_pos,kSlotIdxPos);
+  m_PID.setFF(kFFE_pos,kSlotIdxPos);
 
-  m_PID.setP(kP_in,kSlotIdxIn);
-  m_PID.setI(kI_in,kSlotIdxIn);
-  m_PID.setD(kI_in, kSlotIdxIn);
-  m_PID.setIZone(kIz_in,kSlotIdxIn);
-  m_PID.setFF(kFF_in,kSlotIdxIn);
+  m_PID.setP(kP_vel,kSlotIdxVel);
+  m_PID.setI(kI_vel,kSlotIdxVel);
+  m_PID.setD(kI_vel, kSlotIdxVel);
+  m_PID.setIZone(kIz_vel,kSlotIdxVel);
+  m_PID.setFF(kFF_vel,kSlotIdxVel);
 
-  m_PID.setP(kP_low,kSlotIdxLow);
-  m_PID.setI(kI_low,kSlotIdxLow);
-  m_PID.setD(kI_low, kSlotIdxLow);
-  m_PID.setIZone(kIz_low,kSlotIdxLow);
-  m_PID.setFF(kFF_low,kSlotIdxLow);
 
-  m_PID.setOutputRange(-kMinOutputE_out, kMaxOutputE_out,kSlotIdxOut);
-  m_PID.setOutputRange(-kMinOutputE_in, kMaxOutputE_in,kSlotIdxIn);
-  m_PID.setOutputRange(-kMinOutputE_low, kMaxOutputE_low,kSlotIdxLow);
+
+  m_PID.setOutputRange(-kMinOutputE_out, kMaxOutputE_out,kSlotIdxPos);
+  m_PID.setOutputRange(-kMinOutputE_in, kMaxOutputE_in,kSlotIdxVel);
+
   
-  m_PID.setSmartMotionMaxVelocity(maxRPM, kSlotIdxOut);
-  m_PID.setSmartMotionMinOutputVelocity(-maxRPM, kSlotIdxOut);
-  m_PID.setSmartMotionMaxAccel(maxAccel, kSlotIdxOut);
-  m_PID.setSmartMotionAllowedClosedLoopError(10, kSlotIdxOut);
+  m_PID.setSmartMotionMaxVelocity(maxRPM, kSlotIdxPos);
+  m_PID.setSmartMotionMinOutputVelocity(-maxRPM, kSlotIdxPos);
+  m_PID.setSmartMotionMaxAccel(maxAccel, kSlotIdxPos);
+  m_PID.setSmartMotionAllowedClosedLoopError(10, kSlotIdxPos);
 
-  m_PID.setSmartMotionMaxVelocity(maxRPM, kSlotIdxIn);
-  m_PID.setSmartMotionMinOutputVelocity(-maxRPM, kSlotIdxIn);
-  m_PID.setSmartMotionMaxAccel(maxAccel, kSlotIdxIn);
-  m_PID.setSmartMotionAllowedClosedLoopError(10, kSlotIdxIn);
+  m_PID.setSmartMotionMaxVelocity(maxRPM, kSlotIdxVel);
+  m_PID.setSmartMotionMinOutputVelocity(-maxRPM, kSlotIdxVel);
+  m_PID.setSmartMotionMaxAccel(maxAccel, kSlotIdxVel);
+  m_PID.setSmartMotionAllowedClosedLoopError(10, kSlotIdxVel);
 
-  m_PID.setSmartMotionMaxVelocity(maxRPM, kSlotIdxLow);
-  m_PID.setSmartMotionMinOutputVelocity(-maxRPM, kSlotIdxLow);
-  m_PID.setSmartMotionMaxAccel(maxAccel, kSlotIdxLow);
-  m_PID.setSmartMotionAllowedClosedLoopError(10, kSlotIdxLow);
-
-  m_PID.setSmartMotionAllowedClosedLoopError(allowedErr, kSlotIdxLow);
-  m_PID.setSmartMotionAllowedClosedLoopError(allowedErr, kSlotIdxIn);
-  m_PID.setSmartMotionAllowedClosedLoopError(allowedErr, kSlotIdxOut);
+ 
+  m_PID.setSmartMotionAllowedClosedLoopError(allowedErr, kSlotIdxVel);
+  m_PID.setSmartMotionAllowedClosedLoopError(allowedErr, kSlotIdxPos);
 
 
  }

@@ -130,31 +130,48 @@ public class RobotContainer implements Loggable{
 
 
      
+      m_arm.setDefaultCommand(Commands.run(() -> {
+        m_arm.setExtendPositionArbFF(m_operator.getLeftSlider());
+        m_arm.setRaisePositionArbFF(-m_operator.getRightSlider());
+        // m_arm.setClawPosition(m_operator.arcadeWhiteLeft().getAsBoolean()?1:-1);
+      }, m_arm));
+    
+      
       // m_arm.setDefaultCommand(Commands.run(() -> {
-      //   m_arm.setExtendPositionArbFF(m_operator.getLeftSlider());
+      //   m_arm.setArmPositionSafe(-m_operator.getRightSlider(), m_operator.getLeftSlider()) ;
+        
+      //   // m_arm.setClawPosition(m_operator.arcadeWhiteLeft().getAsBoolean()?1:-1);
+      // }, m_arm));
+      //    m_arm.setDefaultCommand(Commands.run(() -> { //allows you to set the voltage of the Extend and the angle of the arm
+      //   m_arm.s_extend.setVoltage((m_operator.getLeftSlider()));
       //   m_arm.setRaisePosition(-m_operator.getRightSlider());
       //   // m_arm.setClawPosition(m_operator.arcadeWhiteLeft().getAsBoolean()?1:-1);
       // }, m_arm));
-    
-      
-      m_arm.setDefaultCommand(Commands.run(() -> {
-        m_arm.setArmPositionSafe(-m_operator.getRightSlider(), m_operator.getLeftSlider()) ;
-        
-        // m_arm.setClawPosition(m_operator.arcadeWhiteLeft().getAsBoolean()?1:-1);
-      }, m_arm));
 
     
     m_operator.arcadeWhiteLeft().onTrue(new InstantCommand(() -> {
-      m_arm.setGripSpeed(5000);})
-      .andThen(new WaitCommand(0.8))
+      m_arm.setGripSpeed(3000);})
+      .andThen(new InstantCommand(() -> {m_arm.unRetract();}))
+      .andThen(new WaitCommand(0.6))
+      
       .andThen(() -> {m_arm.setGripSpeed(0);})
     );
     m_operator.arcadeWhiteRight().
     onTrue(new InstantCommand(() -> {
-      m_arm.setGripSpeed(-5000);})
-      .andThen(new WaitCommand(0.25))
+      m_arm.setGripSpeed(-2000);})
+     .andThen(new InstantCommand(() -> {m_arm.retract();}))
+      .andThen(new WaitCommand(0.3))
       .andThen(() -> {m_arm.setGripSpeed(0);})
+      // .andThen(new WaitCommand(3))
     );
+    // m_operator.arcadeBlackRight().
+    // onTrue(new InstantCommand(() -> {
+    //   m_arm.setGripSpeed(-11000);})
+
+    //   .andThen(new WaitCommand(0.5))
+    //   .andThen(() -> {m_arm.setGripSpeed(0);})
+    // );
+    
     
     
     // set driver buttons
@@ -174,6 +191,15 @@ public class RobotContainer implements Loggable{
 
     //X button = auto balance cmd testing
     m_driverController.x().whileTrue(new AutoBalance(m_drivetrain));
+    m_driverController.y().whileTrue(new RunCommand(()->m_drivetrain.fullStop(), m_drivetrain));
+    m_driverController.b().whileTrue(new RunCommand(()->m_drivetrain.moveDistance(0.1), m_drivetrain)
+    
+
+  
+    ).onFalse(new InstantCommand(()->{m_drivetrain.accDistance(0.1);}));
+
+  
+
 
     m_operator.scPlus().onTrue(new InstantCommand(()->{move = move+0.10;}));
     m_operator.scMinus().onTrue(new InstantCommand(()->{move = move-0.10;}));
@@ -357,16 +383,6 @@ public class RobotContainer implements Loggable{
   }, m_arm);
 
 
-  // @Log(name = "Extra Stend get", tabName = "Arm PID")
-  private double getExtraStend() {
-    return extrastend;
-  }
-
-  // @Config.NumberSlider(name = "Extra Stend set", tabName = "Arm PID", min = 0, max = .2,
-      // defaultValue = k_extrastend)
-  private void setExtraStend(double value) {
-    extrastend = value;
-  }
 public void setDefaultarm(){
   m_arm.setDefaultCommand(Commands.run(() -> {
     m_arm.setArmPositionSafe(-m_operator.getRightSlider(), m_operator.getLeftSlider()) ;

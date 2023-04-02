@@ -60,7 +60,7 @@ private final double k_minClawPos = 0;
 
 // private final double k_rangeLengthPos = k_maxLengthPos - k_minLengthPos;
 // private final double k_rangeLeanglePos = k_maxLeanglePos- k_minLeanglePos;
-final static double k_rangeExtentPos = 55;
+public final static double k_rangeExtentPos = 55;
 final static double k_rangeLeanglePos =116;//needs to be tuned, adjust tilll the arm is at the right angle at bottom should be nearly correct
 
 private final double k_rangeClawPos = k_maxClawPos - k_minClawPos; //also should be checked and tuned
@@ -100,13 +100,13 @@ private final double k_ticksPerInchGrip= 1;
   //pid constants
 
 //grip
-  public final double kPG = 0.0001;
+  public final double kPG = 0.000001;
   public final double kIG = 0;
-  public final double kDG = 0.0001;
+  public final double kDG = 0.0000;
   public final double kIzG = 0;
-  public final double kFFG = 0.001; 
-  public final double kMaxOutputG = 0.4;//grip open?
-  public final double kMinOutputG = 0.4;//grip close?
+  public final double kFFG = 0.0001; 
+  public final double kMaxOutputG = 1;//grip open?
+  public final double kMinOutputG = 1;//grip close?
   public final double maxRPMG = 5;
   public final double maxAccelG = 2;
 
@@ -123,6 +123,8 @@ private final double k_ticksPerInchGrip= 1;
   public double k_targetRaisePosHigh;
   public double k_targetExtPosHigh;
   public double k_targetGripPosHigh;
+  private double eRetractPos=0;
+  private double rRetractPos=0;
 
 
 // private final AbsoluteEncoder m_Encoder;
@@ -165,7 +167,10 @@ private final double k_ticksPerInchGrip= 1;
     m_gripPID.setIZone(kIzG,0);
     m_gripPID.setFF(kFFG,0);
     m_gripPID.setOutputRange(-kMinOutputG, kMaxOutputG,0);
-
+    // m_masterGripMotor.setClosedLoopRampRate(0.2);
+    // m_droneGripMotor.setClosedLoopRampRate(0.2);
+       m_masterGripMotor.setClosedLoopRampRate(0);
+    m_droneGripMotor.setClosedLoopRampRate(0);
     int kSlotIdxG = 0;
     m_gripPID.setSmartMotionMaxVelocity(maxRPMG, kSlotIdxG);
     m_gripPID.setSmartMotionMinOutputVelocity(-maxRPMG, kSlotIdxG);
@@ -198,6 +203,10 @@ private final double k_ticksPerInchGrip= 1;
     setRaisePosition(setpoints.getX()); 
     setExtendPositionArbFF(setpoints.getY());
 
+ }
+ @Log(name = "grip speed", tabName = "Arm", rowIndex = 3, columnIndex = 6)
+ double getGripSpeed(){
+  return m_gripEncoder.getVelocity();
  }
  
 
@@ -282,19 +291,47 @@ private final double k_ticksPerInchGrip= 1;
 
 
     expos = Math.min(expos,k_rangeExtentPos);
-    setRaisePosition(angleR);
+    setRaisePositionArbFF(angleR);
+
     setExtendPositionArbFF(expos);
   }
  
 
  //Arbituary FF 
  public void setExtendPositionArbFF(double position){
- position = s_extend.mapInput(position);
-  double feedforward = s_extend.kFF_arb * Math.sin(Math.toRadians(getArmAngle())) + 0.25;
+ position = s_extend.mapInput(position)+eRetractPos;
+  double feedforward = s_extend.kFF_arb * Math.sin(Math.toRadians(getArmAngle())) + s_extend.kFF_arbC;//0.25
   vExtendSetPos= s_extend.setPosition(position, 0, feedforward);
     
   }
+  public void setRaisePositionArbFF(double position){
+    position = s_raise.mapInput(position)+rRetractPos;
+     double feedforward = s_raise.karb_ffe * s_extend.getPosition()+ s_raise.karb_ffc;//0.25
+     vExtendSetPos= s_raise.setPosition(position, 0, feedforward);
+       
+  }
 
+     public void setExtendVelocityArbFF(double velocity){
+     
+       double feedforward = s_extend.kFF_arb * Math.sin(Math.toRadians(getArmAngle())) + 0.45;//0.25
+       vExtendSetPos= s_extend.setPosition(velocity, 0, feedforward);
+         
+       }
+      public void setRaiseVelocityArbFF(double velocity){
+         
+          double feedforward = s_raise.karb_ffe * s_extend.getPosition()+ s_raise.karb_ffc;//0.25
+          vExtendSetPos= s_raise.setVelocity(velocity,  feedforward);
+            
+          }
+     public void retract(){
+      eRetractPos=-5;
+      rRetractPos = 30;
+    
+    }
+    public void unRetract(){
+      eRetractPos=0;
+      rRetractPos=0;
+    }
  
 
 public void setExtendPosition(double position){
@@ -342,7 +379,7 @@ public void setRaisePosition(double position){
   //inpoutrange -1 to 1
   //pos 0 is fully raised
   //negative pos is goint down 
-  position = s_raise.mapInput(position);
+  position = s_raise.mapInput(position)+rRetractPos;
   vRaisePos=s_raise.setPosition(position, 0);
 
 }
@@ -672,7 +709,7 @@ public double getGripCurrent(){
 }
 
 //more arbff tuning methods
-@Log(name = "Arm Angle", tabName = "Raise FF", rowIndex = 0, columnIndex = 1)
+@Log(name = "Arm Angle", tabName = "Raise FF", rowIndex = 1, columnIndex = 1)
 public double getAngle(){
   return getArmAngle();
 }
