@@ -3,6 +3,7 @@ import io.github.oblarg.oblog.Loggable;
 import io.github.oblarg.oblog.annotations.Config;
 import io.github.oblarg.oblog.annotations.Log;
 
+
 public class TargetSelector implements Loggable {
     //indacate which target is selected for automatic aiming
    
@@ -14,7 +15,7 @@ public class TargetSelector implements Loggable {
 
     
 
-    final static String tabname = "Target Selector";
+    final static String tabname = "TargetSelector";
 
     @Log.BooleanBox(rowIndex = 0, columnIndex = 0, tabName = tabname, width = 1, height = 1 )
     static boolean backleftA = false;

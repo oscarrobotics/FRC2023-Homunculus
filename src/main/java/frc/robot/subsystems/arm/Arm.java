@@ -324,7 +324,7 @@ private final double k_ticksPerInchGrip= 1;
             
           }
      public void retract(){
-      eRetractPos=-5;
+      eRetractPos=-4;
       rRetractPos = 5;
     
     }
@@ -453,7 +453,7 @@ public void resetPosition(){
 
 
 //Kinematic helper methods
-@Log.ToString(name = "Arm Pose", tabName = "Target Selector", rowIndex = 4, columnIndex = 6)
+@Log.ToString(name = "Arm Pose", tabName = "TargetSelector", rowIndex = 4, columnIndex = 3, width = 3, height = 1)
 public Translation2d getArmPose(){
 
 double armangle = getArmAngle();

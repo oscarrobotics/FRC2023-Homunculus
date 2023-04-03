@@ -585,7 +585,7 @@ public double getRightPositionMeters(){
 
 
 
-@Log.ToString(name = "Pose", tabName = "Target Selector", rowIndex = 4, columnIndex = 8)
+@Log.ToString(name = "Pose", tabName = "TargetSelector", rowIndex = 4, columnIndex =6, width = 5, height = 1)
 public Pose2d getPose() {
     return m_poseEstimator.getEstimatedPosition();
 }

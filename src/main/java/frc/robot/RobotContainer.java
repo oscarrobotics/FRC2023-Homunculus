@@ -25,6 +25,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
+import edu.wpi.first.wpilibj2.command.ScheduleCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandGenericHID;
@@ -39,7 +40,9 @@ import io.github.oblarg.oblog.annotations.Config;
 import io.github.oblarg.oblog.annotations.Log;
 
 
+
 public class RobotContainer implements Loggable{
+  
   private final CommandXboxController m_driverController = new CommandXboxController(0);
 
   private final ControllerButtons m_operator = new ControllerButtons(1);
@@ -121,33 +124,16 @@ public class RobotContainer implements Loggable{
 
 
 
-    // m_operator.arcadeBlackLeft().onTrue(new InstantCommand(() -> {
-    //   safe = true;
-    //   motion = false;
-
-    // // }));
-    //   m_operator.arcadeBlackLeft().onTrue(m_arm.dropCargo2());
-      
-
-
-     
+ 
       m_arm.setDefaultCommand(Commands.run(() -> {
         m_arm.setExtendPositionArbFF(m_operator.getLeftSlider());
-        // m_arm.setRaisePositionArbFF(-m_operator.getRightSlider());
-        // m_arm.setClawPosition(m_operator.arcadeWhiteLeft().getAsBoolean()?1:-1);
+        m_arm.setRaisePositionArbFF(-m_operator.getRightSlider());
+       
       }, m_arm));
     
       
-      // m_arm.setDefaultCommand(Commands.run(() -> {
-      //   m_arm.setArmPositionSafe(-m_operator.getRightSlider(), m_operator.getLeftSlider()) ;
-        
-      //   // m_arm.setClawPosition(m_operator.arcadeWhiteLeft().getAsBoolean()?1:-1);
-      // }, m_arm));
-      //    m_arm.setDefaultCommand(Commands.run(() -> { //allows you to set the voltage of the Extend and the angle of the arm
-      //   m_arm.s_extend.setVoltage((m_operator.getLeftSlider()));
-      //   m_arm.setRaisePosition(-m_operator.getRightSlider());
-      //   // m_arm.setClawPosition(m_operator.arcadeWhiteLeft().getAsBoolean()?1:-1);
-      // }, m_arm));
+     
+   
 
     
     m_operator.arcadeWhiteLeft().onTrue(new InstantCommand(() -> {
@@ -160,9 +146,15 @@ public class RobotContainer implements Loggable{
     m_operator.arcadeWhiteRight().
     onTrue(new InstantCommand(() -> {
       m_arm.setGripSpeed(-2000);})
+      .andThen(new WaitCommand(0.15))
      .andThen(new InstantCommand(() -> {m_arm.retract();}))
-      .andThen(new WaitCommand(0.3))
+      .andThen(new WaitCommand(0.15))
       .andThen(() -> {m_arm.setGripSpeed(0);})
+      .andThen(new ScheduleCommand(
+                      new WaitCommand(5)
+                      .andThen(()->m_arm.unRetract()))
+
+                      )
       // .andThen(new WaitCommand(3))
     );
     // m_operator.arcadeBlackRight().

@@ -40,11 +40,11 @@ public class Extend implements Loggable{
 //  public final double kIzE_pos = 6;
 //  public final double kFFE_pos = 0.0;
 
- public final double kP_vel = 0.004;//0.14
+ public final double kP_vel = 0.00;//0.14
  public final double kI_vel = 0.000;//was 0.05
- public final double kD_vel = 0.02;//was 0.01
+ public final double kD_vel = 0.0;//was 0.01
  public final double kIz_vel = 6;
- public final double kFF_vel = 0.0;
+ public final double kFF_vel = 0.0001;
 
 //  public final double kFF_arbdef = 1.084;
  //  public double kFF_arb = 0.784;
@@ -239,7 +239,7 @@ public double setEncPosition(double position){
  public double getCurrent(){
    return m_extendMotor.getOutputCurrent();
  }
-
+ @Log(name = "RMtr Temp" ,tabName = "TargetSelector", rowIndex = 4 , columnIndex = 1)
  @Log(name = "Motor Temp", tabName = "Extend", rowIndex =1 , columnIndex = 9)
   public double getTemp(){
     return m_extendMotor.getMotorTemperature();

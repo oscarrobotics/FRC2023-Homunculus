@@ -37,17 +37,17 @@ SparkMaxPIDController m_PID;
 
   
 
-    // public final double kMaxOutput_in = 0.4; //arm up
-    // public final double kMinOutput_in = 0.4;//arm down
+    public final double kMaxOutput_in = 0.4; //arm up
+    public final double kMinOutput_in = 0.4;//arm down
 
-    // public final double kMaxOutput_out = 0.4; //arm up
-    // public final double kMinOutput_out = 0.3;//arm down
+    public final double kMaxOutput_out = 0.4; //arm up
+    public final double kMinOutput_out = 0.3;//arm down
 
-    public final double kMaxOutput_in = 0.0; //arm up
-    public final double kMinOutput_in = 0.0;//arm down
+    // public final double kMaxOutput_in = 0.0; //arm up
+    // public final double kMinOutput_in = 0.0;//arm down
 
-    public final double kMaxOutput_out = 0.0; //arm up
-    public final double kMinOutput_out = 0.0;//arm down
+    // public final double kMaxOutput_out = 0.0; //arm up
+    // public final double kMinOutput_out = 0.0;//arm down
     
 
     public final double maxRPM = 5;
@@ -149,7 +149,8 @@ SparkMaxPIDController m_PID;
        public double getCurrent(){
          return m_raiseMotor.getOutputCurrent();
        }
-       @Log(name = "Motor Temp" ,tabName = "Raise", rowIndex = 3 , columnIndex = 6)
+       @Log(name = "EMtr Temp" ,tabName = "TargetSelector", rowIndex = 4 , columnIndex = 0)
+       @Log(name = "Mtr Temp" ,tabName = "Raise", rowIndex = 3 , columnIndex = 6)
         public double getTemp(){
           return m_raiseMotor.getMotorTemperature();
         }
