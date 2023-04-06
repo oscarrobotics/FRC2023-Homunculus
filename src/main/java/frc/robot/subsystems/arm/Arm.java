@@ -313,7 +313,7 @@ private final double k_ticksPerInchGrip= 1;
 
      public void setExtendVelocityArbFF(double velocity){
      
-       double feedforward = s_extend.kFF_arb * Math.sin(Math.toRadians(getArmAngle())) + 0.45;//0.25
+       double feedforward = s_extend.kFF_arb * Math.sin(Math.toRadians(getArmAngle())) +  s_extend.kFF_arbC;//0.25
        vExtendSetPos= s_extend.setPosition(velocity, 0, feedforward);
          
        }

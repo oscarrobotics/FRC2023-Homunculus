@@ -48,8 +48,10 @@ public class Extend implements Loggable{
 
 //  public final double kFF_arbdef = 1.084;
  //  public double kFF_arb = 0.784;
+ public final double kFF_arbDefault = 1.084;
   public double kFF_arb = 1.084;
   // public double kFF_arb = 0;
+  public final double kFF_arbCDefault = 0.184;
    public double kFF_arbC = 0.184;
 
  public final double kPE_pos = 0.06;//0.14
@@ -72,6 +74,8 @@ public class Extend implements Loggable{
  public final double maxAccel = 2;
  public final double allowedErr = 0.5;
  public final double closedRR = 0.18;
+
+public double maxVelocity = 400;
 
 
 
@@ -160,7 +164,7 @@ public double setPosition(double position, int slot, double feedforward){
 }
 
 public double setVelocity(double velocityRatio,double arbFF){
-  double velocity = velocityRatio * 400;
+  double velocity = velocityRatio * maxVelocity;
   m_PID.setReference(velocity, CANSparkMax.ControlType.kVelocity, 1,arbFF);
   return velocity;
 }
@@ -262,6 +266,14 @@ public double setEncPosition(double position){
   public double getPercentError(){
     return (m_Encoder.getPosition() - vSetPos)/Arm.k_rangeExtentPos*100;
   }
+  @Log.Graph (name = "Velocity", tabName = "Extend", rowIndex = 3, columnIndex = 6)
+  public double getVelocity(){
+    return m_Encoder.getVelocity();
+  }
+  @Log.Graph (name = "Velocity Error", tabName = "Extend", rowIndex = 3, columnIndex = 9)
+  public double getVelocityError(){
+    return (m_Encoder.getVelocity() - vSetPos)/maxVelocity*100;
+  }
 
 
 
@@ -286,27 +298,34 @@ void setIz_out(double iz){
 void setFF_out(double f){
   m_PID.setFF(f, kSlotIdxPos );
 }
-// @Config (name = "Extend P_in", tabName = "Extend", defaultValueNumeric = kP_vel, rowIndex = 1,columnIndex = 0)
+@Config (name = "Extend P_VEL", tabName = "Extend", defaultValueNumeric = kP_vel, rowIndex = 1,columnIndex = 0)
 void setP_in(double p){
   m_PID.setP(p, kSlotIdxVel);
 }
-// @Config (name = "Extend I_in", tabName = "Extend", defaultValueNumeric = kI_vel ,  rowIndex = 1, columnIndex = 1)
+@Config (name = "Extend I_vel", tabName = "Extend", defaultValueNumeric = kI_vel ,  rowIndex = 1, columnIndex = 1)
 void setI_in(double i){
   m_PID.setI(i, kSlotIdxVel);
 }
-// @Config (name = "Extend D_in", tabName = "Extend", defaultValueNumeric = kD_vel, rowIndex =1, columnIndex = 2 )
+@Config (name = "Extend D_vel", tabName = "Extend", defaultValueNumeric = kD_vel, rowIndex =1, columnIndex = 2 )
 void setD_in(double d){
   m_PID.setD(d, kSlotIdxVel);
 }
-// @Config (name = "Extend Iz_in", tabName = "Extend", defaultValueNumeric = kIz_vel, rowIndex = 1, columnIndex = 3)
+@Config (name = "Extend Iz_vel", tabName = "Extend", defaultValueNumeric = kIz_vel, rowIndex = 1, columnIndex = 3)
 void setIz_in(double iz){
   m_PID.setIZone(iz, kSlotIdxVel);
 }
-// @Config (name = "Extend FF_in", tabName = "Extend", defaultValueNumeric = kFF_vel, rowIndex = 1, columnIndex = 4)
+@Config (name = "Extend FF_vel", tabName = "Extend", defaultValueNumeric = kFF_vel, rowIndex = 1, columnIndex = 4)
 void setFF_in(double f){
   m_PID.setFF(f, kSlotIdxVel);
 }
-
+@Config (name = "Extend ff_arb", tabName = "Extend", defaultValueNumeric = kFF_arbDefault, rowIndex = 1, columnIndex = 5)
+void setArbFF(double f){
+  kFF_arb = f;
+} 
+@Config (name = "Extend ff_arbC", tabName = "Extend", defaultValueNumeric = kFF_arbCDefault, rowIndex = 1, columnIndex = 6)
+void setArbFFC(double f){
+  kFF_arbC = f;
+}
 // @Config (name = "Extend FF_arb", tabName = "Extend", defaultValueNumeric = kFF_arbdef, rowIndex = 1, columnIndex = 4)
 // void setFF_arb(double FF_arb){
 //   kFF_arb = FF_arb;
@@ -394,5 +413,8 @@ void setClosedLoopRampRate(double rampRate){
 
 
  }
+
+
+
   
 }
