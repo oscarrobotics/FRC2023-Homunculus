@@ -4,6 +4,8 @@ import com.revrobotics.CANSparkMax;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkMaxPIDController;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
+
+import edu.wpi.first.math.filter.SlewRateLimiter;
 import io.github.oblarg.oblog.Loggable;
 import io.github.oblarg.oblog.annotations.Config;
 import io.github.oblarg.oblog.annotations.Log;
@@ -13,21 +15,21 @@ import com.revrobotics.CANSparkMax.IdleMode;
 public class Raise implements Loggable {
 
   private static final double kFF_arbADefault = -0.01;//angle based
-  private static final double kFF_arbCDefault = 0.40;//extent based
-  private static final double kFF_arbeDefault = 0.012; //contstant 
+  private static final double kFF_arbCDefault = 0.04;//extent based0.4
+  private static final double kFF_arbeDefault = 0.012; //contstant 0.012
   public final CANSparkMax m_raiseMotor;
 RelativeEncoder m_Encoder ;
 SparkMaxPIDController m_PID;
 
-    public final double kP_Pos = 0.043;
+    public final double kP_Pos = 0.043;//0.043
     public final double kI_Pos = 0.000;
     public final double kD_Pos = 0.0000;
     public final double kIz_Pos = 4;
-    public final double kFF_Pos = -0.1;
+    public final double kFF_Pos = 0;
   //position based feed forward
     public  double karb_ffa = -0.01; //angle based
     public double karb_ffe = 0.012; //extent based
-    public double karb_ffc = 0.40; //contstant 
+    public double karb_ffc = 0.4; //contstant 0.4
 
     public final double kP_Vel = 0.06;
     public final double kI_Vel = 0.0008;
@@ -43,8 +45,8 @@ SparkMaxPIDController m_PID;
     public final double kMaxOutput_in = 0.4; //arm up
     public final double kMinOutput_in = 0.4;//arm down
 
-    public final double kMaxOutput_out = 0.4; //arm up
-    public final double kMinOutput_out = 0.3;//arm down
+    // public final double kMaxOutput_out = 0.4; //arm up
+    // public final double kMinOutput_out = 0.3;//arm down
 
     // public final double kMaxOutput_in = 0.0; //arm up
     // public final double kMinOutput_in = 0.0;//arm down
@@ -56,7 +58,7 @@ SparkMaxPIDController m_PID;
     public final double maxRPM = 5;
     public final double maxAccel = 1.0;
     public final double allowedErr = 0.5;
-    public final double closedRR  = 0.7;
+    public final double closedRR  = 0.5;
 
     public int kSlotIdx_Pos = 0;
     public int kSlotIdx_Vel = 1;
@@ -75,7 +77,7 @@ SparkMaxPIDController m_PID;
       m_raiseMotor.setSoftLimit(SoftLimitDirection.kReverse, (float)-Arm.k_rangeLeanglePos);
 
       m_raiseMotor.setIdleMode(IdleMode.kBrake);
-      m_raiseMotor.setSmartCurrentLimit(20, 50, 0);
+      m_raiseMotor.setSmartCurrentLimit(14, 50, 0);
       m_raiseMotor.setClosedLoopRampRate(closedRR);
 
 
@@ -107,13 +109,31 @@ SparkMaxPIDController m_PID;
        public double setPosition(double position, int slot){
       
         
-        m_PID.setReference(position, CANSparkMax.ControlType.kPosition,  slot);
+        m_PID.setReference(position, CANSparkMax.ControlType.kPosition,  0);
         return position;
       }
-      public double setPosition(double position, int slot, double feedforward){
-      
+
+  private double baseraiseRate= 11000;
+  private SlewRateLimiter raiseSmother = new SlewRateLimiter(baseraiseRate,-baseraiseRate,0);
+  public void updatesmoother(double position){
+    
+    double raiseRate = baseraiseRate*(1-(position/Arm.k_rangeExtentPos))+1500;
+    raiseSmother =      new SlewRateLimiter(raiseRate,-raiseRate,0);
+    raiseSmother.reset(vSetPos);
         
-        m_PID.setReference(position, CANSparkMax.ControlType.kPosition,  slot, feedforward);
+  }
+      public double setPosition(double position, int slot, double feedforward){
+        // System.out.println(feedforward);
+        position = raiseSmother.calculate(position);
+          vSetPos = position;
+        m_PID.setReference(position, CANSparkMax.ControlType.kPosition,  0, feedforward);
+        return position;
+      }
+      public double setPositionAuto(double position, int slot, double feedforward){
+        // System.out.println(feedforward);
+        // position = raiseSmother.calculate(position);
+          vSetPos = position;
+        m_PID.setReference(position, CANSparkMax.ControlType.kPosition,  0, feedforward);
         return position;
       }
 
@@ -227,15 +247,15 @@ SparkMaxPIDController m_PID;
         void setF_down_in(double f){
           m_PID.setFF(f, kSlotIdx_Vel);
         }
-        @Config (name = "Extend ff_arb", tabName = "Raise", defaultValueNumeric = kFF_arbeDefault, rowIndex = 1, columnIndex = 5)
+        @Config (name = "Raise ff_arb", tabName = "Raise", defaultValueNumeric = kFF_arbeDefault, rowIndex = 1, columnIndex = 5)
 void setArbFFe(double f){
   karb_ffe = f;
 } 
-@Config (name = "Extend ff_arbC", tabName = "Raise", defaultValueNumeric = kFF_arbCDefault, rowIndex = 1, columnIndex = 6)
+@Config (name = "Raise ff_arbC", tabName = "Raise", defaultValueNumeric = kFF_arbCDefault, rowIndex = 1, columnIndex = 6)
 void setArbFFC(double f){
   karb_ffc = f;
 }
-@Config (name = "Extend ff_arbC", tabName = "Raise", defaultValueNumeric = kFF_arbADefault, rowIndex = 1, columnIndex = 7)
+@Config (name = "Raise ff_arbA", tabName = "Raise", defaultValueNumeric = kFF_arbADefault, rowIndex = 1, columnIndex = 7)
 void setArbFFa(double f){
   karb_ffa = f;
 }
@@ -318,14 +338,14 @@ void setArbFFa(double f){
       m_PID.setD(kD_Pos, kSlotIdx_Pos);
       m_PID.setIZone(kIz_Pos, kSlotIdx_Pos);
       m_PID.setFF(kFF_Pos, kSlotIdx_Pos);
-      m_PID.setOutputRange(kMinOutput_in, kMaxOutput_in, kSlotIdx_Pos);
+      m_PID.setOutputRange(-kMinOutput_in, kMaxOutput_in, kSlotIdx_Pos);
 
       m_PID.setP(kP_Vel, kSlotIdx_Vel);
       m_PID.setI(kI_Vel, kSlotIdx_Vel);
       m_PID.setD(kD_Vel, kSlotIdx_Vel);
       m_PID.setIZone(kIz_Vel, kSlotIdx_Vel);
       m_PID.setFF(kFF_Vel, kSlotIdx_Vel);
-      m_PID.setOutputRange(kMinOutput_in, kMaxOutput_in, kSlotIdx_Vel);
+      m_PID.setOutputRange(-kMinOutput_in, kMaxOutput_in, kSlotIdx_Vel);
 
      
 

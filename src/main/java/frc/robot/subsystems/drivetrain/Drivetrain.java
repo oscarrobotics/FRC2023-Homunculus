@@ -153,8 +153,8 @@ public class Drivetrain extends SubsystemBase implements Loggable {
 //                  Constants.wheelRad,
 //                  null);
 
-  private double driveRate=6.5;
-  private double turnRate= 16;
+  private double driveRate=8.5;
+  private double turnRate= 18;
   private SlewRateLimiter driveSmother = new SlewRateLimiter(driveRate,-driveRate,0);
   private SlewRateLimiter turnSmother = new SlewRateLimiter(turnRate,-turnRate,0);
   public Drivetrain() {

@@ -48,15 +48,15 @@ public class Extend implements Loggable{
 
 //  public final double kFF_arbdef = 1.084;
  //  public double kFF_arb = 0.784;
- public final double kFF_arbDefault = 1.084;
-  public double kFF_arb = 1.084;
+ public final double kFF_arbDefault = 1.004;//1.084S
+  public double kFF_arb = 1.004;
   // public double kFF_arb = 0;
   public final double kFF_arbCDefault = 0.184;
    public double kFF_arbC = 0.184;
 
- public final double kPE_pos = 0.06;//0.14
+ public final double kPE_pos = 0.05;//0.14
  public final double kIE_pos = 0.00000;//was 0.05
- public final double kDE_pos = 0.00;//was 0.01
+ public final double kDE_pos = 0.000;//was 0.01
  public final double kIzE_pos = 6;
  public final double kFFE_pos = 0.0;
 
@@ -73,7 +73,7 @@ public class Extend implements Loggable{
  public final double maxRPM = 5;
  public final double maxAccel = 2;
  public final double allowedErr = 0.5;
- public final double closedRR = 0.18;
+ public final double closedRR = 0.018;
 
 public double maxVelocity = 400;
 

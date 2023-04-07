@@ -13,7 +13,9 @@ public class TargetMap {
   public static Pose2d[] blueTargetPoses = new Pose2d[9];
   public static Pose2d[] redTargetPoses = new Pose2d[9];
   public static Translation2d[] coneArmTargets= new Translation2d[3];
+  public static Translation2d[] coneArmTargets2= new Translation2d[3];
   public static Translation2d[] cubeArmTargets= new Translation2d[3];
+  
 
   public static Pose2d[] blueStationPose = new Pose2d[4];
   public static Pose2d[] redStationPose = new Pose2d[4];
@@ -24,6 +26,7 @@ public class TargetMap {
 
   public static Pose2d[] blueChargeingPose2bot = new Pose2d[2];
   public static Pose2d[] redChargeingPose2bot = new Pose2d[2];
+  
 
     TargetMap() {
       //collum 1 is bottom of field
@@ -48,12 +51,16 @@ public class TargetMap {
       redTargetPoses[0] = new Pose2d(new Translation2d(14.54, 4.98), new Rotation2d(Math.toRadians(0)));
 
       coneArmTargets[2] = new Translation2d(0.25, 0.35); //0
-      coneArmTargets[1] = new Translation2d(0.53, 1.70); //87 4inchs higher
-      coneArmTargets[0] = new Translation2d(1.01, 2.10); //117 4inchs higher
+      coneArmTargets[1] = new Translation2d(0.55, 1.14); //87 4inchs higher
+      coneArmTargets[0] = new Translation2d(0.82, 1.56); //117 4inchs higher
+
+      coneArmTargets2[2] = new Translation2d(0.25, 0.35); //0
+      coneArmTargets2[1] = new Translation2d(0.55, 0.99); //87 4inchs higher
+      coneArmTargets2[0] = new Translation2d(0.82, 1.29); //117 4inchs higher
 
       cubeArmTargets[2] = new Translation2d(0.25, 0.35); //0
-      cubeArmTargets[1] = new Translation2d(0.53, 0.95); //60 6inchs higher
-      cubeArmTargets[0] = new Translation2d(1.01, 1.25); //90 6inchs higher
+      cubeArmTargets[1] = new Translation2d(0.33, 0.82); //60 6inchs higher
+      cubeArmTargets[0] = new Translation2d(0.7 ,1.17); //90 6inchs higher
 
       //charging stations
       //top to bottom third is ground sigle sitation 4th is lined up with single station
@@ -180,6 +187,18 @@ public Translation2d getArmTarget(int idx){
   }
   else 
     return coneArmTargets[row];
+
+
+}
+public Translation2d getArmTarget2(int idx){
+  //get alliance color
+  int col = idx%9;
+  int row = (int)Math.floor(idx/9.0);
+  if (col%3==1){
+    return cubeArmTargets[row];
+  }
+  else 
+    return coneArmTargets2[row];
 
 
 }

@@ -17,61 +17,61 @@ public class TargetSelector implements Loggable {
 
     final static String tabname = "TargetSelector";
 
-    @Log.BooleanBox(rowIndex = 0, columnIndex = 0, tabName = tabname, width = 1, height = 1 )
+    // @Log.BooleanBox(rowIndex = 0, columnIndex = 0, tabName = tabname, width = 1, height = 1 )
     static boolean backleftA = false;
-    @Log.BooleanBox(rowIndex = 0, columnIndex = 1, tabName = tabname, width = 1, height = 1 )
+    // @Log.BooleanBox(rowIndex = 0, columnIndex = 1, tabName = tabname, width = 1, height = 1 )
    static  boolean backcenterA = false;
-    @Log.BooleanBox(rowIndex = 0, columnIndex = 2, tabName = tabname, width = 1, height = 1 )
+    // @Log.BooleanBox(rowIndex = 0, columnIndex = 2, tabName = tabname, width = 1, height = 1 )
    static  boolean backrightA = false;
-    @Log.BooleanBox(rowIndex = 1, columnIndex = 0, tabName = tabname, width = 1, height = 1 )
+    // @Log.BooleanBox(rowIndex = 1, columnIndex = 0, tabName = tabname, width = 1, height = 1 )
    static  boolean midleftA = false;
-    @Log.BooleanBox(rowIndex = 1, columnIndex = 1, tabName = tabname, width = 1, height = 1 )
+    // @Log.BooleanBox(rowIndex = 1, columnIndex = 1, tabName = tabname, width = 1, height = 1 )
    static  boolean midcenterA = false;
-    @Log.BooleanBox(rowIndex = 1, columnIndex = 2, tabName = tabname, width = 1, height = 1 )
+    // @Log.BooleanBox(rowIndex = 1, columnIndex = 2, tabName = tabname, width = 1, height = 1 )
    static  boolean midrightA = false;
-    @Log.BooleanBox(rowIndex = 2, columnIndex = 0, tabName = tabname, width = 1, height = 1 )
+    // @Log.BooleanBox(rowIndex = 2, columnIndex = 0, tabName = tabname, width = 1, height = 1 )
    static  boolean frontleftA = false;
-    @Log.BooleanBox(rowIndex = 2, columnIndex = 1, tabName = tabname, width = 1, height = 1 )
+    // @Log.BooleanBox(rowIndex = 2, columnIndex = 1, tabName = tabname, width = 1, height = 1 )
    static  boolean frontcenterA = false;
-    @Log.BooleanBox(rowIndex = 2, columnIndex = 2, tabName = tabname, width = 1, height = 1 )
+    // @Log.BooleanBox(rowIndex = 2, columnIndex = 2, tabName = tabname, width = 1, height = 1 )
    static  boolean frontrightA = false;
   
-    @Log.BooleanBox(rowIndex = 0, columnIndex = 4, tabName = tabname, width = 1, height = 1 )
+    // @Log.BooleanBox(rowIndex = 0, columnIndex = 4, tabName = tabname, width = 1, height = 1 )
    static  boolean backleftB = false;
     @Log.BooleanBox(rowIndex = 0, columnIndex = 5, tabName = tabname, width = 1, height = 1 )
    static  boolean backcenterB = false;
     @Log.BooleanBox(rowIndex = 0, columnIndex = 6, tabName = tabname, width = 1, height = 1 )
    static  boolean backrightB = false;
-    @Log.BooleanBox(rowIndex = 1, columnIndex = 4, tabName = tabname, width = 1, height = 1 )
+    // @Log.BooleanBox(rowIndex = 1, columnIndex = 4, tabName = tabname, width = 1, height = 1 )
    static  boolean midleftB = false;
     @Log.BooleanBox(rowIndex = 1, columnIndex = 5, tabName = tabname, width = 1, height = 1 )
    static  boolean midcenterB = false;
     @Log.BooleanBox(rowIndex = 1, columnIndex = 6, tabName = tabname, width = 1, height = 1 )
    static  boolean midrightB = false;
-    @Log.BooleanBox(rowIndex = 2, columnIndex = 4, tabName = tabname, width = 1, height = 1 )
+    // @Log.BooleanBox(rowIndex = 2, columnIndex = 4, tabName = tabname, width = 1, height = 1 )
    static  boolean frontleftB = false;
     @Log.BooleanBox(rowIndex = 2, columnIndex = 5, tabName = tabname, width = 1, height = 1 )
    static  boolean frontcenterB = false;
     @Log.BooleanBox(rowIndex = 2, columnIndex = 6, tabName = tabname, width = 1, height = 1 )
    static  boolean frontrightB = false;
   
-    @Log.BooleanBox(rowIndex = 0, columnIndex = 8, tabName = tabname, width = 1, height = 1 )
+    // @Log.BooleanBox(rowIndex = 0, columnIndex = 8, tabName = tabname, width = 1, height = 1 )
    static  boolean backleftC = false;
-    @Log.BooleanBox(rowIndex = 0, columnIndex = 9, tabName = tabname, width = 1, height = 1 )
+    // @Log.BooleanBox(rowIndex = 0, columnIndex = 9, tabName = tabname, width = 1, height = 1 )
    static  boolean backcenterC = false;
-    @Log.BooleanBox(rowIndex = 0, columnIndex = 10, tabName = tabname, width = 1, height = 1 )
+    // @Log.BooleanBox(rowIndex = 0, columnIndex = 10, tabName = tabname, width = 1, height = 1 )
    static  boolean backrightC = false;
-    @Log.BooleanBox(rowIndex = 1, columnIndex = 8, tabName = tabname, width = 1, height = 1 )
+    // @Log.BooleanBox(rowIndex = 1, columnIndex = 8, tabName = tabname, width = 1, height = 1 )
    static  boolean midleftC = false;
-    @Log.BooleanBox(rowIndex = 1, columnIndex = 9, tabName = tabname, width = 1, height = 1 )
+  //   @Log.BooleanBox(rowIndex = 1, columnIndex = 9, tabName = tabname, width = 1, height = 1 )
    static  boolean midcenterC = false;
-    @Log.BooleanBox(rowIndex = 1, columnIndex = 10, tabName = tabname, width = 1, height = 1 )
+    // @Log.BooleanBox(rowIndex = 1, columnIndex = 10, tabName = tabname, width = 1, height = 1 )
    static  boolean midrightC = false;
-    @Log.BooleanBox(rowIndex = 2, columnIndex = 8, tabName = tabname, width = 1, height = 1 )
+    // @Log.BooleanBox(rowIndex = 2, columnIndex = 8, tabName = tabname, width = 1, height = 1 )
    static  boolean frontleftC = false;
-    @Log.BooleanBox(rowIndex = 2, columnIndex = 9, tabName = tabname, width = 1, height = 1 )
+    // @Log.BooleanBox(rowIndex = 2, columnIndex = 9, tabName = tabname, width = 1, height = 1 )
    static  boolean frontcenterC = false;
-    @Log.BooleanBox(rowIndex = 2, columnIndex = 10, tabName = tabname, width = 1, height = 1 )
+    // @Log.BooleanBox(rowIndex = 2, columnIndex = 10, tabName = tabname, width = 1, height = 1 )
    static  boolean frontrightC = false;
   TargetSelector(){
   
