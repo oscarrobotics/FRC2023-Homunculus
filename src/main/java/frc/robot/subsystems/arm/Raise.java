@@ -21,7 +21,7 @@ public class Raise implements Loggable {
 RelativeEncoder m_Encoder ;
 SparkMaxPIDController m_PID;
 
-    public final double kP_Pos = 0.043;//0.043
+    public final double kP_Pos = 0.06;//0.043
     public final double kI_Pos = 0.000;
     public final double kD_Pos = 0.0000;
     public final double kIz_Pos = 4;
@@ -29,7 +29,7 @@ SparkMaxPIDController m_PID;
   //position based feed forward
     public  double karb_ffa = -0.01; //angle based
     public double karb_ffe = 0.012; //extent based
-    public double karb_ffc = 0.4; //contstant 0.4
+    public double karb_ffc = 0.5; //contstant 0.4
 
     public final double kP_Vel = 0.06;
     public final double kI_Vel = 0.0008;

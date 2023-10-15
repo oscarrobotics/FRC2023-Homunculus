@@ -486,11 +486,11 @@ public double getArmAngle(){
   angle = angle -90;// i of arm  above or below horizontal
   
  //calibrated fudging
-  double measuredmin = -23.8;
+  double measuredmin = -25;
   double measuredmax = 62;
   double calcmin =-26.9;
   double calcmax = 52.4;
-  double zerooffset = -5.27;
+  double zerooffset = -6.27;
 
 
   angle =   (angle-calcmin)/(calcmax-calcmin)*(measuredmax-measuredmin)+measuredmin; 
@@ -561,7 +561,7 @@ double calcmax = 52.4;
 double zerooffset = -5.27;
 
 
-  angle =   (angle-measuredmin)/(calcmax-calcmin)*(measuredmax-measuredmin)+calcmin; 
+  angle =   (angle-measuredmin)/(measuredmax-measuredmin)*(calcmax-calcmin)+calcmin; 
 
 
 

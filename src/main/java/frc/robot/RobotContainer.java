@@ -53,7 +53,7 @@ public class RobotContainer implements Loggable{
 
   public static final TargetMap m_targetMap = new TargetMap();
 
-  public static final TargetSelector m_targetSelector = new TargetSelector();
+  // public static final TargetSelector m_targetSelector = new TargetSelector();
 
 
   // public final PathOptions m_autoSelector = new PathOptions();

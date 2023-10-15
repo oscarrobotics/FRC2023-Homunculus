@@ -426,6 +426,83 @@ public class Drivetrain extends SubsystemBase implements Loggable {
 
 
   }
+  double lastspeed = 0;
+  public void accelDrive(double speed, double rotation){
+    //speed is the target speed of the robot in m/s
+    //rotation is the target rotation of the robot in rad/s
+
+    // limit the acceleration of the robot of the robot by limiting the  rotational velocity and change in speed
+    // Ax is acceleration front to back of the robot and Ay is acceleration side to side of the robot
+    // Ax = dv/dt, currentspeed- previous speed / time
+    // Ay is primarily caused by rotation of the robot while moving
+    // Ay = v * dtheta/dt  
+    // Ay = v * omega, speed*rotaion
+    //Ar = rotaional accerleraion 
+    // jerk could also be limited
+
+    double maxAccelG = 0.5*9.81; //max acceleration of the robot in m/s^2
+    double dt = 0.02; //robot loop speed
+    
+
+
+    //limit Ax by limiting accelration
+    double maxDV = maxAccelG*dt; //max change in speed in one loop
+    //get current robot speed, nvm
+
+    //select for chosen speed or max speed
+    //need to account for forward/backward, speedup/slowdown
+
+    if (Math.signum(speed) == Math.signum(lastspeed)){
+      //if the sign of the speed is the same as the last speed then limit the acceleration
+      speed = Math.min(speed, lastspeed+maxDV);
+      speed = Math.max(speed, lastspeed-maxDV); 
+    }else{
+      // The sign will always be opsite and the robot will be slowing down and stop as it changes direction
+      speed = lastspeed+maxDV*Math.signum(speed);
+    }
+
+    //limit Ay by limiting rotational speed
+    //calculate the max rotational velocity based on current speed.
+    double maxOmega = maxAccelG/Math.abs(lastspeed);
+
+    //select for chosen rotation or max rotation
+    double rotdir = Math.signum(rotation);
+
+    rotation = Math.min(Math.abs(rotation), maxOmega); 
+    rotation = rotation*rotdir;
+
+    DifferentialDriveWheelSpeeds wheelSpeeds = m_kinematics.toWheelSpeeds(new ChassisSpeeds(speed, 0, rotation));
+    
+    // System.out.print(wheelSpeeds.leftMetersPerSecond);
+    // System.out.print("*");
+    // System.out.println(wheelSpeeds.rightMetersPerSecond);
+   
+    leftspeedtalon = velocityMToNativeUnits( wheelSpeeds.leftMetersPerSecond );
+    rightspeedtalon = velocityMToNativeUnits( wheelSpeeds.rightMetersPerSecond );
+    // System.out.print(leftspeedtalon);
+    // System.out.print("  ");
+    // System.out.println(rightspeedtalon);
+    m_leftMaster.selectProfileSlot(0,0);
+    m_rightMaster.selectProfileSlot(0,0);
+
+    m_leftMaster.set(ControlMode.Velocity, leftspeedtalon);
+    m_rightMaster.set(ControlMode.Velocity, rightspeedtalon);
+    m_leftDrone.set(ControlMode.Follower, 1);
+    m_rightDrone.set(ControlMode.Follower, 3);
+
+
+    
+
+
+    
+    
+
+    
+
+
+
+
+  }
   public void fullStop(){
     m_leftMaster.selectProfileSlot(1, 0);
     m_rightMaster.selectProfileSlot(1, 0);
