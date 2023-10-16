@@ -115,7 +115,8 @@ public class RobotContainer implements Loggable{
           (Math.abs(m_driverController.getLeftY()) < 0.18
            ? Smodifier *1.4: Math.min(0.5, Smodifier));
 
-      m_drivetrain.smoothDrive(
+      // m_drivetrain.smoothDrive(
+        m_drivetrain.accelDrive(
           -1 * m_driverController.getLeftY() * Math.abs(m_driverController.getLeftY()) * Math.abs(m_driverController.getLeftY())* Smodifier
               * Constants.maxSpeed,
           m_driverController.getRightX() * -1 * Math.abs(m_driverController.getRightX())* Tmodifier

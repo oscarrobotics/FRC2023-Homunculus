@@ -657,11 +657,13 @@ public Command dropCargo(){
 }
 public Command dropCargo2(){
   return new SequentialCommandGroup(
-   
-    new InstantCommand(()->setArmPositionSafeAuto(-0.45, 0.75),this),//slider values
+  
+    new InstantCommand(()->setArmPositionSafeAuto(-0.65, 0.75),this),//slider values  was(-0.45, 0.75)
     new WaitCommand(1),
+    new InstantCommand(()->setArmPositionSafeAuto(-0.43, 0.75),this),//slider values  was(-0.45, 0.75)
+    new WaitCommand(1.5),
     new InstantCommand(() -> {
-     setGripSpeed(-500);},this),
+     setGripSpeed(-450);},this),
     new WaitCommand(1),
     // new InstantCommand(()->setClawPosition(1)),
     new InstantCommand( () -> setArmPositionSafeAuto(-1,0.2),this),

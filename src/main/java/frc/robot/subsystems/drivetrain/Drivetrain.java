@@ -439,6 +439,10 @@ public class Drivetrain extends SubsystemBase implements Loggable {
     // Ay = v * omega, speed*rotaion
     //Ar = rotaional accerleraion 
     // jerk could also be limited
+    System.out.println("speed +rotation");
+    System.out.print(speed);
+    System.out.print("  ");
+    System.out.println(rotation);
 
     double maxAccelG = 0.5*9.81; //max acceleration of the robot in m/s^2
     double dt = 0.02; //robot loop speed
@@ -452,7 +456,7 @@ public class Drivetrain extends SubsystemBase implements Loggable {
     //select for chosen speed or max speed
     //need to account for forward/backward, speedup/slowdown
 
-    if (Math.signum(speed) == Math.signum(lastspeed)){
+    if (Math.signum(speed) == Math.signum(lastspeed) || speed ==0){
       //if the sign of the speed is the same as the last speed then limit the acceleration
       speed = Math.min(speed, lastspeed+maxDV);
       speed = Math.max(speed, lastspeed-maxDV); 
@@ -471,6 +475,11 @@ public class Drivetrain extends SubsystemBase implements Loggable {
     rotation = Math.min(Math.abs(rotation), maxOmega); 
     rotation = rotation*rotdir;
 
+    System.out.println("Limitted speed +rotation");
+    System.out.print(speed);
+    System.out.print("  ");
+    System.out.println(rotation);
+
     DifferentialDriveWheelSpeeds wheelSpeeds = m_kinematics.toWheelSpeeds(new ChassisSpeeds(speed, 0, rotation));
     
     // System.out.print(wheelSpeeds.leftMetersPerSecond);
@@ -479,9 +488,9 @@ public class Drivetrain extends SubsystemBase implements Loggable {
    
     leftspeedtalon = velocityMToNativeUnits( wheelSpeeds.leftMetersPerSecond );
     rightspeedtalon = velocityMToNativeUnits( wheelSpeeds.rightMetersPerSecond );
-    // System.out.print(leftspeedtalon);
-    // System.out.print("  ");
-    // System.out.println(rightspeedtalon);
+    System.out.print(leftspeedtalon);
+    System.out.print("  ");
+    System.out.println(rightspeedtalon);
     m_leftMaster.selectProfileSlot(0,0);
     m_rightMaster.selectProfileSlot(0,0);
 
@@ -489,6 +498,8 @@ public class Drivetrain extends SubsystemBase implements Loggable {
     m_rightMaster.set(ControlMode.Velocity, rightspeedtalon);
     m_leftDrone.set(ControlMode.Follower, 1);
     m_rightDrone.set(ControlMode.Follower, 3);
+
+    lastspeed = speed;
 
 
     
