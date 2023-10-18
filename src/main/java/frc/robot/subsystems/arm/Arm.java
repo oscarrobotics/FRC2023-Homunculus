@@ -736,7 +736,16 @@ void setMinArmHeight( double minHeight){
   // public double getGripError(){
   //   return m_gripEncoder.getPosition() - vGripPos;
   // }
+  
+  @Log(name = "Is Stowed")
+  public boolean isStowed(){
 
+    double thetaThreshold = -24;
+    double extThreshold = 0.06;
 
+    if(getArmAngle() > thetaThreshold && getExtent() < extThreshold){
+      return true;
+    }
+    return false;
 
 }
