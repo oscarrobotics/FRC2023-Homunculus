@@ -116,12 +116,12 @@ public class PathOptions implements Loggable{
   }
 
 
-  @Config.NumberSlider(name = "Auto Selectcor", min = -1, max = 10, blockIncrement = 1 ,defaultValue = -1, tabName = "Target Selector", columnIndex = 1, rowIndex = 4) 
+  @Config.NumberSlider(name = "Auto Selectcor", min = -1, max = 10, blockIncrement = 1 ,defaultValue = -1, tabName = "TargetSelector", columnIndex =0, rowIndex = 3) 
   void setauto1(double auto1){
       m_autoSelected = (int)auto1;
   }
 
-  @Log.ToString(name = "Selected Auto" , tabName = "Target Selector", columnIndex = 4, rowIndex = 4 , width = 2, height = 1)
+  @Log.ToString(name = "Selected Auto" , tabName = "TargetSelector", columnIndex = 3, rowIndex = 3 , width = 2, height = 1)
   String getSelectedAutoName(){
     if (m_autoSelected == -1) {
       return "Do Nothing";

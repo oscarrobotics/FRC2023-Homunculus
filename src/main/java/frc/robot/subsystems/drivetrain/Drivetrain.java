@@ -20,6 +20,7 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.motorcontrol.MotorControllerGroup;
 import edu.wpi.first.wpilibj.RobotController;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -79,10 +80,20 @@ public class Drivetrain extends SubsystemBase implements Loggable {
     return xyzDPS[0];
   }
   
-  private final LinearFilter pitchRateFilter = LinearFilter.movingAverage(16);
+  private final LinearFilter pitchRateFilter = LinearFilter.movingAverage(10);
   
+  @Log(name = "Filtered Gyro Pitch Rate", tabName = "Auto Balance")
   public double getFilteredGyroPitchRate() {
     return pitchRateFilter.calculate(getGyroPitchRate());
+  }
+  @Log(name = "Gyro Pitch", tabName = "Auto Balance")
+  public double getGyroPitch() {
+    return  m_gyro.getPitch();
+  }
+  @Log(name = "Climbing sign", tabName = "Auto Balance")
+  public double getClimbingSign() {
+  
+    return Math.signum(m_gyro.getPitch());
   }
 
   //motor groups
@@ -101,7 +112,7 @@ public class Drivetrain extends SubsystemBase implements Loggable {
   
   //kinematics
   public final DifferentialDriveKinematics m_kinematics =
-      new DifferentialDriveKinematics(Constants.wheelBaseWidth);
+      new DifferentialDriveKinematics(Constants.wheelBaseWidth );
 
   // a varible used to keep track of the current commanded speed from the joystick
   // used in smooth drive as part of a low pass filter
@@ -132,7 +143,7 @@ public class Drivetrain extends SubsystemBase implements Loggable {
 
 //  private final Field2d m_fieldSim = new Field2d();
 //  private final LinearSystem<N2, N2, N2> m_drivetrainSystem =
-//          LinearSystemId.identifyDrivetrainSystem(1.98, 0.2, 1.5, 0.3);
+//          LinearSystemId.identifyDrivetrainSystem(1.98, 0.2, 1.5, 0.3);slew
 //  private final DifferentialDrivetrainSim m_driveSim =
 //          new DifferentialDrivetrainSim(
 //                  m_drivetrainSystem,
@@ -142,7 +153,10 @@ public class Drivetrain extends SubsystemBase implements Loggable {
 //                  Constants.wheelRad,
 //                  null);
 
-  private SlewRateLimiter driveSmother = new SlewRateLimiter(6,-6,0);
+  private double driveRate=8.5;
+  private double turnRate= 18;
+  private SlewRateLimiter driveSmother = new SlewRateLimiter(driveRate,-driveRate,0);
+  private SlewRateLimiter turnSmother = new SlewRateLimiter(turnRate,-turnRate,0);
   public Drivetrain() {
 
     m_gyro.reset(); 
@@ -172,7 +186,8 @@ public class Drivetrain extends SubsystemBase implements Loggable {
     m_leftMaster.configNominalOutputReverse(0);
     m_leftMaster.configPeakOutputForward(1);
     m_leftMaster.configPeakOutputReverse(-1);
-    m_leftMaster.configClosedloopRamp(.2);
+    m_leftMaster.configClosedloopRamp(0.4
+    );
     
     m_leftMaster.config_kF(Constants.dkslot, Constants.dKf);
     m_leftMaster.config_kP(Constants.dkslot, Constants.dKp);
@@ -187,13 +202,20 @@ public class Drivetrain extends SubsystemBase implements Loggable {
     m_rightMaster.configNominalOutputReverse(0);
     m_rightMaster.configPeakOutputForward(1);
     m_rightMaster.configPeakOutputReverse(-1);
-    m_rightMaster.configClosedloopRamp(0.2);
+    m_rightMaster.configClosedloopRamp(0.4);
 
     m_rightMaster.config_kF(Constants.dkslot, Constants.dKf);
     m_rightMaster.config_kP(Constants.dkslot, Constants.dKp);
     m_rightMaster.config_kI(Constants.dkslot, Constants.dKi);
     m_rightMaster.config_kD(Constants.dkslot, Constants.dKd);
     m_rightMaster.config_IntegralZone(Constants.dkslot, Constants.dIz);
+
+    m_rightMaster.config_kP(1,0.1);
+    m_rightMaster.config_kD(1,0.01);
+
+    m_leftMaster.config_kP(1,0.1);
+    m_leftMaster.config_kD(1,0.01);
+
 
 
     //Odometry
@@ -247,15 +269,12 @@ public class Drivetrain extends SubsystemBase implements Loggable {
     m_poseEstimator.resetPosition(m_gyro.getRotation2d(), nativeUnitsToDistanceMeters( m_leftMaster.getSelectedSensorPosition()), nativeUnitsToDistanceMeters( m_rightMaster.getSelectedSensorPosition()), initialPose);
   }
 
-  public void hardStop() {
-    m_leftMaster.set(ControlMode.PercentOutput, 0);
-    m_rightMaster.set(ControlMode.PercentOutput, 0);
-  }
 
   @Override
   public void periodic() {
-    // This method will be called once per scheduler runs
-    updateOdometry();
+    // This method will be called once per scheduler runst
+    // updateOdometry();
+    autoBreak();
     // System.out.println(String.format("Roll: %f, Pitch: %f, Yaw: %f", m_gyro.getRoll(), m_gyro.getPitch(), m_gyro.getYaw()));
   }
  
@@ -346,8 +365,8 @@ public class Drivetrain extends SubsystemBase implements Loggable {
     // System.out.println(wheelSpeeds.rightMetersPerSecond);
    
 
-    double leftspeedtalon = velocityToNativeUnits( wheelSpeeds.leftMetersPerSecond );
-    double rightspeedtalon = velocityToNativeUnits( wheelSpeeds.rightMetersPerSecond );
+    double leftspeedtalon = velocityMToNativeUnits( wheelSpeeds.leftMetersPerSecond );
+    double rightspeedtalon = velocityMToNativeUnits( wheelSpeeds.rightMetersPerSecond );
     // System.out.print(leftspeedtalon);
     // System.out.print("  ");
     // System.out.println(rightspeedtalon);
@@ -361,6 +380,11 @@ public class Drivetrain extends SubsystemBase implements Loggable {
 
   }
   double kFiltercoeff = 0;
+  private double accumulated;
+  private boolean breakmode;
+  private Timer breaktimer = new Timer() ;
+  private double leftspeedtalon;
+  private double rightspeedtalon;
    
   // @Config.NumberSlider(name = " Smothing Filter coeff" , min = 0, max = 0.5,defaultValue = 0 )
   // private void setSmothing(double filtervalue){
@@ -375,7 +399,10 @@ public class Drivetrain extends SubsystemBase implements Loggable {
     //apply a low pass filter to the speed input
     //takes a percentage of the new speed and the oposite percentage of the old speed and adds them together
     // speed = speed * (1-kFiltercoeff) + filtspeed * kFiltercoeff ;
+    double speedratio = Math.min(speed,1.5)/1.5;
     speed = driveSmother.calculate(speed);
+    // rotation = (1-speedratio)* turnSmother.calculate(rotation)+speedratio*rotation;
+    rotation =turnSmother.calculate(rotation);
     //use the differntial drive invers kinematics class to set the motor controllers directly in velocity control mode
     DifferentialDriveWheelSpeeds wheelSpeeds = m_kinematics.toWheelSpeeds(new ChassisSpeeds(speed, 0, rotation));
     
@@ -383,11 +410,13 @@ public class Drivetrain extends SubsystemBase implements Loggable {
     // System.out.print("*");
     // System.out.println(wheelSpeeds.rightMetersPerSecond);
    
-    double leftspeedtalon = velocityToNativeUnits( wheelSpeeds.leftMetersPerSecond );
-    double rightspeedtalon = velocityToNativeUnits( wheelSpeeds.rightMetersPerSecond );
+      leftspeedtalon = velocityMToNativeUnits( wheelSpeeds.leftMetersPerSecond );
+     rightspeedtalon = velocityMToNativeUnits( wheelSpeeds.rightMetersPerSecond );
     // System.out.print(leftspeedtalon);
     // System.out.print("  ");
     // System.out.println(rightspeedtalon);
+    m_leftMaster.selectProfileSlot(0,0);
+    m_rightMaster.selectProfileSlot(0,0);
 
     m_leftMaster.set(ControlMode.Velocity, leftspeedtalon);
     m_rightMaster.set(ControlMode.Velocity, rightspeedtalon);
@@ -397,6 +426,120 @@ public class Drivetrain extends SubsystemBase implements Loggable {
 
 
   }
+  double lastspeed = 0;
+  public void accelDrive(double speed, double rotation){
+    //speed is the target speed of the robot in m/s
+    //rotation is the target rotation of the robot in rad/s
+
+    // limit the acceleration of the robot of the robot by limiting the  rotational velocity and change in speed
+    // Ax is acceleration front to back of the robot and Ay is acceleration side to side of the robot
+    // Ax = dv/dt, currentspeed- previous speed / time
+    // Ay is primarily caused by rotation of the robot while moving
+    // Ay = v * dtheta/dt  
+    // Ay = v * omega, speed*rotaion
+    //Ar = rotaional accerleraion 
+    // jerk could also be limited
+    System.out.println("speed +rotation");
+    System.out.print(speed);
+    System.out.print("  ");
+    System.out.println(rotation);
+
+    double maxAccelG = 0.5*9.81; //max acceleration of the robot in m/s^2
+    double dt = 0.02; //robot loop speed
+    
+
+
+    //limit Ax by limiting accelration
+    double maxDV = maxAccelG*dt; //max change in speed in one loop
+    //get current robot speed, nvm
+
+    //select for chosen speed or max speed
+    //need to account for forward/backward, speedup/slowdown
+
+    if (Math.signum(speed) == Math.signum(lastspeed) || speed ==0){
+      //if the sign of the speed is the same as the last speed then limit the acceleration
+      speed = Math.min(speed, lastspeed+maxDV);
+      speed = Math.max(speed, lastspeed-maxDV); 
+    }else{
+      // The sign will always be opsite and the robot will be slowing down and stop as it changes direction
+      speed = lastspeed+maxDV*Math.signum(speed);
+    }
+
+    //limit Ay by limiting rotational speed
+    //calculate the max rotational velocity based on current speed.
+    double maxOmega = maxAccelG/Math.abs(lastspeed);
+
+    //select for chosen rotation or max rotation
+    double rotdir = Math.signum(rotation);
+
+    rotation = Math.min(Math.abs(rotation), maxOmega); 
+    rotation = rotation*rotdir;
+
+    System.out.println("Limitted speed +rotation");
+    System.out.print(speed);
+    System.out.print("  ");
+    System.out.println(rotation);
+
+    DifferentialDriveWheelSpeeds wheelSpeeds = m_kinematics.toWheelSpeeds(new ChassisSpeeds(speed, 0, rotation));
+    
+    // System.out.print(wheelSpeeds.leftMetersPerSecond);
+    // System.out.print("*");
+    // System.out.println(wheelSpeeds.rightMetersPerSecond);
+   
+    leftspeedtalon = velocityMToNativeUnits( wheelSpeeds.leftMetersPerSecond );
+    rightspeedtalon = velocityMToNativeUnits( wheelSpeeds.rightMetersPerSecond );
+    System.out.print(leftspeedtalon);
+    System.out.print("  ");
+    System.out.println(rightspeedtalon);
+    m_leftMaster.selectProfileSlot(0,0);
+    m_rightMaster.selectProfileSlot(0,0);
+
+    m_leftMaster.set(ControlMode.Velocity, leftspeedtalon);
+    m_rightMaster.set(ControlMode.Velocity, rightspeedtalon);
+    m_leftDrone.set(ControlMode.Follower, 1);
+    m_rightDrone.set(ControlMode.Follower, 3);
+
+    lastspeed = speed;
+
+
+    
+
+
+    
+    
+
+    
+
+
+
+
+  }
+  public void fullStop(){
+    m_leftMaster.selectProfileSlot(1, 0);
+    m_rightMaster.selectProfileSlot(1, 0);
+
+
+
+    m_leftMaster.set(ControlMode.Position, m_leftMaster.getSelectedSensorPosition());
+    m_rightMaster.set(ControlMode.Position, m_rightMaster.getSelectedSensorPosition());
+
+  }
+
+  public void moveDistance(double distance){
+    distance += accumulated;
+    m_leftMaster.selectProfileSlot(1, 0);
+    m_rightMaster.selectProfileSlot(1, 0);
+    m_leftMaster.set(ControlMode.Position, distanceMToNativeUnits(distance));
+    m_rightMaster.set(ControlMode.Position, distanceMToNativeUnits(distance));
+  }
+  public void accDistance(double distance){
+    accumulated += distance;
+  
+  }
+  public boolean isDoneMoving(){
+    return Math.abs(m_leftMaster.getClosedLoopError())< 10 && Math.abs(m_rightMaster.getClosedLoopError())< 10;
+  }
+  
   // public void arcadeDrive(double speed, double rotation) {
   //   m_differentialDrive.arcadeDrive(speed, rotation);
   // }
@@ -452,7 +595,7 @@ public Command goToPoseCommand(Pose2d tpose, double speed, double accel) {
     Rotation2d rotation = m_gyro.getRotation2d();
     rotation = rotation.times(1);
     m_poseEstimator.update(
-      rotation, -nativeUnitsToDistanceMeters( m_rightMaster.getSelectedSensorPosition()),-nativeUnitsToDistanceMeters( m_leftMaster.getSelectedSensorPosition()));
+      rotation,nativeUnitsToDistanceMeters( m_leftMaster.getSelectedSensorPosition()), nativeUnitsToDistanceMeters( m_rightMaster.getSelectedSensorPosition()));
     Optional<EstimatedRobotPose> result =
             pcw.getEstimatedGlobalPose(m_poseEstimator.getEstimatedPosition());
     
@@ -482,6 +625,40 @@ public Command goToPoseCommand(Pose2d tpose, double speed, double accel) {
     // m_fieldSim.getObject("Actual Pos").setPose(m_driveSim.getPose());
     // m_fieldSim.setRobotPose(m_poseEstimator.getEstimatedPosition());
 }
+public void setBrake(){
+  
+  m_leftMaster.setNeutralMode(NeutralMode.Brake);
+  m_rightMaster.setNeutralMode(NeutralMode.Brake);
+  m_leftDrone.setNeutralMode(NeutralMode.Brake);
+  m_rightDrone.setNeutralMode(NeutralMode.Brake);
+}
+public void setCoast(){
+    
+    m_leftMaster.setNeutralMode(NeutralMode.Coast);
+    m_rightMaster.setNeutralMode(NeutralMode.Coast);
+    m_leftDrone.setNeutralMode(NeutralMode.Coast);
+    m_rightDrone.setNeutralMode(NeutralMode.Coast);
+
+}
+
+public void autoBreak(){
+  // check if the robot is stopped and if it is, set the brake mode if it not already in brake mode
+  if(Math.abs(m_leftMaster.getSelectedSensorVelocity())< 10 && Math.abs(m_rightMaster.getSelectedSensorVelocity())< 10){
+    
+    if(!breakmode && breaktimer.hasElapsed(1)){
+      setBrake();
+      breakmode = true;
+    }
+  }else{
+    breaktimer.reset();
+    if(breakmode){
+      setCoast();
+      breakmode = false;
+    }
+  }
+
+
+}
 
 // @Log(name = "left enc")
 public double getLeftPositionMeters(){
@@ -496,7 +673,7 @@ public double getRightPositionMeters(){
 
 
 
-@Log.ToString(name = "Pose", tabName = "Target Selector", rowIndex = 4, columnIndex = 8)
+@Log.ToString(name = "Pose", tabName = "TargetSelector", rowIndex = 4, columnIndex =6, width = 5, height = 1)
 public Pose2d getPose() {
     return m_poseEstimator.getEstimatedPosition();
 }
@@ -520,9 +697,9 @@ public double getGyroRoll(){
 }
 
 // @Log(name = "Gyro Pitch")
-public double getGyroPitch(){
-  return m_gyro.getPitch();
-}
+// public double getGyroPitch(){
+//   return m_gyro.getPitch();
+// }
 
 
 
@@ -534,22 +711,37 @@ public double getGyroPitch(){
 // public double rerror(){
 //   return m_rightMaster.getClosedLoopError();
 // }
+@Log.Graph(name = "leftsetp")
+public double leftsetp(){
+  return leftspeedtalon;
+}
+@Log.Graph(name = "rightsetp")
+public double rightsetp(){
+  return rightspeedtalon;
+}
+@Log.Graph(name = "leftspeed")
+public double leftspeed(){
+  return  ( m_leftMaster.getSelectedSensorVelocity());
+}
+@Log.Graph(name = "rightspeed")
+public double rightspeed(){
+  return ( m_rightMaster.getSelectedSensorVelocity());
+
+}
 
 
 
 
 
 
-
-
-private int distanceToNativeUnits(double positionMeters){
+private int distanceMToNativeUnits(double positionMeters){
   double wheelRotations = positionMeters/(2 * Math.PI * Units.inchesToMeters(kWheelRadiusInches));
   double motorRotations = wheelRotations * kSensorGearRatio;
   int sensorCounts = (int)(motorRotations * kCountsPerRev);
   return sensorCounts;
 }
 
-private int velocityToNativeUnits(double velocityMetersPerSecond){
+private int velocityMToNativeUnits(double velocityMetersPerSecond){
   double wheelRotationsPerSecond = velocityMetersPerSecond/(2 * Math.PI * Units.inchesToMeters(kWheelRadiusInches));
   double motorRotationsPerSecond = wheelRotationsPerSecond * kSensorGearRatio;
   double motorRotationsPer100ms = motorRotationsPerSecond / k100msPerSecond;
@@ -573,7 +765,7 @@ public void setSpeeds(Double left, Double right){
 
 private int moveTenFeet(){  //move 10 feet in native units
   double tenFeet = Units.feetToMeters(10);
-  int tenFeetNativeUnits = distanceToNativeUnits(tenFeet);
+  int tenFeetNativeUnits = distanceMToNativeUnits(tenFeet);
   return tenFeetNativeUnits;
 }                                
 

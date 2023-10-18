@@ -1,6 +1,6 @@
 package frc.robot.subsystems.arm;
 import frc.robot.subsystems.arm.Extend;
-
+import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -21,6 +21,8 @@ import io.github.oblarg.oblog.Loggable;
 import io.github.oblarg.oblog.annotations.Config;
 import io.github.oblarg.oblog.annotations.Log;
 import java.lang.annotation.Target;
+
+import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.CANSparkMax.ControlType;
@@ -36,13 +38,11 @@ public class Arm extends SubsystemBase implements Loggable{
 public final Extend s_extend;
 public final Raise s_raise;
 
-public final CANSparkMax m_gripMotor;
-
+public final CANSparkMax m_masterGripMotor;
+public final CANSparkMax m_droneGripMotor;
 
 
 RelativeEncoder m_gripEncoder;
-
-
 
 
 SparkMaxPIDController m_gripPID;
@@ -60,7 +60,7 @@ private final double k_minClawPos = 0;
 
 // private final double k_rangeLengthPos = k_maxLengthPos - k_minLengthPos;
 // private final double k_rangeLeanglePos = k_maxLeanglePos- k_minLeanglePos;
-final static double k_rangeExtentPos = 55;
+public final static double k_rangeExtentPos = 55;
 final static double k_rangeLeanglePos =116;//needs to be tuned, adjust tilll the arm is at the right angle at bottom should be nearly correct
 
 private final double k_rangeClawPos = k_maxClawPos - k_minClawPos; //also should be checked and tuned
@@ -100,13 +100,13 @@ private final double k_ticksPerInchGrip= 1;
   //pid constants
 
 //grip
-  public final double kPG = 1;
+  public final double kPG = 0.0001;
   public final double kIG = 0;
-  public final double kDG = 0;
+  public final double kDG = 0.001;
   public final double kIzG = 0;
-  public final double kFFG = 0; 
-  public final double kMaxOutputG = 0.3;//grip open?
-  public final double kMinOutputG = 0.3;//grip close?
+  public final double kFFG = 0.0001; 
+  public final double kMaxOutputG = 1;//grip open?
+  public final double kMinOutputG = 1;//grip close?
   public final double maxRPMG = 5;
   public final double maxAccelG = 2;
 
@@ -114,7 +114,7 @@ private final double k_ticksPerInchGrip= 1;
   public double vExtendSetPos = 0;
 
   public double vRaisePos = 0;
-  public double vGripPos = 0;
+  public double vGripSpeed = 0;
 
   // @Log.Graph(name = "minArmHeight")
   public double vMaxExtention = 0;
@@ -123,13 +123,15 @@ private final double k_ticksPerInchGrip= 1;
   public double k_targetRaisePosHigh;
   public double k_targetExtPosHigh;
   public double k_targetGripPosHigh;
+  private double eRetractPos=0;
+  private double rRetractPos=0;
 
 
 // private final AbsoluteEncoder m_Encoder;
 
 @Log(name = "Grip Motor Temp", tabName = "Extend", rowIndex =4 , columnIndex = 5)
      public double gripMotorTemp(){
-      return m_gripMotor.getMotorTemperature();
+      return m_masterGripMotor.getMotorTemperature();
      }
 
 //Sets max velocity, acceleration, and state
@@ -138,23 +140,26 @@ private final double k_ticksPerInchGrip= 1;
     s_extend = new Extend();
     s_raise = new Raise();
 
-   m_gripMotor = new CANSparkMax(22,MotorType.kBrushless) ;
-   m_gripMotor.setInverted(true);
+   m_masterGripMotor = new CANSparkMax(22,MotorType.kBrushless);
+   m_droneGripMotor = new CANSparkMax(23, MotorType.kBrushless);
+
+  //  m_droneGripMotor.setInverted(true);
+   m_droneGripMotor.follow(m_masterGripMotor, true);
    //cuewnt limit
    
-   m_gripMotor.setSmartCurrentLimit(10,28,0);
+   m_masterGripMotor.setSmartCurrentLimit(10,28,0);
 
    // neutral mode
       
-   m_gripMotor.setIdleMode(IdleMode.kBrake);
+   m_masterGripMotor.setIdleMode(IdleMode.kBrake);
 
   //encoder
     
-    m_gripEncoder = m_gripMotor.getEncoder();
+    m_gripEncoder = m_masterGripMotor.getEncoder();
 
     // pid controllers
    
-    m_gripPID = m_gripMotor.getPIDController();
+    m_gripPID = m_masterGripMotor.getPIDController();
     
     m_gripPID.setP(kPG,0);
     m_gripPID.setI(kIG,0);
@@ -162,7 +167,10 @@ private final double k_ticksPerInchGrip= 1;
     m_gripPID.setIZone(kIzG,0);
     m_gripPID.setFF(kFFG,0);
     m_gripPID.setOutputRange(-kMinOutputG, kMaxOutputG,0);
-
+    // m_masterGripMotor.setClosedLoopRampRate(0.2);
+    // m_droneGripMotor.setClosedLoopRampRate(0.2);
+       m_masterGripMotor.setClosedLoopRampRate(0.2);
+    m_droneGripMotor.setClosedLoopRampRate(0.2);
     int kSlotIdxG = 0;
     m_gripPID.setSmartMotionMaxVelocity(maxRPMG, kSlotIdxG);
     m_gripPID.setSmartMotionMinOutputVelocity(-maxRPMG, kSlotIdxG);
@@ -189,109 +197,139 @@ private final double k_ticksPerInchGrip= 1;
  public void setArmPosition(Translation2d position){
     //takes in a pose and sets the arm to that position
     Translation2d setpoints = cartToPosRatio(position.getX(), position.getY());
-    System.out.println("position"+position);
-    System.out.println("setpoints"+ setpoints);
+    // System.out.println("position"+position);
+    // System.out.println("setpoints"+ setpoints);
     
     setRaisePosition(setpoints.getX()); 
     setExtendPositionArbFF(setpoints.getY());
 
  }
- 
+ @Log(name = "grip speed", tabName = "Arm", rowIndex = 3, columnIndex = 6)
+ double getGripSpeed(){
+  return m_gripEncoder.getVelocity();
+ }
+ @Log.Graph(name = "grip error", tabName = "Arm", rowIndex = 3, columnIndex = 6)
+ double gripPercentError(){
+  return (m_gripEncoder.getVelocity()-vGripSpeed  )/vGripSpeed*100;
+ }
 
-  // public void setArmPositionSafe (double angleR, double extentR){
-  //     //takes in Setpoints and sets the arm to that position 
-  //     //;retracts the arm if the arm if the angle would makie it incorectly positioned
-  //     //extent =  extentPosToExtent(extentPos)
-  //     //angle = anglePosToAngle(anglePos)
-  //    //height = extent * sin(angle) + pivotHeight
-  //     //length = extent * cos(angle) -  columtToFront
-  //     //raisePos = angleToLeangle(angle)
-  //     //maxHeight = 1.87m
-  //     //minHeight = 0.15m
-  //     //maxLength = 1.1m
-  //     //pivotHeight = 0.33m
-  //     //columtToFront = 0.46m
-  //     //leangle is the angle of the arm
-  //     //raise is the angle of the arm
-  //     double leanglePos = s_raise.mapInput(angleR);
-  //     double extentPos = s_extend.mapInput(extentR);
-      
-  //     double angle = leanglePosToAngle(leanglePos);
-  //     double extent = extentPosToExtent(extentPos);
-
-  //     System.out.println("angle"+angle);
-  //     double height = extent * Math.sin(Math.toRadians( angle)) + k_pivotHeight;
-  //     double length = extent * Math.cos(Math.toRadians( angle)) - k_columToFront;
-  //     System.out.println("height"+ height);
-  //     System.out.println("length"+length);
-
-  //     if (height > k_maxHeight){
-  //       extentPos = extentToExtentPos ( (k_maxHeight- k_pivotHeight ) / Math.sin(Math.toRadians( angle)));
-  //       extent = extentPosToExtent(extentPos);
-  //       length = extent * Math.cos(Math.toRadians( angle)) - k_columToFront;
-  //       // angle = Math.atan((k_maxHeight-k_pivotHeight)/length)
-  //       ;
-  //       // leanglePos = angleToLeanglePos(angle);
-  //     }
-  //     if(height < k_minArmHeight){
-  //       extentPos = extentToExtentPos((( k_pivotHeight-k_minArmHeight )) / Math.sin(angle)*-1);
-  //       extent = extentPosToExtent(extentPos);
-  //       length = extent * Math.cos(Math.toRadians( angle)) - k_columToFront;
-  //       // angle = Math.toDegrees(Math.atan((k_pivotHeight-k_minArmHeight)/length))*-1;
-  //       // leanglePos = angleToLeanglePos(angle);
-  //     }
-  //     if(length > k_maxLength){
-  //       extentPos = extentToExtentPos((k_maxLength + k_columToFront)/Math.cos(Math.toRadians( angle)));
-  //       extent = extentPosToExtent(extentPos);
-  //       height = extent * Math.sin(Math.toRadians( angle)) + k_pivotHeight;
-  //       // angle = Math.toDegrees(Math.atan((height-k_pivotHeight)/k_maxLength));
-  //       // leanglePos = angleToLeanglePos(angle);
-  //     }
-  //     System.out.println("height f"+ height);
-  //     System.out.println("length f"+length);
-  //     double leanglePosRatio = leanglePos/k_rangeLeanglePos*2-1;
-  //     double extentPosRatio = extentPos/k_rangeExtentPos*2-1;
-
-  //     setRaisePosition(angleR); 
-  //     setExtendPositionArbFF(extentPosRatio);
-
-  //     //raise is the angle of the arm
-  
-  // }
   
   public  void setArmPositionSafe(double angleR, double extentR){
-
+    s_raise.updatesmoother(s_extend.getPosition());
     double expos = s_extend.mapInput(extentR);
     //pos max at horizontal =40
     // pos max at vert
-    double downfudge = s_extend.m_Encoder.getVelocity()<0?5:0;
-
+    // *Math.abs(s_raise.m_Encoder.getVelocity()) *0.001
+    double speedfudge = Math.abs(s_raise.m_Encoder.getVelocity())*Math.abs(s_raise.m_Encoder.getVelocity()) *0.0001*0.0001*Math.abs(Math.sin(Math.toRadians(getAngle())))
+    *(s_raise.m_Encoder.getVelocity()<0?1:1);
     // double fudge = getArmAngle()>0? getArmAngle()-10: getArmAngle()+5;
-    double fudge = Math.min(Math.abs(leanglePosToAngle(s_raise.mapInput(angleR))) ,Math.abs( getAngle()));
-    double maxExtent = (Units.inchesToMeters(39)+k_columToFront)/Math.abs(Math.cos(Math.toRadians(fudge)));
+    // double fudge = Math.min(Math.abs(leanglePosToAngle(s_raise.mapInput(angleR))) ,Math.abs( getAngle()));
+    double fudge = getAngle();
+    double maxExtent = (Units.inchesToMeters(38)+k_columToFront)/(1*Math.abs(Math.cos(Math.toRadians(fudge*0.8))));
     double maxExtension =  (Units.inchesToMeters(70)+k_pivotHeight)/Math.abs(Math.sin(Math.toRadians(fudge)));
+
+    
+    
     double max = Math.min(maxExtension,maxExtent);
+
+    maxExtent = maxExtent - speedfudge;
     
     double maxPos = extentToExtentPos(maxExtent);
+
 
     expos = Math.min(expos, maxPos);
     expos = expos/k_rangeExtentPos*2-1;
 
 
     expos = Math.min(expos,k_rangeExtentPos);
-    setRaisePosition(angleR);
+    
+    setRaisePositionArbFF(angleR);
+
     setExtendPositionArbFF(expos);
   }
- 
+  public  void setArmPositionSafeAuto(double angleR, double extentR){
+    s_raise.updatesmoother(s_extend.getPosition());
+    double expos = s_extend.mapInput(extentR);
+    //pos max at horizontal =40
+    // pos max at vert
+    // *Math.abs(s_raise.m_Encoder.getVelocity()) *0.001
+    double speedfudge = Math.abs(s_raise.m_Encoder.getVelocity())*Math.abs(s_raise.m_Encoder.getVelocity()) *0.0001*0.0001*Math.abs(Math.sin(Math.toRadians(getAngle())))
+    *(s_raise.m_Encoder.getVelocity()<0?1:1);
+    // double fudge = getArmAngle()>0? getArmAngle()-10: getArmAngle()+5;
+    // double fudge = Math.min(Math.abs(leanglePosToAngle(s_raise.mapInput(angleR))) ,Math.abs( getAngle()));
+    double fudge = getAngle();
+    double maxExtent = (Units.inchesToMeters(38)+k_columToFront)/(1*Math.abs(Math.cos(Math.toRadians(fudge*0.8))));
+    double maxExtension =  (Units.inchesToMeters(70)+k_pivotHeight)/Math.abs(Math.sin(Math.toRadians(fudge)));
+
+    
+    
+    double max = Math.min(maxExtension,maxExtent);
+
+    maxExtent = maxExtent - speedfudge;
+    
+    double maxPos = extentToExtentPos(maxExtent);
+
+
+    expos = Math.min(expos, maxPos);
+    expos = expos/k_rangeExtentPos*2-1;
+
+
+    expos = Math.min(expos,k_rangeExtentPos);
+    
+    setRaisePositionArbFFAuto(angleR);
+
+    setExtendPositionArbFFAuto(expos);
+  } 
 
  //Arbituary FF 
  public void setExtendPositionArbFF(double position){
- position = s_extend.mapInput(position);
-  double feedforward = s_extend.kFF_arb * Math.sin(Math.toRadians(getArmAngle())) + 0.25;
+ position = s_extend.mapInput(position)+eRetractPos;
+  double feedforward = s_extend.kFF_arb * Math.sin(Math.toRadians(getArmAngle())) + s_extend.kFF_arbC;//0.25
   vExtendSetPos= s_extend.setPosition(position, 0, feedforward);
     
   }
+  public void setRaisePositionArbFF(double position){
+    position = s_raise.mapInput(position)+rRetractPos;
+     double feedforward = s_raise.karb_ffe * s_extend.getPosition()+ s_raise.karb_ffc;//0.25
+     
+     vExtendSetPos= s_raise.setPosition(position, 0, feedforward);
+       
+  }
+  public void setExtendPositionArbFFAuto(double position){
+    position = s_extend.mapInput(position)+eRetractPos;
+     double feedforward = s_extend.kFF_arb * Math.sin(Math.toRadians(getArmAngle())) + s_extend.kFF_arbC;//0.25
+     vExtendSetPos= s_extend.setPosition(position, 0, feedforward);
+       
+     }
+     public void setRaisePositionArbFFAuto(double position){
+       position = s_raise.mapInput(position)+rRetractPos;
+        double feedforward = s_raise.karb_ffe * s_extend.getPosition()+ s_raise.karb_ffc;//0.25
+        
+        vExtendSetPos= s_raise.setPositionAuto(position, 0, feedforward);
+          
+     }
 
+     public void setExtendVelocityArbFF(double velocity){
+     
+       double feedforward = s_extend.kFF_arb * Math.sin(Math.toRadians(getArmAngle())) +  s_extend.kFF_arbC;//0.25
+       vExtendSetPos= s_extend.setPosition(velocity, 0, feedforward);
+         
+       }
+      public void setRaiseVelocityArbFF(double velocity){
+         
+          double feedforward = s_raise.karb_ffe * s_extend.getPosition()+ s_raise.karb_ffc;//0.25
+          vExtendSetPos= s_raise.setVelocity(velocity,  feedforward);
+            
+          }
+     public void retract(){
+      eRetractPos=-1;
+      rRetractPos = 1;
+    
+    }
+    public void unRetract(){
+      eRetractPos=0;
+      rRetractPos=0;
+    }
  
 
 public void setExtendPosition(double position){
@@ -339,7 +377,7 @@ public void setRaisePosition(double position){
   //inpoutrange -1 to 1
   //pos 0 is fully raised
   //negative pos is goint down 
-  position = s_raise.mapInput(position);
+  position = s_raise.mapInput(position)+rRetractPos;
   vRaisePos=s_raise.setPosition(position, 0);
 
 }
@@ -357,7 +395,7 @@ public void setClawPosition(double position){
   position = position +1;
   position = position/2;
   position = position * k_rangeClawPos ;
-  vGripPos=position;
+  vGripSpeed=position;
   m_gripPID.setReference(position, CANSparkMax.ControlType.kPosition);
   
 
@@ -413,7 +451,7 @@ public void resetPosition(){
 
 
 //Kinematic helper methods
-@Log.ToString(name = "Arm Pose", tabName = "Target Selector", rowIndex = 4, columnIndex = 6)
+@Log.ToString(name = "Arm Pose", tabName = "TargetSelector", rowIndex = 4, columnIndex = 3, width = 3, height = 1)
 public Translation2d getArmPose(){
 
 double armangle = getArmAngle();
@@ -448,11 +486,11 @@ public double getArmAngle(){
   angle = angle -90;// i of arm  above or below horizontal
   
  //calibrated fudging
-  double measuredmin = -23.8;
+  double measuredmin = -25;
   double measuredmax = 62;
   double calcmin =-26.9;
   double calcmax = 52.4;
-  double zerooffset = -5.27;
+  double zerooffset = -6.27;
 
 
   angle =   (angle-calcmin)/(calcmax-calcmin)*(measuredmax-measuredmin)+measuredmin; 
@@ -523,7 +561,7 @@ double calcmax = 52.4;
 double zerooffset = -5.27;
 
 
-  angle =   (angle-measuredmin)/(calcmax-calcmin)*(measuredmax-measuredmin)+calcmin; 
+  angle =   (angle-measuredmin)/(measuredmax-measuredmin)*(calcmax-calcmin)+calcmin; 
 
 
 
@@ -619,13 +657,16 @@ public Command dropCargo(){
 }
 public Command dropCargo2(){
   return new SequentialCommandGroup(
-   
-    new InstantCommand(()->setArmPositionSafe(-0.45, 0.75),this),//slider values
+  
+    new InstantCommand(()->setArmPositionSafeAuto(-0.65, 0.75),this),//slider values  was(-0.45, 0.75)
     new WaitCommand(1),
-    new InstantCommand(()->setClawPosition(-1)),
+    new InstantCommand(()->setArmPositionSafeAuto(-0.43, 0.75),this),//slider values  was(-0.45, 0.75)
+    new WaitCommand(1.5),
+    new InstantCommand(() -> {
+     setGripSpeed(-450);},this),
     new WaitCommand(1),
     // new InstantCommand(()->setClawPosition(1)),
-    new InstantCommand( () -> setArmPositionSafe(-1,0.2),this),
+    new InstantCommand( () -> setArmPositionSafeAuto(-1,0.2),this),
     new WaitCommand(1),
     new InstantCommand(()->setArmPositionSafe(-1,-1),this),
     new WaitCommand(1)
@@ -639,7 +680,7 @@ public Command dropCargo2(){
 
 
 // Data Helper Methods
-@Log(name = "Extent Position")
+// @Log(name = "Extent Position")
 public double getExtendedPosition(){
   return s_extend.getPosition();
 }
@@ -659,17 +700,17 @@ public double getRaisedPosition(){
 // @Log(name = "Grip Position")
 // 
 // @Log(name = "Grip Position")
-public double getGripPosition(){
+public double getGrip(){
   return m_gripEncoder.getPosition();
 }
 
 @Log(name = "Grip Current")
 public double getGripCurrent(){
-  return m_gripMotor.getOutputCurrent();
+  return m_masterGripMotor.getOutputCurrent();
 }
 
 //more arbff tuning methods
-@Log(name = "Arm Angle", tabName = "Raise FF", rowIndex = 0, columnIndex = 1)
+// @Log(name = "Arm Angle", tabName = "Raise FF", rowIndex = 1, columnIndex = 1)
 public double getAngle(){
   return getArmAngle();
 }
@@ -692,20 +733,23 @@ public double getMaxKarbFFStoped(){
   return s_extend.getMaxVoltageStopped()/Math.sin(Math.toRadians(getArmAngle()));
 }
 
-@Log(name = "karbFF", tabName = "Raise FF", rowIndex = 2, columnIndex = 0)
+// @Log(name = "karbFF", tabName = "Raise FF", rowIndex = 2, columnIndex = 0)
 
 
 
 
 //oblog config methods
-@Config (name = "Grip Max Output", tabName = "Arm")
+// @Config (name = "Grip Max Output", tabName = "Arm")
 void setGripMaxOutput(@Config(defaultValueNumeric = kMaxOutputG) double gripPower, @Config(defaultValueNumeric = kMinOutputG) double releasePower){
   
   m_gripPID.setOutputRange(-gripPower, releasePower);
 }
 
- 
 
+public void setGripSpeed(double speed){
+  vGripSpeed = speed;
+   m_gripPID.setReference(speed, CANSparkMax.ControlType.kVelocity);
+}
 // @Config.NumberSlider (name = "min height", tabName = "Arm", min = 0, max = 8, defaultValue = d_minArmHeight)
 // @Config.NumberSlider (name = "min height", tabName = "Arm", min = 0, max = 8, defaultValue = d_minArmHeight)
 void setMinArmHeight( double minHeight){
@@ -725,7 +769,7 @@ void setMinArmHeight( double minHeight){
 // @Log.Graph(name = "Grip Setpoint")
 // double vGripPos(){
 //   return vGripPos;
-// }
+//}
 
 
   // @Log.Graph (name = "Raise Error", tabName = "Arm PID")
