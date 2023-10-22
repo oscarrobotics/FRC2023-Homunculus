@@ -46,11 +46,11 @@ import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.sensors.WPI_Pigeon2;
 
-import com.pathplanner.lib.PathPlanner;
-import com.pathplanner.lib.PathPlannerTrajectory;
-import com.pathplanner.lib.PathConstraints;
-import com.pathplanner.lib.PathPoint;
-import com.pathplanner.lib.commands.PPRamseteCommand;
+// import com.pathplanner.lib.PathPlanner;
+// import com.pathplanner.lib.PathPlannerTrajectory;
+// import com.pathplanner.lib.PathConstraints;
+// import com.pathplanner.lib.PathPoint;
+// import com.pathplanner.lib.commands.PPRamseteCommand;
 
 import com.ctre.phoenix.motorcontrol.TalonFXSimCollection;
 import com.ctre.phoenix.sensors.BasePigeonSimCollection;
@@ -561,35 +561,35 @@ public class Drivetrain extends SubsystemBase implements Loggable {
   // }
 
 
-  public Command followTrajectoryCommand(PathPlannerTrajectory traj, boolean isFirstPath) {
-    return new SequentialCommandGroup(
-        new InstantCommand(() -> {
-          // Reset odometry for the first path you run during auto
-          if(isFirstPath){
-              this.resetOdometry(traj.getInitialPose());
-          }
-        }),
-         new PPRamseteCommand(traj,this::getPose, m_ramseteController, m_kinematics, this::setSpeeds, this)
+//   public Command followTrajectoryCommand(PathPlannerTrajectory traj, boolean isFirstPath) {
+//     return new SequentialCommandGroup(
+//         new InstantCommand(() -> {
+//           // Reset odometry for the first path you run during auto
+//           if(isFirstPath){
+//               this.resetOdometry(traj.getInitialPose());
+//           }
+//         }),
+//          new PPRamseteCommand(traj,this::getPose, m_ramseteController, m_kinematics, this::setSpeeds, this)
    
-    );
-}
+//     );
+// }
 
-public Command goToPoseCommand(Pose2d tpose, double speed, double accel) {
-  //take a target pose and generate a path to it
+// public Command goToPoseCommand(Pose2d tpose, double speed, double accel) {
+//   //take a target pose and generate a path to it
 
     
-    Pose2d ipose = this.getPose();
-    PathPlannerTrajectory traj  = PathPlanner.generatePath(
-    new PathConstraints(4, 3), 
-    new PathPoint(ipose.getTranslation(), ipose.getRotation()), // position, heading
-    new PathPoint(tpose.getTranslation(), tpose.getRotation()) // position, heading
-    );
+//     Pose2d ipose = this.getPose();
+//     PathPlannerTrajectory traj  = PathPlanner.generatePath(
+//     new PathConstraints(4, 3), 
+//     new PathPoint(ipose.getTranslation(), ipose.getRotation()), // position, heading
+//     new PathPoint(tpose.getTranslation(), tpose.getRotation()) // position, heading
+//     );
     
 
 
 
-  return followTrajectoryCommand(traj, false);
-}
+//   return followTrajectoryCommand(traj, false);
+// }
 
   public void updateOdometry() {
     Rotation2d rotation = m_gyro.getRotation2d();
