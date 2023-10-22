@@ -146,7 +146,7 @@ public double  mapInput(double position){
   // m_PID.setReference(position-2, CANSparkMax.ControlType.kPosition, slot);
   return position;
 }
-public double setPosition(double position, int slot, double feedforward){
+public double setPosition(double position, int slot, double feedforward, boolean isStowed){
   // if (Math.abs(position-vSetPos)<3 && settlTimer.hasElapsed(2)){
   //   position = m_Encoder.getPosition();
       
@@ -159,7 +159,16 @@ public double setPosition(double position, int slot, double feedforward){
 
   vSetPos = position;
 
+  
+  /*Added Stowing algorithm --> if the arm is stowed, set the voltage to 0 (since we're not using the arm in that case, and providing the
+   * unextended arm extra voltage would be unnecessary.)
+   */
+  if(isStowed){
   m_PID.setReference(position, CANSparkMax.ControlType.kPosition, slot, feedforward);
+  }
+  else{
+    m_PID.setReference(0, ControlType.kVoltage);
+  }
   return position;
 }
 

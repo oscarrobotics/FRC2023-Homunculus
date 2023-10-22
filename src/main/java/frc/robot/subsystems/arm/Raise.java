@@ -89,7 +89,7 @@ SparkMaxPIDController m_PID;
       
     // }
 
-    public double  mapInput(double position){
+    public double mapInput(double position){
       //inpoutrange -1 to 1
         // pos zero is fully retracted
         //1 is fully Raiseed

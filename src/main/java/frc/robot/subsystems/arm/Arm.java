@@ -201,7 +201,7 @@ private final double k_ticksPerInchGrip= 1;
     // System.out.println("setpoints"+ setpoints);
     
     setRaisePosition(setpoints.getX()); 
-    setExtendPositionArbFF(setpoints.getY());
+    setExtendPositionArbFF(setpoints.getY(), isStowed());
 
  }
  @Log(name = "grip speed", tabName = "Arm", rowIndex = 3, columnIndex = 6)
@@ -245,7 +245,7 @@ private final double k_ticksPerInchGrip= 1;
     
     setRaisePositionArbFF(angleR);
 
-    setExtendPositionArbFF(expos);
+    setExtendPositionArbFF(expos, isStowed());
   }
   public  void setArmPositionSafeAuto(double angleR, double extentR){
     s_raise.updatesmoother(s_extend.getPosition());
@@ -282,10 +282,10 @@ private final double k_ticksPerInchGrip= 1;
   } 
 
  //Arbituary FF 
- public void setExtendPositionArbFF(double position){
+ public void setExtendPositionArbFF(double position, boolean isStowed){
  position = s_extend.mapInput(position)+eRetractPos;
   double feedforward = s_extend.kFF_arb * Math.sin(Math.toRadians(getArmAngle())) + s_extend.kFF_arbC;//0.25
-  vExtendSetPos= s_extend.setPosition(position, 0, feedforward);
+  vExtendSetPos= s_extend.setPosition(position, 0, feedforward, isStowed);
     
   }
   public void setRaisePositionArbFF(double position){
@@ -298,7 +298,7 @@ private final double k_ticksPerInchGrip= 1;
   public void setExtendPositionArbFFAuto(double position){
     position = s_extend.mapInput(position)+eRetractPos;
      double feedforward = s_extend.kFF_arb * Math.sin(Math.toRadians(getArmAngle())) + s_extend.kFF_arbC;//0.25
-     vExtendSetPos= s_extend.setPosition(position, 0, feedforward);
+     vExtendSetPos= s_extend.setPosition(position, 0, feedforward, isStowed());
        
      }
      public void setRaisePositionArbFFAuto(double position){
@@ -312,7 +312,7 @@ private final double k_ticksPerInchGrip= 1;
      public void setExtendVelocityArbFF(double velocity){
      
        double feedforward = s_extend.kFF_arb * Math.sin(Math.toRadians(getArmAngle())) +  s_extend.kFF_arbC;//0.25
-       vExtendSetPos= s_extend.setPosition(velocity, 0, feedforward);
+       vExtendSetPos= s_extend.setPosition(velocity, 0, feedforward, isStowed());
          
        }
       public void setRaiseVelocityArbFF(double velocity){
@@ -791,5 +791,7 @@ void setMinArmHeight( double minHeight){
       return true;
     }
     return false;
+
+}
 
 }
