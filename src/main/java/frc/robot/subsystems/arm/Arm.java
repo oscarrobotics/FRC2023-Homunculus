@@ -49,7 +49,7 @@ SparkMaxPIDController m_gripPID;
 
 
 private final double k_maxLengthPos = 55;//38.3//postion at the max length we mesures in units
-private final double k_minLengthPos = 0;//postion at the max length we mesures in units
+private final double k_minLengthPos = 0;//postion at the min length we mesures in units
 
 
 
@@ -784,10 +784,9 @@ void setMinArmHeight( double minHeight){
   @Log(name = "Is Stowed")
   public boolean isStowed(){
 
-    double thetaThreshold = -24;
-    double extThreshold = 0.06;
-
-    if(getArmAngle() > thetaThreshold && getExtent() < extThreshold){
+    double thetaThreshold = 55;
+  
+    if(getArmAngle() > thetaThreshold){
       return true;
     }
     return false;

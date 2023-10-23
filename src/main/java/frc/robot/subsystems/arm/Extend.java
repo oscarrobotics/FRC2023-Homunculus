@@ -162,8 +162,12 @@ public double setPosition(double position, int slot, double feedforward, boolean
   
   /*Added Stowing algorithm --> if the arm is stowed, set the voltage to 0 (since we're not using the arm in that case, and providing the
    * unextended arm extra voltage would be unnecessary.)
+   * 
+   * Keep note of DeMorgen's Law for boolean operators
+   * 
+   * Also make sure to fix limits
    */
-  if(isStowed){
+  if(!isStowed || (position > 4 || getPosition() > 4)){
   m_PID.setReference(position, CANSparkMax.ControlType.kPosition, slot, feedforward);
   }
   else{
